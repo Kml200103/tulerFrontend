@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+   
+}
+.swiper-pagination {
+   padding: 10px;
+    margin-bottom: -20px !important; /* Adjust spacing as needed */
+    position: relative;
+    margin: 10px; /* Keeps it below the slider */
+  }
+
+  .swiper-pagination{
+    position: relative !important;
+  }
+  .swiper {
+    margin-top: 100px !important;
+    margin-bottom: 100px;
+  }
