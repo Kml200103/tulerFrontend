@@ -3,10 +3,10 @@ import { Link } from "react-router";
 import NavigationLinks from "./NavigationLinks";
 import SocialIcons from "./SocialIcons";
 
-export default function Header() {
+export default function Header({ toggleSearchInput }) {
   return (
     <nav
-      className="flex items-center justify-around px-6 py-4"
+      className="flex bg-sky-50 mb-10 items-center max-h-[308px] justify-around px-6 py-4"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -20,7 +20,7 @@ export default function Header() {
       </Link>
       <div className="flex gap-6 items-center">
         <NavigationLinks />
-        <SocialIcons />
+        <SocialIcons toggleSearchInput={toggleSearchInput} />
       </div>
     </nav>
   );

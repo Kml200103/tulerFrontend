@@ -1,0 +1,27 @@
+.cart-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 400px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
+  overflow: hidden;
+  z-index: 50;
+  transform: translateX(100%); /* Start off-screen */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.cart-container.open {
+  transform: translateX(0); /* Slide in */
+}
+
+.cart-container.closed {
+  transform: translateX(100%); /* Slide out */
+}
+
+.fade-out {
+  opacity: 0; /* Fade out */
+  transition: opacity 0.3s ease; /* Smooth transition for fade */
+}
