@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Slider from "@mui/material/Slider";
 import ProductCard from "./ProductCard";
 
 const products = [
@@ -30,6 +29,17 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState(100); // Set your max price according to your product range
   const [filteredProducts, setFilteredProducts] = useState(products); // Initialize with all products
 
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    const parsedValue = Math.max(0, Number(value)); // Prevent negative values
+
+    if (name === "min") {
+      setMinPrice(parsedValue > maxPrice ? maxPrice : parsedValue);
+    } else {
+      setMaxPrice(parsedValue < minPrice ? minPrice : parsedValue);
+    }
+  };
   // Function to filter products based on price range
   const applyFilter = () => {
     const newFilteredProducts = products.filter((product) => {
@@ -87,7 +97,7 @@ const Products = () => {
               <div className="self-start mt-4 text-2xl font-semibold leading-[32px] text-neutral-700">
                 Filter by price
               </div>
-              <Slider
+              {/* <Slider
                 value={[minPrice, maxPrice]}
                 onChange={(event, newValue) => {
                   setMinPrice(Math.max(0, newValue[0])); // Prevent negative value
@@ -127,6 +137,54 @@ const Products = () => {
                 <div className="self-end text-sm font-medium text-black">
                   <button
                     className="bg-transparent text-black border-none px-4 py-2 rounded"
+                    onClick={applyFilter}
+                  >
+                    Filter
+                  </button>
+                </div>
+              </div> */}
+              <div className="w-full max-w-md mx-auto">
+                <div className="relative w-full h-2 bg-gray-300 rounded-full">
+          
+                  <div
+                    className="absolute h-2 bg-yellow-400 rounded-full"
+                    style={{
+                      left: `${(minPrice / 100) * 100}%`,
+                      width: `${((maxPrice - minPrice) / 100) * 100}%`,
+                    }}
+                  ></div>
+
+                  <input
+                    type="range"
+                    name="min"
+                    min="0"
+                    max="100"
+                    value={minPrice}
+                    onChange={handleChange}
+                    className="absolute w-full h-2 opacity-0 cursor-pointer"
+                    style={{ zIndex: 1 }}
+                  />
+
+                  {/* Max Price Thumb */}
+                  <input
+                    type="range"
+                    name="max"
+                    min="0"
+                    max="100"
+                    value={maxPrice}
+                    onChange={handleChange}
+                    className="absolute w-full h-2 opacity-0 cursor-pointer"
+                    style={{ zIndex: 1 }}
+                  />
+                </div>
+
+                {/* Price Display & Filter Button */}
+                <div className="flex justify-between items-center mt-4">
+                  <div className="text-sm text-gray-600">
+                    Price: ${minPrice} - ${maxPrice}
+                  </div>
+                  <button
+                    className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 transition"
                     onClick={applyFilter}
                   >
                     Filter
@@ -200,9 +258,8 @@ const Products = () => {
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product, idx) => (
                 <div
-                  className={`flex flex-col ${
-                    idx !== 0 && "ml-2"
-                  } w-[30%] max-md:ml-0 max-md:w-full mb-5`}
+                  className={`flex flex-col ${idx !== 0 && "ml-2"
+                    } w-[30%] max-md:ml-0 max-md:w-full mb-5`}
                   key={idx}
                 >
                   <ProductCard

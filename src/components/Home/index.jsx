@@ -11,7 +11,6 @@ import "swiper/css/pagination";
 import HoneyBlend from "../HoneyTypes/HoneyBlend";
 import { HoneyCard } from "../HoneyTypes/HoneyCard";
 import { BenefitCard } from "../Benefit/BenefitCard";
-import { Star } from "lucide-react";
 import TestimonialCard from "../Testimonial/TestimonialCard";
 import { Footer } from "../Footer";
 
@@ -212,56 +211,7 @@ const Home = () => {
         </div>
       )}
 
-      {/* <section className="relative flex flex-col rounded-none min-h-screen z-0">
-        <div className="absolute inset-0 w-full h-full">
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ddb1fa88ca4b0c3524cb240aac2344eece0ebd481a450f426db26840a551e623?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-            alt="Honey background texture"
-            className="object-cover w-full h-full"
-          />
-        </div>
 
-        <div className="relative flex flex-col items-center px-16 pt-52 pb-6 w-full min-h-[774px] max-md:px-5 max-md:pt-24 max-md:max-w-full">
-          <div className="relative ml-7 w-full max-w-[1425px] max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-[43%] max-md:w-full">
-                <div className="flex flex-col mt-44 max-md:mt-10 max-md:max-w-full">
-                  <h1 className="self-start text-xl text-neutral-900 tracking-[3px]">
-                    FRESH & SWEET AS HONEY
-                  </h1>
-                  <div className="mt-2.5 text-base font-medium text-neutral-900 tracking-[2.4px] max-md:max-w-full">
-                    <span className="text-8xl font-extrabold tracking-wider text-neutral-900">
-                      HONEYBEE
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-start pr-20 pl-1.5 mt-16 max-md:pr-5 max-md:mt-10 max-md:max-w-full">
-                    <p className="text-xl font-extrabold tracking-wide text-neutral-700 max-md:max-w-full">
-                      Lorem ipsum dolor sit amet, sint nostrum mea ut, vel
-                      semper vidisse eu usu temporibus disputationi voluptatibus
-                      in ei est possit salutandi abhorrea acusa
-                    </p>
-                    <button
-                      className="px-9 py-5 mt-12 text-lg font-medium text-black bg-yellow-400 rounded-[30px] max-md:px-5 max-md:mt-10"
-                      aria-label="Shop Honey"
-                    >
-                      Shop Honey
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/b9afe11d945d503470a5a7cc9414c5bfb31d6dcbbed536adc2a604270d16e39a?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-                  alt="Honey product showcase"
-                  className="object-contain grow w-full aspect-[1.37] max-md:mt-10 max-md:max-w-full"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section> */}
       <section>
         <div className="flex relative flex-col items-center px-16 pt-56 pb-6 w-full rounded-none min-h-[774px] max-md:px-5 max-md:pt-24 max-md:max-w-full">
           <img

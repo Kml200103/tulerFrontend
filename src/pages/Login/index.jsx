@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { NotificationService } from "../../services/Notifcation";
+import { useLoginUserMutation } from "../../services/http/userService";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,20 +15,24 @@ const Login = () => {
   } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loginUser] = useLoginUserMutation()
+
   const { isLoggedIn } = useSelector((state) => state.auth);
 
+
   const onSubmit = (data) => {
-    // Simulate a login attempt
-    console.log(data);
 
-    const success = true; // Replace with actual login logic
+    loginUser(data).then((res) => {
+      localStorage.setItem("userToken", res?.data?.token)
 
-    if (success) {
-      NotificationService.sendSuccessMessage("Login successful!");
-      navigate("/");
-    } else {
-      NotificationService.sendErrorMessage("Login failed. Please try again.");
-    }
+      // if (success) {
+      //   NotificationService.sendSuccessMessage("Login successful!");
+      //   navigate("/");
+      // } else {
+      //   NotificationService.sendErrorMessage("Login failed. Please try again.");
+      // }
+    })
+
   };
 
   useEffect(() => {
@@ -64,9 +69,8 @@ const Login = () => {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
             })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
-              errors.email ? "border-red-400" : "border-gray-300"
-            } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.email ? "border-red-400" : "border-gray-300"
+              } border-solid text-neutral-700`}
           />
           {errors.email && (
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
@@ -148,9 +152,8 @@ const Login = () => {
               required: "Password is required",
             })}
             autoComplete="current-password"
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
-              errors.password ? "border-red-400" : "border-gray-300"
-            } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.password ? "border-red-400" : "border-gray-300"
+              } border-solid text-neutral-700`}
           />
           <button
             type="button"

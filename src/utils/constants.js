@@ -24,3 +24,6 @@ export const honeyTypes = [
       "https://cdn.builder.io/api/v1/image/assets/TEMP/669e15bde4a287bf027d8b1bfdc30b400579aa5ccaa19f36f80ac1d362490c6b?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
   },
 ];
+
+
+export const apiUrl='http://localhost:3001/api'
