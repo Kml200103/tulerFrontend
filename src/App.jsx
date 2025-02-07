@@ -17,14 +17,15 @@ import Checkout from "./pages/Checkout";
 import ProfilePage from "./pages/Profile";
 
 import Loader from "./components/Loader";
+import ProtectedRoute from "./components/Protected/ProtectedRoute";
 
 
 export default function App() {
   return (
     <Provider store={store}>
-    
+
       <BrowserRouter>
-      <Loader />
+        <Loader />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -69,9 +70,11 @@ export default function App() {
             path="/checkout"
             element={
               Layout ? (
+                <ProtectedRoute>
                 <Layout.main>
                   <Checkout />
                 </Layout.main>
+                </ProtectedRoute>
               ) : (
                 <Checkout />
               )
@@ -81,9 +84,11 @@ export default function App() {
             path="/profile"
             element={
               Layout ? (
-                <Layout.main>
-                  <ProfilePage />
-                </Layout.main>
+                <ProtectedRoute>
+                  <Layout.main>
+                    <ProfilePage />
+                  </Layout.main>
+                </ProtectedRoute>
               ) : (
                 <ProfilePage />
               )
