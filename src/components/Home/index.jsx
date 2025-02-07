@@ -30,13 +30,13 @@ const honeyProducts = [
     imageSrc:
       "https://cdn.builder.io/api/v1/image/assets/TEMP/0e9b6e00a8de9ea90a3e99cb6c679e7cf784e10f40d8aa715a712fae8cd185cf?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
   },
-  // {
-  //   title: "HONEY BLEND",
-  //   description:
-  //     "A honey blend refers to a product that combines natural honey with other ingredients, such as additional sweeteners",
-  //   imageSrc:
-  //     " https://cdn.builder.io/api/v1/image/assets/TEMP/669e15bde4a287bf027d8b1bfdc30b400579aa5ccaa19f36f80ac1d362490c6b?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-  // },
+  {
+    title: "HONEY BLEND",
+    description:
+      "A honey blend refers to a product that combines natural honey with other ingredients, such as additional sweeteners",
+    imageSrc:
+      " https://cdn.builder.io/api/v1/image/assets/TEMP/669e15bde4a287bf027d8b1bfdc30b400579aa5ccaa19f36f80ac1d362490c6b?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
+  },
 ];
 
 const products = [
@@ -199,12 +199,11 @@ const Home = () => {
         <div className="flex gap-6 items-center">
           <NavigationLinks />
           <SocialIcons toggleSearchInput={toggleSearchInput} />{" "}
-          {/* Pass the toggle function */}
         </div>
       </nav>
+
       {isSearchInputOpen && (
         <div className="absolute z-50 left-1/2 top-32 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-96">
-          {/* Outer div with rounded border */}
           <input
             type="text"
             placeholder="Search products..."
@@ -213,7 +212,7 @@ const Home = () => {
         </div>
       )}
 
-      <section className="relative flex flex-col rounded-none min-h-screen z-0">
+      {/* <section className="relative flex flex-col rounded-none min-h-screen z-0">
         <div className="absolute inset-0 w-full h-full">
           <img
             loading="lazy"
@@ -262,9 +261,60 @@ const Home = () => {
             </div>
           </div>
         </div>
+      </section> */}
+      <section>
+        <div className="flex relative flex-col items-center px-16 pt-56 pb-6 w-full rounded-none min-h-[774px] max-md:px-5 max-md:pt-24 max-md:max-w-full">
+          <img
+            loading="lazy"
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+            alt=""
+            className="object-cover absolute inset-0 size-full"
+          />
+          <div className="relative ml-8 w-full max-w-[1422px] max-md:max-w-full">
+            <div className="flex gap-5 max-md:flex-col">
+              <div className="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
+                <div className="flex relative flex-col mt-40 max-md:mt-10 max-md:max-w-full">
+                  <div className="self-start text-xl text-neutral-900 tracking-[3px]">
+                    <span className="font-medium text-neutral-900">
+                      FRESH & SWEET AS HONEY
+                    </span>
+                  </div>
+                  <div className="mt-2 text-base font-medium text-neutral-900 tracking-[2.4px] max-md:max-w-full">
+                    <span className="text-8xl font-extrabold tracking-wider text-neutral-900">
+                      HONEYBEE
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-start pr-20 pl-1.5 mt-14 max-md:pr-5 max-md:mt-10 max-md:max-w-full">
+                    <div className="text-xl font-extrabold tracking-wide text-neutral-700 max-md:max-w-full">
+                      <span className="leading-7 text-neutral-700">
+                        Lorem ipsum dolor sit amet, sint nostrum mea ut, vel
+                        semper vidisse eu usu temporibus disputationi
+                        voluptatibus in ei est possit salutandi abhorrea acusa
+                      </span>
+                    </div>
+                    <button
+                      className="px-9 py-5 mt-11 text-lg font-medium text-black bg-yellow-400 rounded-[30px] max-md:px-5 max-md:mt-10"
+                      tabIndex="0"
+                    >
+                      Shop Honey
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/9f4153f0473c59ba62497d0b2c178a37869743aa7dbb9d1e43206ae2d4e47c43?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Honey product showcase"
+                  className="object-contain grow w-full aspect-[1.41] max-md:mt-10 max-md:max-w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <div className=" container rounded-custom pt-5 ">
+      <div className=" container rounded-xl pt-5 ">
         <div className="flex gap-5 max-md:flex-col">
           {honeyProducts.map((honey) => (
             <HoneyCard
@@ -274,85 +324,10 @@ const Home = () => {
               image={honey.imageSrc}
             />
           ))}
-          <HoneyBlend />
         </div>
       </div>
 
-      <div className=" flex flex-col pt-1.5 rounded-none mt-10">
-        <div className="flex flex-col items-center px-20 pb-10 w-full bg-orange-50 max-md:px-5 max-md:max-w-full">
-          <div className="flex flex-col items-center mt-0 w-full max-w-[1440px] max-md:max-w-full">
-            <div className="text-xl mt-3 font-semibold text-center text-yellow-400">
-              Shop our
-            </div>
-            <div className="mt-1.5 text-5xl font-extrabold text-center text-neutral-900 max-md:max-w-full max-md:text-4xl">
-              Best Sellers
-            </div>
-          </div>
-          <div className=" container self-stretch mt-28 max-md:mt-10 max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              {products.map((product, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full"
-                >
-                  {/* Outer card - Added relative positioning here */}
-                  <div className="relative flex flex-col px-5 py-6 mt-2.5 w-full font-semibold bg-white rounded-xl shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:mt-10 max-md:max-w-full">
-                    {/* Discount Badge - Now positioned in the outer card */}
-                    {product.discount && (
-                      <div className="absolute -top-2 -right-2 px-4 py-2.5 text-sm font-extrabold bg-yellow-400 rounded-3xl">
-                        {product.discount}%
-                      </div>
-                    )}
-
-                    {/* Image Container */}
-                    <div className="flex flex-col items-center">
-                      <img
-                        src={product.imgSrc}
-                        alt={product.altText}
-                        className="object-contain self-stretch w-full rounded-xl aspect-[1.45]"
-                        loading="lazy"
-                      />
-                      <div className="mt-7 text-xl">{product.name}</div>
-                      <div className="flex gap-1 mt-2 max-w-full w-[101px]">
-                        {product.ratings.map((ratingSrc, index) => (
-                          <img
-                            key={index}
-                            src={ratingSrc}
-                            alt=""
-                            className="object-contain shrink-0 aspect-[1.13] w-[17px]"
-                            loading="lazy"
-                          />
-                        ))}
-                      </div>
-                      <div className="mt-4 text-base font-semibold text-center text-black">
-                        {product.price}
-                      </div>
-                      <div className="flex gap-2 items-start px-4 py-2.5 mt-5 max-w-full text-sm text-amber-300 bg-black rounded-3xl w-[147px]">
-                        <img
-                          src="https://cdn.builder.io/api/v1/image/assets/TEMP/c954dc3adb6d139179d898037ac514ca5661d905999476b792335b9808b3d43b?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                          alt=""
-                          className="object-contain shrink-0 self-start aspect-[1.04] w-[26px]"
-                          loading="lazy"
-                        />
-                        <div className="my-auto">Add to cart</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <button
-            className="px-16 py-3.5 mt-16 max-w-full bg-yellow-400 text-lg font-medium text-center text-black rounded-[90px] w-[230px] max-md:px-5 max-md:mt-10"
-            tabindex="0"
-          >
-            All Products
-          </button>
-        </div>
-      </div>
-
-      <div className=" flex flex-col items-center px-16 pt-32 pb-20 w-full bg-stone-50 max-md:px-5 max-md:pt-24 max-md:max-w-full">
+      <div className=" fle x flex-col items-center px-16 pt-32 pb-20 w-full bg-stone-50 max-md:px-5 max-md:pt-24 max-md:max-w-full">
         <div className="  ml-5 w-full max-w-[1455px] max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
             <div className="flex flex-col w-[28%] max-md:ml-0 max-md:w-full">
@@ -405,152 +380,142 @@ const Home = () => {
         </div>
       </div>
 
-      {/* <div className="flex flex-col rounded-none max-md:pr-5">
-        <div className="flex flex-col pb-28 w-full bg-sky-50 rounded-none max-md:pb-24 max-md:max-w-full">
-          <div className="flex flex-wrap gap-5 justify-between items-start w-full text-center max-w-[1459px] max-md:max-w-full">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/028e9fe3de5a717452f980dfc02e1d79980b9640ef58165189a444cdc6cd89b6?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-              className="object-contain shrink-0 self-start max-w-full aspect-[0.73] w-[172px]"
-              alt="Honey product logo"
-            />
-            <div className="flex flex-col items-center self-end mt-14 max-md:mt-10 max-md:max-w-full">
-              <div className="text-3xl font-semibold text-yellow-400">
-                Discover
-              </div>
-              <h1 className="mt-2.5 text-7xl font-extrabold text-neutral-900 max-md:max-w-full max-md:text-4xl">
-                The Benefits of Honey Products
-              </h1>
-              <p className="self-stretch mt-4 text-base font-medium leading-7 text-neutral-700 max-md:max-w-full">
-                The benefits of raw honey include the nutrients and antioxidants
-                it contains. Honey is also better for your blood sugar and your
-                heart, and it may promote healing. Honey is a syrupy liquid that
-                honeybees make from plant nectar.
-              </p>
-            </div>
+      {/* benefits section */}
+      <div
+        className="flex flex-col items-center mt-10 bg-sky-50 min-h-[1200px] relative"
+        style={{
+          borderBottomLeftRadius: "400px", // Increased radius for more rounding
+        }}
+      >
+        <img
+          loading="lazy"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/028e9fe3de5a717452f980dfc02e1d79980b9640ef58165189a444cdc6cd89b6?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+          alt="Product showcase"
+          className="absolute top-2 left-0 object-contain w-full aspect-[0.73] max-w-[172px]"
+        />
+
+        <div className="text-center mt-[118px] w-1/2">
+          <div className="text-3xl font-semibold text-yellow-400 mt-2">
+            Discover
           </div>
-          <div className=" container self-end mt-8 mr-0 mb-0 w-full max-w-[1525px] max-md:mb-2.5 max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-[37%] max-md:ml-0 max-md:w-full">
-                <div className="grow mt-10 max-md:max-w-full">
-                  <div className="flex gap-5 max-md:flex-col">
-                    <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                      <div className="flex flex-col text-base font-semibold text-center text-black max-md:mt-5">
-                        {benefitsData.slice(0, 2).map((benefit, index) => (
-                          <BenefitCard key={index} {...benefit} />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                      <div className="flex flex-col grow mt-36 text-base font-semibold text-center text-black max-md:mt-10">
-                        {benefitsData.slice(2, 4).map((benefit, index) => (
-                          <BenefitCard key={index} {...benefit} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col ml-5 w-[63%] max-md:ml-0 max-md:w-full">
-                <div className="max-md:mt-10 max-md:max-w-full">
-                  <div className="flex gap-5 max-md:flex-col">
-                    <div className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fed36deb61b9e117f7fcddfcb97436f0e01226088829c38667107a6667de04c?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                        className="object-contain grow w-full aspect-[0.96] max-md:mt-10 max-md:max-w-full"
-                        alt="Honey product showcase"
-                      />
-                    </div>
-                    <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/d857d7a41aa6e24fd3565682a060127691dc6b4b653120f18db444ab4728f4ce?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                        className="object-contain grow shrink-0 mt-96 max-w-full aspect-[0.74] w-[156px] max-md:mt-10"
-                        alt="Honey product detail"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="w-full text-7xl font-extrabold text-neutral-900 max-md:max-w-full max-md:text-4xl">
+            The Benefits of Honey Products
           </div>
         </div>
-      </div> */}
-      <div className="flex flex-col rounded-none max-md:pr-5">
-        <div className="flex flex-col pb-28 w-full bg-sky-50 rounded-none max-md:pb-24 max-md:max-w-full">
-          <div className="flex flex-wrap gap-5 justify-between items-start w-full text-center max-w-[1459px] max-md:max-w-full">
+        <div className="pt-0 mt-5 w-full text-base font-medium leading-7 text-center max-w-[950px] text-neutral-700 max-md:max-w-full">
+          The benefits of raw honey include the nutrients and antioxidants it
+          contains. Honey is also better for your blood sugar and your heart,
+          and it may promote healing. Honey is a syrupy liquid that honeybees
+          make from plant nectar.
+        </div>
+
+        <div className="flex mt-10 gap-[40px] mb-[200px]">
+          <div className="flex flex-wrap justify-center">
+            <div className="flex flex-col items-start gap-[35px] ">
+              <div className="relative w-full max-w-[243px] mt-20">
+                {" "}
+                {/* Container for positioning */}
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Featured content"
+                  className="object-contain w-full aspect-[1.12] max-w-[243px]"
+                />
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/e330948d463d832f7408f67b12aaaed494b0c359f56e8b63af980662d8b90aeb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt=""
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                />
+                <div className=" absolute top-28 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                  Promotes burn and <br />
+                  wound healing
+                </div>
+              </div>
+              <div className="relative w-full max-w-[243px] mt-20">
+                {" "}
+                {/* Container for positioning */}
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Featured content"
+                  className="object-contain w-full aspect-[1.12] max-w-[243px]"
+                />
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5c9a65e65eccbfd559a6ade45829a6d180a57ca242cf4d6e4b43f3b27682258?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt=""
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                />
+                <div className=" absolute top-32 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                  Better for blood <br />
+                  sugar levels
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start ml-4 mt-[200px] gap-[35px]">
+              <div className="relative w-full max-w-[243px] ">
+                {" "}
+                {/* Container for positioning */}
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Featured content"
+                  className="object-contain w-full aspect-[1.12] max-w-[243px]"
+                />
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/3614b1c4de446ef3c9c7e64c596ec50337cafc2826391996dc141e01a7c73805?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt=""
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                />
+                <div className=" absolute top-28 left-12 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                  Improve health and <br />
+                  immune support
+                </div>
+              </div>
+              <div className="relative w-full max-w-[243px] mt-20">
+                {" "}
+                {/* Container for positioning */}
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Featured content"
+                  className="object-contain w-full aspect-[1.12] max-w-[243px]"
+                />
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/81103e8ac05c90dcc9673a718695a05cd178db37719ae966daf5ab8e8609f6d5?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt=""
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                />
+                <div className=" absolute top-28 left-11 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                  Contains a variety <br />
+                  of nutrients
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
             <img
               loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/028e9fe3de5a717452f980dfc02e1d79980b9640ef58165189a444cdc6cd89b6?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-              className="object-contain shrink-0 self-start max-w-full aspect-[0.73] w-[172px]"
-              alt="Honey product logo"
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fed36deb61b9e117f7fcddfcb97436f0e01226088829c38667107a6667de04c?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+              alt="Featured content display"
+              className="object-contain w-full aspect-[0.96] max-w-[597px]"
             />
-            <div className="flex flex-col items-center self-end mt-14 max-md:mt-10 max-md:max-w-full">
-              <div className="text-3xl font-semibold text-yellow-400">
-                Discover
-              </div>
-              <h1 className="mt-2.5 text-7xl font-extrabold text-neutral-900 max-md:max-w-full max-md:text-4xl">
-                The Benefits of Honey Products
-              </h1>
-              <p className="self-stretch mt-4 text-base font-medium leading-7 text-neutral-700 max-md:max-w-full">
-                The benefits of raw honey include the nutrients and antioxidants
-                it contains. Honey is also better for your blood sugar and your
-                heart, and it may promote healing. Honey is a syrupy liquid that
-                honeybees make from plant nectar.
-              </p>
-            </div>
-          </div>
-          <div className="container self-end mt-8 mr-0 mb-0 w-full max-w-[1525px] max-md:mb-2.5 max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-[37%] max-md:ml-0 max-md:w-full">
-                <div className="grow mt-10 max-md:max-w-full">
-                  <div className="flex gap-5 max-md:flex-col">
-                    <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                      <div className="flex flex-col text-base font-semibold text-center text-black max-md:mt-5">
-                        {benefitsData.slice(0, 2).map((benefit, index) => (
-                          <BenefitCard key={index} {...benefit} />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                      <div className="flex flex-col grow mt-36 text-base font-semibold text-center text-black max-md:mt-10">
-                        {benefitsData.slice(2, 4).map((benefit, index) => (
-                          <BenefitCard key={index} {...benefit} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col ml-5 w-[63%] max-md:ml-0 max-md:w-full">
-                <div className="max-md:mt-10 max-md:max-w-full">
-                  <div className="flex gap-5 max-md:flex-col">
-                    <div className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fed36deb61b9e117f7fcddfcb97436f0e01226088829c38667107a6667de04c?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                        className="object-contain grow w-full aspect-[0.96] max-md:mt-10 max-md:max-w-full"
-                        alt="Honey product showcase"
-                      />
-                    </div>
-                    <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-                      <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/d857d7a41aa6e24fd3565682a060127691dc6b4b653120f18db444ab4728f4ce?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                        className="object-contain grow shrink-0 mt-96 max-w-full aspect-[0.74] w-[156px] max-md:mt-10"
-                        alt="Honey product detail"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
+
+        <img
+          loading="lazy"
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/504963f9f665c86d5d6664191f3b4697659eb9b172b1b67bcef6dbf6b660d7ad?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+          alt="Featured content"
+          className=" absolute right-0 bottom-0 object-contain w-full aspect-[0.9] max-w-[189px]"
+        />
       </div>
 
-      <div className="mt-4 flex flex-col pb-5 text-center">
+      <div className="mt-20 flex flex-col pb-5 text-center">
         <div className="z-10 self-center -mt-1.5 text-3xl font-semibold text-yellow-400">
           Testimonials
         </div>

@@ -45,7 +45,7 @@ export default function SocialIcons({ toggleSearchInput }) {
         <button
           className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
           aria-label="Visit our Social media icon 1"
-          onClick={toggleSearchInput}
+          onClick={toggleSearchInput} // Open search input on click
         >
           <img
             loading="lazy"
@@ -89,13 +89,20 @@ export default function SocialIcons({ toggleSearchInput }) {
         >
           {isLoggedIn ? (
             <div>
-              <p className="font-semibold text-center">Welcome, {userName}!</p>
               <div className="mt-2">
                 <Link
                   to="/profile"
                   className="block text-black text-center hover:underline"
                 >
                   Profile
+                </Link>
+              </div>
+              <div className="mt-2">
+                <Link
+                  to=""
+                  className="block text-black text-center hover:underline"
+                >
+                  Logout
                 </Link>
               </div>
             </div>

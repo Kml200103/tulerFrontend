@@ -7,9 +7,12 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: "Montserrat", sans-serif; /* Set Montserrat as the default font */
 }
+
 @layer components {
 }
+
 .swiper-pagination {
   padding: 10px;
   margin-bottom: -20px !important; /* Adjust spacing as needed */
