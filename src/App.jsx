@@ -13,11 +13,14 @@ import "react-toastify/dist/ReactToastify.css";
 import Register from "./pages/Register";
 import ContactPage from "./pages/Contact";
 import Checkout from "./pages/Checkout";
+import Loader from "./components/Loader";
 
 export default function App() {
   return (
     <Provider store={store}>
+    
       <BrowserRouter>
+      <Loader />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

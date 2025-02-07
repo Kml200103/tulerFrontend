@@ -11,7 +11,6 @@ import "swiper/css/pagination";
 import HoneyBlend from "../HoneyTypes/HoneyBlend";
 import { HoneyCard } from "../HoneyTypes/HoneyCard";
 import { BenefitCard } from "../Benefit/BenefitCard";
-import { Star } from "lucide-react";
 import TestimonialCard from "../Testimonial/TestimonialCard";
 import { Footer } from "../Footer";
 
@@ -214,6 +213,7 @@ const Home = () => {
       )}
 
       <section className="relative flex flex-col rounded-none min-h-screen z-0">
+    
         <div className="absolute inset-0 w-full h-full">
           <img
             loading="lazy"

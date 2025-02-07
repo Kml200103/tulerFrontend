@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
+import { useRegisterUserMutation } from "../../services/http/userService";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [registerUser] = useRegisterUserMutation()
   const {
     register,
     handleSubmit,
@@ -51,10 +53,13 @@ const Register = () => {
     return allPassed;
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (validatePassword(data.password)) {
       console.log(data);
-      // Handle registration logic here
+      await registerUser(data).then((res) => {
+        console.log('res', res)
+      })
+
     }
   };
 
@@ -85,9 +90,8 @@ const Register = () => {
             id="name"
             type="text"
             {...register("name", { required: "Name is required" })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
-              errors.name ? "border-red-400" : "border-gray-300"
-            } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.name ? "border-red-400" : "border-gray-300"
+              } border-solid text-neutral-700`}
           />
           {errors.name && (
             <p className="text-red-400 text-sm mt-3">*{errors.name.message}</p>
@@ -109,9 +113,8 @@ const Register = () => {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
             })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
-              errors.email ? "border-red-400" : "border-gray-300"
-            } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.email ? "border-red-400" : "border-gray-300"
+              } border-solid text-neutral-700`}
           />
           {errors.email && (
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
@@ -138,9 +141,8 @@ const Register = () => {
               required: "Password is required",
             })}
             autoComplete="current-password"
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
-              errors.password ? "border-red-400" : "border-gray-300"
-            } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.password ? "border-red-400" : "border-gray-300"
+              } border-solid text-neutral-700`}
           />
           <button
             type="button"
