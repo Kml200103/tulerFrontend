@@ -4,8 +4,8 @@ function TestimonialCard({ image, quote, name, imagePosition = "center" }) {
       <div className="flex overflow-hidden flex-col items-center pb-5 w-full rounded bg-stone-900">
         <div className="flex items-start self-stretch pt-5 pb-12 px-7 text-sm font-bold text-black bg-orange-50 min-h-[150px]">
           <div className="flex-1">
-            <span className="text-4xl font-medium uppercase leading-[50px]">
-              "
+            <span className="text-4xl font-gotham uppercase leading-[50px]">
+              <span className="font-gotham">"</span>
             </span>
             <br />
             <span className="leading-5 font-[325]">{quote}</span>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 import NavigationLinks from "../Header/NavigationLinks";
 import SocialIcons from "../Header/SocialIcons";
@@ -11,7 +11,6 @@ import "swiper/css/pagination";
 import HoneyBlend from "../HoneyTypes/HoneyBlend";
 import { HoneyCard } from "../HoneyTypes/HoneyCard";
 import { BenefitCard } from "../Benefit/BenefitCard";
-import { Star } from "lucide-react";
 import TestimonialCard from "../Testimonial/TestimonialCard";
 import { Footer } from "../Footer";
 
@@ -176,6 +175,11 @@ const testimonials = [
   },
 ];
 const Home = () => {
+  const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
+
+  const toggleSearchInput = () => {
+    setIsSearchInputOpen((prev) => !prev);
+  };
   return (
     <>
       <nav
@@ -193,11 +197,23 @@ const Home = () => {
         </Link>
         <div className="flex gap-6 items-center">
           <NavigationLinks />
-          <SocialIcons />
+          <SocialIcons toggleSearchInput={toggleSearchInput} />{" "}
+          {/* Pass the toggle function */}
         </div>
       </nav>
+      {isSearchInputOpen && (
+        <div className="absolute z-50 left-1/2 top-32 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-96">
+          {/* Outer div with rounded border */}
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400" // Standard border without rounded-full
+          />
+        </div>
+      )}
 
       <section className="relative flex flex-col rounded-none min-h-screen z-0">
+    
         <div className="absolute inset-0 w-full h-full">
           <img
             loading="lazy"
@@ -389,7 +405,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="flex flex-col rounded-none max-md:pr-5">
+      {/* <div className="flex flex-col rounded-none max-md:pr-5">
         <div className="flex flex-col pb-28 w-full bg-sky-50 rounded-none max-md:pb-24 max-md:max-w-full">
           <div className="flex flex-wrap gap-5 justify-between items-start w-full text-center max-w-[1459px] max-md:max-w-full">
             <img
@@ -460,6 +476,78 @@ const Home = () => {
             </div>
           </div>
         </div>
+      </div> */}
+      <div className="flex flex-col rounded-none max-md:pr-5">
+        <div className="flex flex-col pb-28 w-full bg-sky-50 rounded-none max-md:pb-24 max-md:max-w-full">
+          <div className="flex flex-wrap gap-5 justify-between items-start w-full text-center max-w-[1459px] max-md:max-w-full">
+            <img
+              loading="lazy"
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/028e9fe3de5a717452f980dfc02e1d79980b9640ef58165189a444cdc6cd89b6?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+              className="object-contain shrink-0 self-start max-w-full aspect-[0.73] w-[172px]"
+              alt="Honey product logo"
+            />
+            <div className="flex flex-col items-center self-end mt-14 max-md:mt-10 max-md:max-w-full">
+              <div className="text-3xl font-semibold text-yellow-400">
+                Discover
+              </div>
+              <h1 className="mt-2.5 text-7xl font-extrabold text-neutral-900 max-md:max-w-full max-md:text-4xl">
+                The Benefits of Honey Products
+              </h1>
+              <p className="self-stretch mt-4 text-base font-medium leading-7 text-neutral-700 max-md:max-w-full">
+                The benefits of raw honey include the nutrients and antioxidants
+                it contains. Honey is also better for your blood sugar and your
+                heart, and it may promote healing. Honey is a syrupy liquid that
+                honeybees make from plant nectar.
+              </p>
+            </div>
+          </div>
+          <div className="container self-end mt-8 mr-0 mb-0 w-full max-w-[1525px] max-md:mb-2.5 max-md:max-w-full">
+            <div className="flex gap-5 max-md:flex-col">
+              <div className="flex flex-col w-[37%] max-md:ml-0 max-md:w-full">
+                <div className="grow mt-10 max-md:max-w-full">
+                  <div className="flex gap-5 max-md:flex-col">
+                    <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
+                      <div className="flex flex-col text-base font-semibold text-center text-black max-md:mt-5">
+                        {benefitsData.slice(0, 2).map((benefit, index) => (
+                          <BenefitCard key={index} {...benefit} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
+                      <div className="flex flex-col grow mt-36 text-base font-semibold text-center text-black max-md:mt-10">
+                        {benefitsData.slice(2, 4).map((benefit, index) => (
+                          <BenefitCard key={index} {...benefit} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col ml-5 w-[63%] max-md:ml-0 max-md:w-full">
+                <div className="max-md:mt-10 max-md:max-w-full">
+                  <div className="flex gap-5 max-md:flex-col">
+                    <div className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
+                      <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/6fed36deb61b9e117f7fcddfcb97436f0e01226088829c38667107a6667de04c?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                        className="object-contain grow w-full aspect-[0.96] max-md:mt-10 max-md:max-w-full"
+                        alt="Honey product showcase"
+                      />
+                    </div>
+                    <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
+                      <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/d857d7a41aa6e24fd3565682a060127691dc6b4b653120f18db444ab4728f4ce?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                        className="object-contain grow shrink-0 mt-96 max-w-full aspect-[0.74] w-[156px] max-md:mt-10"
+                        alt="Honey product detail"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col pb-5 text-center">
@@ -478,8 +566,12 @@ const Home = () => {
           ))}
         </div>
       </div>
-      <div className="container px-8 max-md:px-5 my-8"> {/* Add margin to the whole Swiper component */}
-        <div className="my-6"> {/* Margin around Swiper */}
+      <div className="container px-8 max-md:px-5 my-8">
+        {" "}
+        {/* Add margin to the whole Swiper component */}
+        <div className="my-6">
+          {" "}
+          {/* Margin around Swiper */}
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={20}
@@ -507,8 +599,6 @@ const Home = () => {
           </Swiper>
         </div>
       </div>
-
-
 
       <Footer />
     </>

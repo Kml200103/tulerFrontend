@@ -3,9 +3,10 @@ import axios from "axios";
 
 import store from "../../redux/store";
 import { show, hide } from "../../redux/loader/loaderSlice";
+import { apiUrl } from "../../utils/constants";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, // Your API base URL
+  baseURL: apiUrl, 
 });
 
 let requestCount = 0;
