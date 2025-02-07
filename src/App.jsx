@@ -13,7 +13,11 @@ import "react-toastify/dist/ReactToastify.css";
 import Register from "./pages/Register";
 import ContactPage from "./pages/Contact";
 import Checkout from "./pages/Checkout";
+
+import ProfilePage from "./pages/Profile";
+
 import Loader from "./components/Loader";
+
 
 export default function App() {
   return (
@@ -70,6 +74,18 @@ export default function App() {
                 </Layout.main>
               ) : (
                 <Checkout />
+              )
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <ProfilePage />
+                </Layout.main>
+              ) : (
+                <ProfilePage />
               )
             }
           />
