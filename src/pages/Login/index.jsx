@@ -20,17 +20,21 @@ const Login = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
 
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
 
-    loginUser(data).then((res) => {
-      localStorage.setItem("userToken", res?.data?.token)
+    await loginUser(data).then((res) => {
+      if (res?.data) {
+        localStorage.setItem("userToken", res?.data?.token)
+      }
+      if (res.data.success) {
 
-      // if (success) {
-      //   NotificationService.sendSuccessMessage("Login successful!");
-      //   navigate("/");
-      // } else {
-      //   NotificationService.sendErrorMessage("Login failed. Please try again.");
-      // }
+
+        NotificationService.sendSuccessMessage("Login successful!");
+        navigate("/profile");
+      }
+      else {
+        NotificationService.sendErrorMessage("Login failed. Please try again.");
+      }
     })
 
   };

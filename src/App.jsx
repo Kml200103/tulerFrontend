@@ -8,27 +8,23 @@ import { Layout } from "./components/Layout/Layout";
 import Products from "./components/Products";
 import About from "./components/About";
 import Login from "./pages/Login";
-
-import "react-toastify/dist/ReactToastify.css";
 import Register from "./pages/Register";
 import ContactPage from "./pages/Contact";
 import Checkout from "./pages/Checkout";
-
 import ProfilePage from "./pages/Profile";
-
 import Loader from "./components/Loader";
-
+import ProtectedRoute from "./components/Protected/ProtectedRoute";
 
 export default function App() {
   return (
     <Provider store={store}>
-    
       <BrowserRouter>
-      <Loader />
+        <Loader />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
           <Route
             path="/products"
             element={
@@ -65,28 +61,34 @@ export default function App() {
               )
             }
           />
+
+          {/* Protected Routes */}
           <Route
             path="/checkout"
             element={
-              Layout ? (
-                <Layout.main>
+              <ProtectedRoute>
+                {Layout ? (
+                  <Layout.main>
+                    <Checkout />
+                  </Layout.main>
+                ) : (
                   <Checkout />
-                </Layout.main>
-              ) : (
-                <Checkout />
-              )
+                )}
+              </ProtectedRoute>
             }
           />
           <Route
             path="/profile"
             element={
-              Layout ? (
-                <Layout.main>
+              <ProtectedRoute>
+                {Layout ? (
+                  <Layout.main>
+                    <ProfilePage />
+                  </Layout.main>
+                ) : (
                   <ProfilePage />
-                </Layout.main>
-              ) : (
-                <ProfilePage />
-              )
+                )}
+              </ProtectedRoute>
             }
           />
         </Routes>

@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import AddressDetails from "../../components/AddressCard";
+import { login } from "../../redux/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { useGetUserQuery } from "../../services/http/userService";
 
 const profileData = [
   { label: "Full Name", value: "John Doe" },
@@ -8,7 +11,18 @@ const profileData = [
   { label: "Gender", value: "Female" },
 ];
 
+
 const ProfilePage = () => {
+  const dispatch = useDispatch()
+
+  const { data, isError, isLoading, isSuccess } = useGetUserQuery()
+
+  useEffect(() => {
+    console.log("data", data);
+    if (data) {
+      dispatch(login(data));
+    }
+  }, [data])
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px]">
       <div className="flex flex-col items-start px-11 pt-7 pb-72 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-5 max-md:pb-24 max-md:max-w-full">

@@ -1,20 +1,26 @@
 import { useState, useRef, useEffect } from "react";
 import Cart from "../Cart";
-import { Link } from "react-router"; // Make sure to import Link from react-router-dom
+import { Link, useNavigate } from "react-router"; // Make sure to import Link from react-router-dom
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/auth/authSlice";
 
 export default function SocialIcons({ toggleSearchInput }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Replace with actual authentication logic
-  const [userName, setUserName] = useState("John Doe"); // Replace with actual user data
 
+  const { isLoggedIn } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
   const dropdownRef = useRef(null); // Create a ref for the dropdown
   const cartRef = useRef(null); // Create a ref for the cart
-
+  const router = useNavigate()
   const toggleCart = () => {
     setIsCartOpen((prev) => !prev);
   };
 
+  const handleLogout = () => {
+    dispatch(logout())
+    router('/')
+  }
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
   };
@@ -98,12 +104,12 @@ export default function SocialIcons({ toggleSearchInput }) {
                 </Link>
               </div>
               <div className="mt-2">
-                <Link
-                  to=""
+                <button
+                  onClick={ handleLogout}
                   className="block text-black text-center hover:underline"
                 >
                   Logout
-                </Link>
+                </button>
               </div>
             </div>
           ) : (
