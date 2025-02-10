@@ -85,7 +85,7 @@ export default function SocialIcons({ toggleSearchInput }) {
       {isDropdownOpen && (
         <div
           ref={dropdownRef} // Attach the ref to the dropdown
-          className="absolute bg-white border border-gray-300 rounded-lg shadow-lg mt-2 p-4 w-48"
+          className="absolute right-3  bg-white border border-gray-300 rounded-lg shadow-lg mt-2 p-4 w-48"
         >
           {isLoggedIn ? (
             <div>

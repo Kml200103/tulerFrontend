@@ -17,14 +17,16 @@ import Checkout from "./pages/Checkout";
 import ProfilePage from "./pages/Profile";
 
 import Loader from "./components/Loader";
+import MyOrders from "./pages/MyOrders";
 
+import { ResetPassword } from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 export default function App() {
   return (
     <Provider store={store}>
-    
       <BrowserRouter>
-      <Loader />
+        <Loader />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -86,6 +88,42 @@ export default function App() {
                 </Layout.main>
               ) : (
                 <ProfilePage />
+              )
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <MyOrders />
+                </Layout.main>
+              ) : (
+                <MyOrders />
+              )
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <ForgotPassword />
+                </Layout.main>
+              ) : (
+                <ForgotPassword />
+              )
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <ResetPassword />
+                </Layout.main>
+              ) : (
+                <ResetPassword />
               )
             }
           />

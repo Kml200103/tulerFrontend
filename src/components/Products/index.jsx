@@ -23,12 +23,12 @@ const products = [
     discount: "10%",
   },
 ];
+const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100); // Set your max price according to your product range
   const [filteredProducts, setFilteredProducts] = useState(products); // Initialize with all products
-
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -94,7 +94,7 @@ const Products = () => {
               Uncategorized (0)
             </div>
             <div className="p-4">
-              <div className="self-start mt-4 text-2xl font-semibold leading-[32px] text-neutral-700">
+              <div className="self-start mt-4 mb-4 text-2xl font-semibold leading-[32px] text-neutral-700">
                 Filter by price
               </div>
               {/* <Slider
@@ -143,9 +143,8 @@ const Products = () => {
                   </button>
                 </div>
               </div> */}
-              <div className="w-full max-w-md mx-auto">
+              {/* <div className="w-full max-w-md mx-auto">
                 <div className="relative w-full h-2 bg-gray-300 rounded-full">
-          
                   <div
                     className="absolute h-2 bg-yellow-400 rounded-full"
                     style={{
@@ -165,7 +164,6 @@ const Products = () => {
                     style={{ zIndex: 1 }}
                   />
 
-                  {/* Max Price Thumb */}
                   <input
                     type="range"
                     name="max"
@@ -178,18 +176,29 @@ const Products = () => {
                   />
                 </div>
 
-                {/* Price Display & Filter Button */}
                 <div className="flex justify-between items-center mt-4">
                   <div className="text-sm text-gray-600">
                     Price: ${minPrice} - ${maxPrice}
                   </div>
                   <button
-                    className="bg-yellow-400 text-black px-4 py-2 rounded hover:bg-yellow-500 transition"
+                    className=" text-black px-4 py-2 rounded  transition"
                     onClick={applyFilter}
                   >
                     Filter
                   </button>
                 </div>
+              </div> */}
+              <div className="flex justify-start mr-10">
+                {circleButtons.map((button, index) => (
+                  <React.Fragment key={button.key}>
+                    <div className="flex flex-col justify-center items-center px-1.5 bg-yellow-400 rounded-full h-[25px] w-[25px]">
+                      <div className="flex shrink-0 bg-white rounded-full h-[15px] w-[15px]" />
+                    </div>
+                    {index === 0 && (
+                      <div className="flex shrink-0 self-start mt-1.5 max-w-full h-3.5 bg-yellow-400 w-[280px]" />
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
           </div>
@@ -258,8 +267,9 @@ const Products = () => {
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product, idx) => (
                 <div
-                  className={`flex flex-col ${idx !== 0 && "ml-2"
-                    } w-[30%] max-md:ml-0 max-md:w-full mb-5`}
+                  className={`flex flex-col ${
+                    idx !== 0 && "ml-2"
+                  } w-[30%] max-md:ml-0 max-md:w-full mb-5`}
                   key={idx}
                 >
                   <ProductCard

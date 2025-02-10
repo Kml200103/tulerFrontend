@@ -15,24 +15,21 @@ const Login = () => {
   } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [loginUser] = useLoginUserMutation()
+  const [loginUser] = useLoginUserMutation();
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
-
   const onSubmit = (data) => {
-
     loginUser(data).then((res) => {
-      localStorage.setItem("userToken", res?.data?.token)
+      localStorage.setItem("userToken", res?.data?.token);
 
-      // if (success) {
-      //   NotificationService.sendSuccessMessage("Login successful!");
-      //   navigate("/");
-      // } else {
-      //   NotificationService.sendErrorMessage("Login failed. Please try again.");
-      // }
-    })
-
+      if (success) {
+        NotificationService.sendSuccessMessage("Login successful!");
+        navigate("/");
+      } else {
+        NotificationService.sendErrorMessage("Login failed. Please try again.");
+      }
+    });
   };
 
   useEffect(() => {
@@ -69,8 +66,9 @@ const Login = () => {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
             })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.email ? "border-red-400" : "border-gray-300"
-              } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.email ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
           />
           {errors.email && (
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
@@ -141,9 +139,9 @@ const Login = () => {
             >
               Password
             </label>
-            <a href="#" className="text-xs text-red-400">
+            <Link to="/forgot-password" className="text-xs text-red-400">
               Forgot Password?
-            </a>
+            </Link>
           </div>
           <input
             id="password"
@@ -152,8 +150,9 @@ const Login = () => {
               required: "Password is required",
             })}
             autoComplete="current-password"
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.password ? "border-red-400" : "border-gray-300"
-              } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.password ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
           />
           <button
             type="button"
@@ -228,8 +227,8 @@ const Login = () => {
       </button>
       <div className="flex shrink-0 mt-10 w-full h-px bg-gray-300" />
 
-      <div className="flex self-center mt-6 max-w-full text-sm w-[221px]">
-        <div className="grow text-stone-500">Don't have any account?&nbsp;</div>
+      <div className="flex self-center mt-4 max-w-full text-sm w-[221px]">
+        <div className="grow text-stone-500">Not have an account?</div>
         <Link
           to="/register"
           className="font-bold text-yellow-400 hover:underline"

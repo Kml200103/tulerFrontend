@@ -147,6 +147,7 @@
 
 import React, { useState } from "react";
 import CardItem from "./CheckoutCardItem";
+import AddressForm from "../../components/AddressForm";
 
 const items = [
   {
@@ -284,69 +285,7 @@ const Checkout = () => {
             </div>
 
             {/* Add Address Form */}
-            {showAddAddressForm && (
-              <div className="mt-4">
-                <h2 className="text-center font-semibold text-xl ">
-                  Add Address
-                </h2>
-                <div className="mb-2">Name</div>
-                <div className="flex space-x-4">
-                  <input
-                    type="text"
-                    placeholder="Enter Name"
-                    className="w-1/2 p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Enter Street"
-                    className="w-1/2 p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  />
-                </div>
-                <div className="flex space-x-4">
-                  <div className="w-1/2">
-                    <div className="mb-2">City</div>
-                    <input
-                      type="text"
-                      placeholder="Enter City"
-                      className="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    />
-                  </div>
-                  <div className="w-1/2">
-                    <div className="mb-2">State</div>
-                    <input
-                      type="text"
-                      placeholder="Enter State"
-                      className="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    />
-                  </div>
-                </div>
-                <div className="flex space-x-4">
-                  <div className="w-1/2">
-                    <div className="mb-2">Country</div>
-                    <input
-                      type="text"
-                      placeholder="Enter Country"
-                      className="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    />
-                  </div>
-                  <div className="w-1/2">
-                    <div className="mb-2">Pincode</div>
-                    <input
-                      type="text"
-                      placeholder="Enter Pincode"
-                      className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    />
-                  </div>
-                </div>
-
-                {/* "Add Address" Button */}
-                <div className="flex justify-end mt-4">
-                  <button className="text-blue-500 hover:text-blue-700 hover:underline">
-                    Add Address
-                  </button>
-                </div>
-              </div>
-            )}
+            {showAddAddressForm && <AddressForm title="Add" />}
           </div>
         </div>
       )}
