@@ -1,12 +1,9 @@
-// services/axiosConfig.js
 import axios from "axios";
-
-import store from "../../redux/store";
-import { show, hide } from "../../redux/loader/loaderSlice";
 import { apiUrl } from "../../utils/constants";
+import { hideLoader, showLoader } from "./loaderService";
 
 const apiClient = axios.create({
-  baseURL: apiUrl, 
+  baseURL: apiUrl,
 });
 
 let requestCount = 0;
@@ -14,7 +11,7 @@ let requestCount = 0;
 // Request interceptor to show loader
 const requestHandler = (request) => {
   if (requestCount === 0) {
-    store.dispatch(show());
+    showLoader();
   }
   requestCount++;
   return request;
@@ -24,7 +21,7 @@ const requestHandler = (request) => {
 const responseHandler = (response) => {
   requestCount--;
   if (requestCount === 0) {
-    store.dispatch(hide()); // Hide loader when all requests are completed
+    hideLoader();
   }
   return response;
 };
@@ -33,7 +30,7 @@ const responseHandler = (response) => {
 const errorHandler = (error) => {
   requestCount--;
   if (requestCount === 0) {
-    store.dispatch(hide()); // Hide loader on error
+    hideLoader();
   }
   return Promise.reject(error);
 };
