@@ -10,7 +10,7 @@ export const UserService = BaseService.injectEndpoints({
                 url: `${apiUrl}/verify`,
                 method: "get",
                 headers: {
-                    Authorization: localStorage.getItem("userToken"),
+                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
                 },
             }),
         }),

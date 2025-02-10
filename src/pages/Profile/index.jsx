@@ -1,3 +1,4 @@
+
 import React, { Profiler, useState } from "react";
 import AddressDetails from "../../components/AddressCard";
 import { PencilIcon } from "@heroicons/react/24/outline";
@@ -5,13 +6,22 @@ import AddressForm from "../../components/AddressForm";
 import ProfileUpdateDialog from "../../components/UpdateForm";
 import { Link } from "react-router";
 
+import  { useCallback, useEffect } from "react";
+import AddressDetails from "../../components/AddressCard";
+import { login } from "../../redux/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { useGetUserQuery } from "../../services/http/userService";
+
+
 const profileData = [
   { label: "Full Name", value: "John Doe" },
   { label: "Mobile Number", value: "+91-1234 5678 21" },
   { label: "Email ID", value: "JohnDoe256@gmail.com" },
 ];
 
+
 const ProfilePage = () => {
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isEditProfileDialog, setIsEditProfileDialog] = useState(false);
@@ -38,6 +48,18 @@ const ProfilePage = () => {
   const handleCloseEditProfileDialog = () => {
     setIsEditProfileDialog(false);
   };
+
+
+  const dispatch = useDispatch()
+
+  const { data, isError, isLoading, isSuccess } = useGetUserQuery()
+
+  useEffect(() => {
+    console.log("data", data);
+    if (data) {
+      dispatch(login(data));
+    }
+  }, [data])
 
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px]">

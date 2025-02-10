@@ -1,12 +1,42 @@
-// src/redux/store.js
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/authSlice";
 import loaderReducer from "./loader/loaderSlice";
-const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    loader: loaderReducer,
-  },
+import { BaseService } from "./reduxQuery";
+
+
+import { loaderMiddleware } from "../services/middleware/loaderMiddleware";
+import { setStore } from "../services/loaderApi/loaderService";
+
+// Persist config
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["auth"],
+};
+
+// Combine reducers
+const rootReducer = combineReducers({
+  auth: authReducer,
+  loader: loaderReducer,
+  [BaseService.reducerPath]: BaseService.reducer,
 });
 
-export default store;
+// Persist reducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(
+      BaseService.middleware,
+      loaderMiddleware
+    ),
+});
+
+// Set store in loaderService to avoid direct import
+setStore(store);
+
+// Persistor
+export const persistor = persistStore(store);

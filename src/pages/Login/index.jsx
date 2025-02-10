@@ -19,17 +19,27 @@ const Login = () => {
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
-  const onSubmit = (data) => {
-    loginUser(data).then((res) => {
-      localStorage.setItem("userToken", res?.data?.token);
 
-      if (success) {
+
+  const onSubmit = async (data) => {
+
+    await loginUser(data).then((res) => {
+      if (res?.data) {
+        localStorage.setItem("userToken", res?.data?.token)
+      }
+      if (res.data.success) {
+
+
         NotificationService.sendSuccessMessage("Login successful!");
-        navigate("/");
-      } else {
+        navigate("/profile");
+      }
+      else {
         NotificationService.sendErrorMessage("Login failed. Please try again.");
       }
-    });
+    })
+
+
+
   };
 
   useEffect(() => {

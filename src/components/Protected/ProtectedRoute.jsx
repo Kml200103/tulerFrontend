@@ -4,7 +4,7 @@ import { Navigate } from "react-router";
 const ProtectedRoute = ({ children }) => {
   const authenticate = () => {
     // Check if the token exists in localStorage
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("userToken");
     return !!token; // Returns true if token exists, otherwise false
   };
 
@@ -12,7 +12,6 @@ const ProtectedRoute = ({ children }) => {
   if (!authenticate()) {
     return <Navigate to="/login" replace />;
   }
-
   // If authenticated, render the children components
   return <>{children}</>;
 };

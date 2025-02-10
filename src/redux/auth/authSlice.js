@@ -1,10 +1,12 @@
-// src/redux/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
+
+
 const initialState = {
-  user: null, // Contains user info when logged in
-  isLoggedIn: false, // Authentication status
-  token: null, // JWT or access token
+  user: null,
+
+  isLoggedIn: false,
+
 };
 
 const authSlice = createSlice({
@@ -13,13 +15,19 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.user = action.payload.user;
-      state.token = action.payload.token;
+
       state.isLoggedIn = true;
+
+
+      // localStorage.setItem("token", action.payload.token);
+      // localStorage.setItem("user", JSON.stringify(action.payload.user));
+      // localStorage.setItem("userId", action.payload.user.id);
     },
     logout: (state) => {
       state.user = null;
-      state.token = null;
       state.isLoggedIn = false;
+      localStorage.removeItem("userToken");
+     
     },
   },
 });
