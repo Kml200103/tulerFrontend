@@ -5,7 +5,7 @@ import { useRegisterUserMutation } from "../../services/http/userService";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [registerUser] = useRegisterUserMutation()
+  const [registerUser] = useRegisterUserMutation();
   const {
     register,
     handleSubmit,
@@ -57,9 +57,8 @@ const Register = () => {
     if (validatePassword(data.password)) {
       console.log(data);
       await registerUser(data).then((res) => {
-        console.log('res', res)
-      })
-
+        console.log("res", res);
+      });
     }
   };
 
@@ -90,8 +89,9 @@ const Register = () => {
             id="name"
             type="text"
             {...register("name", { required: "Name is required" })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.name ? "border-red-400" : "border-gray-300"
-              } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.name ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
           />
           {errors.name && (
             <p className="text-red-400 text-sm mt-3">*{errors.name.message}</p>
@@ -113,8 +113,9 @@ const Register = () => {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
             })}
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.email ? "border-red-400" : "border-gray-300"
-              } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.email ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
           />
           {errors.email && (
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
@@ -141,8 +142,9 @@ const Register = () => {
               required: "Password is required",
             })}
             autoComplete="current-password"
-            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${errors.password ? "border-red-400" : "border-gray-300"
-              } border-solid text-neutral-700`}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.password ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
           />
           <button
             type="button"
@@ -190,9 +192,7 @@ const Register = () => {
       </div>
 
       <div className="flex self-center mt-4 max-w-full text-sm w-[221px]">
-        <div className="grow text-stone-500">
-          Already have an account?&nbsp;
-        </div>
+        <div className="grow text-stone-500">Already have an account?</div>
         <Link to="/login" className="font-bold text-yellow-400 hover:underline">
           Login
         </Link>

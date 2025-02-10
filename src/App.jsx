@@ -14,13 +14,22 @@ import ContactPage from "./pages/Contact";
 import Checkout from "./pages/Checkout";
 import ProfilePage from "./pages/Profile";
 import Loader from "./components/Loader";
+
+import MyOrders from "./pages/MyOrders";
+
+import { ResetPassword } from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
+
 import ProtectedRoute from "./components/Protected/ProtectedRoute";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux/store";
 
+
 export default function App() {
   return (
     <Provider store={store}>
+
+
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <Loader />
@@ -37,6 +46,7 @@ export default function App() {
                     <Products />
                   </Layout.main>
                 ) : (
+
                   <Products />
                 )
               }
@@ -62,9 +72,51 @@ export default function App() {
                   </Layout.main>
                 ) : (
                   <ContactPage />
-                )
-              }
-            />
+
+                </Layout.main>
+              ) : (
+                <ContactPage />
+              )
+            }
+          />
+         
+          <Route
+            path="/my-orders"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <MyOrders />
+                </Layout.main>
+              ) : (
+                <MyOrders />
+              )
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <ForgotPassword />
+                </Layout.main>
+              ) : (
+                <ForgotPassword />
+              )
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              Layout ? (
+                <Layout.main>
+                  <ResetPassword />
+                </Layout.main>
+              ) : (
+                <ResetPassword />
+              )
+            }
+          />
+      
 
             {/* Protected Routes */}
             <Route
@@ -98,6 +150,7 @@ export default function App() {
           </Routes>
         </BrowserRouter>
       </PersistGate>
+
 
     </Provider>
   );

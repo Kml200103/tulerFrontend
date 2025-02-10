@@ -6,7 +6,7 @@ import SocialIcons from "./SocialIcons";
 export default function Header({ toggleSearchInput }) {
   return (
     <nav
-      className="flex flex-col md:flex-row bg-sky-50 mb-10 items-center max-h-[308px] justify-between px-6 py-4"
+      className="  flex flex-col md:flex-row bg-sky-50 mb-10 items-center max-h-[308px] justify-around px-6 py-4"
       role="navigation"
       aria-label="Main navigation"
     >
