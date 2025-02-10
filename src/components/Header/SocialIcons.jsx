@@ -105,8 +105,8 @@ export default function SocialIcons({ toggleSearchInput }) {
               </div>
               <div className="mt-2">
                 <button
-                  onClick={ handleLogout}
-                  className="block text-black text-center hover:underline"
+                  onClick={handleLogout}
+                  className="block w-full text-black text-center hover:underline"
                 >
                   Logout
                 </button>
@@ -135,6 +135,7 @@ export default function SocialIcons({ toggleSearchInput }) {
           )}
         </div>
       )}
+
 
       {/* Slide-in Cart */}
       {isCartOpen && (

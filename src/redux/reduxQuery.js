@@ -45,6 +45,8 @@ const axiosBaseQuery = async ({ url, method, data, params, headers }) => {
 };
 
 export const BaseService = createApi({
+  reducerPath: "baseService",
   baseQuery: axiosBaseQuery,
   endpoints: () => ({}),
 });
+
