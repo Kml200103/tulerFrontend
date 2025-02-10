@@ -1,6 +1,5 @@
 
 import React, { Profiler, useState } from "react";
-import AddressDetails from "../../components/AddressCard";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import AddressForm from "../../components/AddressForm";
 import ProfileUpdateDialog from "../../components/UpdateForm";

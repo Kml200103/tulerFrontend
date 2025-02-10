@@ -72,51 +72,47 @@ export default function App() {
                   </Layout.main>
                 ) : (
                   <ContactPage />
+                )
+              }
+            />
 
-                </Layout.main>
-              ) : (
-                <ContactPage />
-              )
-            }
-          />
-         
-          <Route
-            path="/my-orders"
-            element={
-              Layout ? (
-                <Layout.main>
+            <Route
+              path="/my-orders"
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <MyOrders />
+                  </Layout.main>
+                ) : (
                   <MyOrders />
-                </Layout.main>
-              ) : (
-                <MyOrders />
-              )
-            }
-          />
-          <Route
-            path="/forgot-password"
-            element={
-              Layout ? (
-                <Layout.main>
+                )
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ForgotPassword />
+                  </Layout.main>
+                ) : (
                   <ForgotPassword />
-                </Layout.main>
-              ) : (
-                <ForgotPassword />
-              )
-            }
-          />
-          <Route
-            path="/reset-password"
-            element={
-              Layout ? (
-                <Layout.main>
+                )
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ResetPassword />
+                  </Layout.main>
+                ) : (
                   <ResetPassword />
-                </Layout.main>
-              ) : (
-                <ResetPassword />
-              )
-            }
-          />
-      
+                )
+              }
+            />
+
 
             {/* Protected Routes */}
             <Route
