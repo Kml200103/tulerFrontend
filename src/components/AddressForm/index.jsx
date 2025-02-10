@@ -1,18 +1,45 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { post } from "../../services/http/axiosApi";
+import { useNavigate } from "react-router";
 
-const AddressForm = ({ title, button }) => {
+const AddressForm = ({ title, button, onClose, initialData }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
-  const onSubmit = (data) => {
-    // Here you can handle the form submission, e.g., send data to an API
-    console.log("Address added:", data);
+  const navigate = useNavigate();
+  const { id } = useSelector((state) => state.auth.user);
 
-    // Close the dialog after submission
+  const onSubmit = async (data) => {
+    const payload = { ...data, userId: id }; // Include userId in the payload
+
+    try {
+      // Make the API call to create or update the address
+      const { receiveObj } = await post(`/address/add/${id}`, payload);
+
+      reset(); // Reset the form after submission
+
+      // Check the response status
+      if (receiveObj.status === true) {
+        NotificationService.sendInfoMessage(receiveObj.message);
+        onClose(); // Close the dialog after successful submission
+        navigate("/profile"); // Redirect to the profile page
+      } else {
+        NotificationService.sendErrorMessage(
+          "Error creating or updating address"
+        );
+      }
+    } catch (error) {
+      console.error("Error adding address:", error);
+      NotificationService.sendErrorMessage(
+        "An error occurred while adding the address."
+      );
+    }
   };
 
   return (
@@ -125,6 +152,48 @@ const AddressForm = ({ title, button }) => {
             </p>
           )}
         </div>
+      </div>
+
+      {/* Address Type Selection */}
+      <div className="mb-4">
+        <label className="block mb-1 font-medium text-gray-700">
+          Address Type
+        </label>
+        <div className="flex space-x-4">
+          <div>
+            <input
+              type="radio"
+              value="home"
+              {...register("addressType", {
+                required: "Address type is required",
+              })}
+              id="home"
+              className="mr-2"
+            />
+            <label htmlFor="home" className="text-gray-700">
+              Home
+            </label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              value="office"
+              {...register("addressType", {
+                required: "Address type is required",
+              })}
+              id="office"
+              className="mr-2"
+            />
+            <label htmlFor="office" className="text-gray-700">
+              Office
+            </label>
+          </div>
+        </div>
+        {errors.addressType && (
+          <p className="text-red-500 text-sm mt-2">
+            *{errors.addressType.message}
+          </p>
+        )}
       </div>
 
       {/* "Add Address" Button */}
