@@ -16,9 +16,20 @@ const AddressModal = ({ isOpen, onClose, initialValues, button }) => {
 
   useEffect(() => {
     if (initialValues) {
-      reset(initialValues);
+      reset(initialValues); // Populate form with existing values for editing
+    } else {
+      reset({
+        name: "",
+        streetAddress: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+        addressType: "", // Reset to empty values for adding new
+      });
     }
   }, [initialValues, reset]);
+  
 
   const onSubmit = async (data) => {
     const payload = { ...data, userId: id };

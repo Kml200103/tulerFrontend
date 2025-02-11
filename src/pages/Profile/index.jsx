@@ -25,8 +25,14 @@ const ProfilePage = () => {
   const { data, isError, isLoading } = useGetUserQuery();
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
+
   const navigate = useNavigate()
+
+  console.log('data', data)
+
+
   useEffect(() => {
+
     if (isError) {
       dispatch(logout()); // Dispatch the logout action
       navigate("/login");
@@ -34,7 +40,6 @@ const ProfilePage = () => {
       dispatch(login(data)); // Log in user if data is valid
     }
   }, [data, isError, dispatch]);
-
 
 
   const handleRemove = async (id) => {
@@ -108,9 +113,11 @@ const ProfilePage = () => {
   };
 
   const handleCloseModal = () => {
-    setModalOpen(false);
     setSelectedAddress(null);
-    getAllAddress(); // Refresh addresses after closing the modal
+
+    setModalOpen(false);
+    getAllAddress(); 
+    // Refresh addresses after closing the modal
   };
 
 
@@ -125,6 +132,8 @@ const ProfilePage = () => {
   if (isError) {
     return <div>Error loading profile data.</div>; // Show error state
   }
+
+
 
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px]">
