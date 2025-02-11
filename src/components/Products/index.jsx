@@ -1,53 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import ProductCard from "./ProductCard";
+import { get } from "../../services/http/axiosApi";
+import { useSelector } from "react-redux";
 
-const products = [
-  {
-    imageSrc:
-      "https://cdn.builder.io/api/v1/image/assets/TEMP/53170dd3676b4a1a6be8852c858c8bacd448f290c0d0f526e2bd386531b16f6e?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-    title: "Multi Flower Honey",
-    priceRange: "$20",
-    discount: "10%",
-  },
-  {
-    imageSrc:
-      "https://cdn.builder.io/api/v1/image/assets/TEMP/e206c5101ce081c236d4d04f08212424254cfb2311d78ee44b29281d556b3633?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-    title: "Acacia Honey",
-    priceRange: "$78",
-  },
-  {
-    imageSrc:
-      "https://cdn.builder.io/api/v1/image/assets/TEMP/0a6293df810ed9eb9fa42023a0b1074820a055d06f78488614074e8c9311ff7f?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-    title: "Kashmir Black forest Honey",
-    priceRange: "$23",
-    discount: "10%",
-  },
-];
+
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
+  const [products, setProducts] = useState([]); // Store API products
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(100); // Set your max price according to your product range
-  const [filteredProducts, setFilteredProducts] = useState(products); // Initialize with all products
+  const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
+  const [isLoading, setIsLoading] = useState(true); // Handle loading state
+  const [error, setError] = useState(null);
+  const { id } = useSelector((state) => state.auth.user);
+  // Fetch products from API only once
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const response = await get("/products"); // Replace with actual API
+        // const data = await response.json();
+        console.log('response', response)
+        if (response.isSuccess) {
+          setProducts(response?.receiveObj?.products);
+        } else {
+          throw new Error("Failed to fetch products");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    const parsedValue = Math.max(0, Number(value)); // Prevent negative values
+    fetchProducts();
+  }, []);
 
-    if (name === "min") {
-      setMinPrice(parsedValue > maxPrice ? maxPrice : parsedValue);
-    } else {
-      setMaxPrice(parsedValue < minPrice ? minPrice : parsedValue);
-    }
+  // Debounce function to avoid frequent filtering
+  const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
+    };
   };
-  // Function to filter products based on price range
-  const applyFilter = () => {
-    const newFilteredProducts = products.filter((product) => {
-      const productPrice = parseFloat(product.priceRange.replace("$", ""));
-      return productPrice >= minPrice && productPrice <= maxPrice;
+
+  // Memoized filter function to avoid recalculating on every re-render
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const minVariantPrice = Math.min(...product.variants.map((v) => v.price));
+      return minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
     });
-    setFilteredProducts(newFilteredProducts);
-  };
+  }, [products, minPrice, maxPrice]);
+
+  // Handle price input changes with debounce
+  const handleChange = useCallback(
+    debounce((event) => {
+      const { name, value } = event.target;
+      const parsedValue = Math.max(0, Number(value)); // Prevent negative values
+
+      if (name === "min") {
+        setMinPrice(parsedValue > maxPrice ? maxPrice : parsedValue);
+      } else {
+        setMaxPrice(parsedValue < minPrice ? minPrice : parsedValue);
+      }
+    }, 300), // 300ms debounce delay
+    [minPrice, maxPrice]
+  );
+
+  console.log('filtered', filteredProducts)
+
   return (
     <div className="container flex overflow-hidden flex-col bg-white">
       <div className="container flex flex-col self-center mb-4 ml-2.5 w-full max-w-[1385px] max-md:mt-5 max-md:max-w-full">
@@ -97,97 +119,7 @@ const Products = () => {
               <div className="self-start mt-4 mb-4 text-2xl font-semibold leading-[32px] text-neutral-700">
                 Filter by price
               </div>
-              {/* <Slider
-                value={[minPrice, maxPrice]}
-                onChange={(event, newValue) => {
-                  setMinPrice(Math.max(0, newValue[0])); // Prevent negative value
-                  setMaxPrice(Math.max(0, newValue[1])); // Prevent negative value
-                }}
-                valueLabelDisplay="auto"
-                min={0}
-                max={100} // Adjust this max value based on your product prices
-                step={1}
-                sx={{
-                  color: "#F9C300",
-                  height: 5,
-                  "& .MuiSlider-thumb": {
-                    height: 18,
-                    width: 18,
-                    backgroundColor: "#fff",
-                    border: "2px solid currentColor",
-                    "&:hover, &.Mui-focusVisible": {
-                      boxShadow: "inherit",
-                    },
-                  },
-                  "& .MuiSlider-track": {
-                    height: 5,
-                    borderRadius: 5,
-                  },
-                  "& .MuiSlider-rail": {
-                    height: 5,
-                    borderRadius: 5,
-                    backgroundColor: "#e0e0e0",
-                  },
-                }}
-              />
-              <div className="flex justify-between items-center mt-2">
-                <div className="text-sm text-neutral-600">
-                  Price: ${minPrice} - ${maxPrice}
-                </div>
-                <div className="self-end text-sm font-medium text-black">
-                  <button
-                    className="bg-transparent text-black border-none px-4 py-2 rounded"
-                    onClick={applyFilter}
-                  >
-                    Filter
-                  </button>
-                </div>
-              </div> */}
-              {/* <div className="w-full max-w-md mx-auto">
-                <div className="relative w-full h-2 bg-gray-300 rounded-full">
-                  <div
-                    className="absolute h-2 bg-yellow-400 rounded-full"
-                    style={{
-                      left: `${(minPrice / 100) * 100}%`,
-                      width: `${((maxPrice - minPrice) / 100) * 100}%`,
-                    }}
-                  ></div>
 
-                  <input
-                    type="range"
-                    name="min"
-                    min="0"
-                    max="100"
-                    value={minPrice}
-                    onChange={handleChange}
-                    className="absolute w-full h-2 opacity-0 cursor-pointer"
-                    style={{ zIndex: 1 }}
-                  />
-
-                  <input
-                    type="range"
-                    name="max"
-                    min="0"
-                    max="100"
-                    value={maxPrice}
-                    onChange={handleChange}
-                    className="absolute w-full h-2 opacity-0 cursor-pointer"
-                    style={{ zIndex: 1 }}
-                  />
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-sm text-gray-600">
-                    Price: ${minPrice} - ${maxPrice}
-                  </div>
-                  <button
-                    className=" text-black px-4 py-2 rounded  transition"
-                    onClick={applyFilter}
-                  >
-                    Filter
-                  </button>
-                </div>
-              </div> */}
               <div className="flex justify-start mr-10">
                 {circleButtons.map((button, index) => (
                   <React.Fragment key={button.key}>
@@ -262,33 +194,50 @@ const Products = () => {
         </div>
 
         {/* Product List Section */}
-        <div className="flex flex-col w-3/4 p-4 max-md:w-full">
-          <div className="flex gap-5 max-md:flex-col max-md:mt-5 max-md:max-w-full">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product, idx) => (
-                <div
-                  className={`flex flex-col ${
-                    idx !== 0 && "ml-2"
-                  } w-[30%] max-md:ml-0 max-md:w-full mb-5`}
-                  key={idx}
-                >
-                  <ProductCard
-                    imageSrc={product.imageSrc}
-                    title={product.title}
-                    priceRange={product.priceRange}
-                    discount={product.discount}
-                  />
-                </div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center w-full h-full">
-                <div className="text-center text-lg text-red-600">
-                  No products found for the selected price range.
-                </div>
-              </div>
-            )}
+        {/* <div className="flex flex-col w-3/4 p-4 max-md:w-full"> */}
+        {/* Price Filter Inputs */}
+        <div className="container bg-white">
+          <div className="text-3xl font-bold mb-4">PRODUCTS</div>
+
+          {isLoading && <p>Loading...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product._id} userId={id} product={product} />
+            ))}
           </div>
         </div>
+
+        {/* Handle Loading & Error States */}
+        {/* {isLoading ? (
+            <p>Loading products...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <div className="flex gap-5 max-md:flex-col max-md:mt-5 max-md:max-w-full">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <div
+                    className="flex flex-col w-[30%] max-md:w-full mb-5"
+                    key={product._id}
+                  >
+                    <ProductCard
+                      imageSrc={product.images[0]}
+                      title={product.name}
+                      priceRange={`$${Math.min(...product.variants.map((v) => v.price))}`} // Show lowest price
+                      discount="10%" // Add dynamic discount if needed
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>No products found in this range.</p>
+              )}
+            </div>
+          )}
+        </div> */}
+
+
       </div>
     </div>
   );
