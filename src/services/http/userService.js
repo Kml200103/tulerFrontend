@@ -24,15 +24,22 @@ export const UserService = BaseService.injectEndpoints({
         }),
         registerUser: builder.mutation({
             query: (body) => ({
-                url: `${apiUrl}/register`,
+                url: `${apiUrl}/registerUpdate`,
                 method: "post",
                 data: body,
             }),
         }),
+        updateUser:builder.mutation({
+            query:(body)=>({
+                url:`${apiUrl}/registerUpdate`,
+                method: "post",
+                data: body,
+            })
+        })
 
        
     }),
     overrideExisting: false,
 });
 
-export const {useGetUserQuery,useLoginUserMutation,useRegisterUserMutation}=UserService
+export const {useGetUserQuery,useLoginUserMutation,useRegisterUserMutation,useUpdateUserMutation}=UserService

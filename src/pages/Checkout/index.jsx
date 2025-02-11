@@ -285,7 +285,7 @@ const Checkout = () => {
             </div>
 
             {/* Add Address Form */}
-            {showAddAddressForm && <AddressForm title="Add" />}
+            {showAddAddressForm && <AddressForm title="Add" button="Add" />}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import apiClient from "../loaderAPI/loaderApi";
+import apiClient from "../loaderApi/loaderApi";
 
 // POST request utility function
 export const post = async (endpoint, params, headers = {}) => {
