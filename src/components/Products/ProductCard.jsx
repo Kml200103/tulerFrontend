@@ -1,40 +1,77 @@
-import * as React from "react";
+import React, { useState } from "react";
+import { post } from "../../services/http/axiosApi";
 
-function ProductCard({ imageSrc, title, priceRange, discount }) {
+function ProductCard({ userId, product }) {
+  const [selectedVariant, setSelectedVariant] = useState(product.variants[0]); // Default to first variant
+
+  const handleVariantChange = (event) => {
+    const selectedId = event.target.value;
+    const variant = product.variants.find((v) => v._id === selectedId);
+    setSelectedVariant(variant);
+  };
+
+  const handleAddToCart = async () => {
+    if (!userId || !selectedVariant) {
+      alert("Please select a variant before adding to cart.");
+      return;
+    }
+
+    try {
+      const response = await post("/cart/add", {
+        userId,
+        productId: product._id,
+        weight: selectedVariant.weight,
+        quantity: 1,
+        price: selectedVariant.price,
+      });
+
+      if (response.status === 200 || response.data?.success) {
+        alert("Product added to cart successfully!");
+      } else {
+        alert("Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      alert("Error adding product to cart.");
+    }
+  };
+
   return (
-    <div className="flex flex-col grow pb-5 w-full text-center text-black bg-white rounded-xl shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:mt-9 relative">
-      {discount && (
-        <div className="absolute -top-3 -right-3 z-10 px-3.5 py-2.5 text-sm font-extrabold whitespace-nowrap bg-yellow-400 rounded-3xl">
-          {discount}
-        </div>
-      )}
-      <div className="flex flex-col items-center px-4 mt-2 w-full font-semibold">
-        <img
-          loading="lazy"
-          src={imageSrc}
-          alt="Product"
-          className="object-contain self-stretch w-full rounded-xl aspect-[1.84]"
-        />
-        <div className="z-10 mt-6 text-xl">
-          <span className="text-base">{title}</span>
-          <br />
-          <br />
-        </div>
-        <div className="text-base">{priceRange}</div>
-        <div
-          className="flex gap-1.5 items-start px-3.5 py-2.5 mt-5 max-w-full text-sm text-amber-300 bg-black rounded-3xl w-[147px]"
-          tabIndex="0"
-          role="button"
+    <div className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md">
+      {/* Product Image */}
+      <img
+        src={product.images[0]}
+        alt={product.name}
+        className="w-full h-48 object-cover rounded-xl"
+      />
+
+      {/* Product Info */}
+      <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
+      <p className="mt-2 text-sm text-gray-600">{product.description}</p>
+
+      {/* Variant Selector */}
+      <div className="mt-4">
+        <label className="block text-sm font-semibold">Choose Weight:</label>
+        <select
+          className="w-full p-2 mt-1 border rounded-md"
+          onChange={handleVariantChange}
+          value={selectedVariant._id}
         >
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/894806623d78863f592eba6f3bf1318652cbab1c22af94232c6182283f083e08?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-            alt="Shopping Cart Icon"
-            className="object-contain shrink-0 self-start aspect-[1.08] w-[27px]"
-          />
-          <div className="my-auto">Add to cart</div>
-        </div>
+          {product.variants.map((variant) => (
+            <option key={variant._id} value={variant._id}>
+              {variant.weight} - ₹{variant.price}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {/* Add to Cart Button */}
+      <button
+        onClick={handleAddToCart}
+        className="mt-4 w-full py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
+      >
+        Add to Cart
+      </button>
     </div>
   );
 }
