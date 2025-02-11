@@ -48,7 +48,7 @@ const ProfilePage = () => {
           value:
             data.user.name.charAt(0).toUpperCase() + data.user.name.slice(1),
         },
-        { label: "Mobile Number", value: data.user.phoneNumber || "N/A" },
+        { label: "Mobile Number", value: data.user.phone || "N/A" },
         { label: "Email ID", value: data.user.email || "N/A" },
       ]
     : [];
@@ -63,6 +63,7 @@ const ProfilePage = () => {
   };
 
   const handleOpenEditDialog = (address) => {
+    
     console.log("Editing address:", address);
     setSelectedAddress(address); // Set the address to be edited
     setIsEditDialogOpen(true);
@@ -101,7 +102,7 @@ const ProfilePage = () => {
           />
         </div>
         {isEditProfileDialog && (
-          <ProfileUpdateDialog onClose={handleCloseEditProfileDialog} />
+          <ProfileUpdateDialog onClose={handleCloseEditProfileDialog} userData={data?.user} />
         )}
         <div className="mt-16 w-full max-w-[653px] max-md:mt-10 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">

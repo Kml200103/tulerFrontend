@@ -12,16 +12,20 @@ const AddressForm = ({ title, button, onClose, initialData }) => {
     reset,
   } = useForm();
 
+  console.log('in', initialData)
   const navigate = useNavigate();
   const { id } = useSelector((state) => state.auth.user);
 
   const onSubmit = async (data) => {
-    const payload = { ...data, userId: id }; // Include userId in the payload
+    console.log('data', data)
+    const payload = { ...data, userId: id }; 
 
+    console.log('payload', payload)
     try {
       // Make the API call to create or update the address
       const { receiveObj } = await post(`/address/add/${id}`, payload);
 
+      console.log('receiveobj', receiveObj)
       reset(); // Reset the form after submission
 
       // Check the response status
@@ -69,7 +73,7 @@ const AddressForm = ({ title, button, onClose, initialData }) => {
         </label>
         <input
           type="text"
-          {...register("street", { required: "Street address is required" })}
+          {...register("streetAddress", { required: "Street address is required" })}
           placeholder="Enter Street"
           className={`w-full p-2 border ${
             errors.street ? "border-red-500" : "border-gray-300"
@@ -125,6 +129,8 @@ const AddressForm = ({ title, button, onClose, initialData }) => {
             } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
           >
             <option value="">Select Country</option>
+            <option value="India">India</option>
+
             <option value="USA">USA</option>
             <option value="Canada">Canada</option>
           </select>
