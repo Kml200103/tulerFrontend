@@ -1,38 +1,30 @@
 import { useState, useRef, useEffect } from "react";
-import Cart from "../Cart";
 import { Link, useNavigate } from "react-router"; // Make sure to import Link from react-router-dom
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/auth/authSlice";
 
-export default function SocialIcons({ toggleSearchInput }) {
-  const [isCartOpen, setIsCartOpen] = useState(false);
+export default function SocialIcons() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { isLoggedIn } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const dropdownRef = useRef(null); // Create a ref for the dropdown
-  const cartRef = useRef(null); // Create a ref for the cart
   const router = useNavigate();
-  const toggleCart = () => {
-    setIsCartOpen((prev) => !prev);
-  };
 
   const handleLogout = () => {
     dispatch(logout());
     router("/");
   };
+
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  // Close dropdown and cart when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
-      }
-      if (cartRef.current && !cartRef.current.contains(event.target)) {
-        setIsCartOpen(false);
       }
     };
 
@@ -42,13 +34,13 @@ export default function SocialIcons({ toggleSearchInput }) {
       // Clean up the event listener
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownRef, cartRef]);
+  }, [dropdownRef]);
 
   return (
     <div className="relative">
       <div className="flex text-lg gap-2 items-start">
         {/* Social Media Icons */}
-        <button
+        {/* <button
           className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
           aria-label="Visit our Social media icon 1"
           onClick={toggleSearchInput} // Open search input on click
@@ -59,7 +51,7 @@ export default function SocialIcons({ toggleSearchInput }) {
             className="object-contain shrink-0 aspect-square w-[30px]"
             alt="Social media icon 1"
           />
-        </button>
+        </button> */}
 
         <button
           className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
@@ -73,25 +65,13 @@ export default function SocialIcons({ toggleSearchInput }) {
             alt="Social media icon 2"
           />
         </button>
-
-        <button
-          className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
-          aria-label="Visit our Social media icon 3"
-          onClick={toggleCart}
-        >
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/6a8d69cd46160b47eb3fdea162aaedfd579586976de6fd46e47a24c2265316ce?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec080 5"
-            className="object-contain shrink-0 aspect-square w-8 "
-          />
-        </button>
       </div>
 
       {/* Dropdown for Login/Register or Profile */}
       {isDropdownOpen && (
         <div
           ref={dropdownRef} // Attach the ref to the dropdown
-          className="absolute right-3  bg-white border border-gray-300 rounded-lg shadow-lg mt-2 p-4 w-48"
+          className="absolute right-3 bg-white border border-gray-300 rounded-lg shadow-lg mt-2 p-4 w-48"
         >
           {isLoggedIn ? (
             <div>
@@ -133,14 +113,6 @@ export default function SocialIcons({ toggleSearchInput }) {
               </div>
             </div>
           )}
-        </div>
-      )}
-
-      {/* Slide-in Cart */}
-      {isCartOpen && (
-        <div ref={cartRef}>
-          {/* Attach the ref to the cart */}
-          <Cart />
         </div>
       )}
     </div>

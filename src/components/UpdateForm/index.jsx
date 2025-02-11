@@ -1,36 +1,27 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useUpdateUserMutation } from "../../services/http/userService";
+import { useSelector } from "react-redux";
 
-const ProfileUpdateDialog = ({ onClose, userData }) => {
+const ProfileUpdateDialog = ({ onClose }) => {
+  const user = useSelector((state) => state.auth.user);
+
   const {
     register,
     handleSubmit,
-    reset,
+    setValue,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      name: userData?.name || "",
-      email: userData?.email || "",
-      mobile: userData?.mobile || "",
-    },
-  });
+  } = useForm();
 
-
-  const [updateUser] = useUpdateUserMutation()
-  console.log('userData', userData)
-  // Reset form with new userData when modal opens
   useEffect(() => {
-    reset(userData);
-  }, [userData, reset]);
-
-  const onSubmit = async (data) => {
-    console.log("Profile updated:", data);
-
-    if (data) {
-      const response = await updateUser(data).unwrap()
-      console.log('response', response)
+    if (user) {
+      setValue("name", user.name || "");
+      setValue("email", user.email || "");
+      setValue("phoneNumber", user.phoneNumber || "");
     }
+  }, [user, setValue]);
+
+  const onSubmit = (data) => {
+    console.log("Profile updated:", data);
     onClose();
   };
 
@@ -47,15 +38,15 @@ const ProfileUpdateDialog = ({ onClose, userData }) => {
           Update Profile
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/* Name Input */}
+          {/ Name Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">Name</label>
             <input
               type="text"
               {...register("name", { required: "Name is required" })}
-              placeholder="Enter your name"
-              className={`w-full p-2 border ${errors.name ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
+              className={`w-full p-2 border ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-2">
@@ -64,9 +55,11 @@ const ProfileUpdateDialog = ({ onClose, userData }) => {
             )}
           </div>
 
-          {/* Email Input */}
+          {/ Email Input /}
           <div className="mb-4">
-            <label className="block mb-1 font-medium text-gray-700">Email</label>
+            <label className="block mb-1 font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               {...register("email", {
@@ -76,9 +69,9 @@ const ProfileUpdateDialog = ({ onClose, userData }) => {
                   message: "Please enter a valid email address",
                 },
               })}
-              placeholder="Enter your email"
-              className={`w-full p-2 border ${errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
+              className={`w-full p-2 border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-2">
@@ -87,32 +80,34 @@ const ProfileUpdateDialog = ({ onClose, userData }) => {
             )}
           </div>
 
-          {/* Mobile Number Input */}
+          {/ Mobile Number Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
               Mobile Number
             </label>
             <input
               type="tel"
-              {...register("phone", { required: "Mobile number is required" })}
-              placeholder="Enter your mobile number"
-              className={`w-full p-2 border ${errors.mobile ? "border-red-500" : "border-gray-300"
-                } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
+              {...register("phoneNumber", {
+                required: "Mobile number is required",
+              })}
+              className={`w-full p-2 border ${
+                errors.phoneNumber ? "border-red-500" : "border-gray-300"
+              } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
-            {errors.mobile && (
+            {errors.phoneNumber && (
               <p className="text-red-500 text-sm mt-2">
-                *{errors.mobile.message}
+                *{errors.phoneNumber.message}
               </p>
             )}
           </div>
 
-          {/* Buttons */}
+          {/ Buttons /}
           <div className="flex justify-end mt-4">
             <button
               type="submit"
               className="text-blue-500 hover:text-blue-700 hover:underline"
             >
-              {`Update Profile`}
+              Update Profile
             </button>
           </div>
         </form>

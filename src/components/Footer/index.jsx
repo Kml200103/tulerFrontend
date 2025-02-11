@@ -1,6 +1,12 @@
 import React from "react";
+import { Link } from "react-router";
 
-const menuItems = ["Home", "Products", "Contact Us", "Cart"];
+const menuItems = [
+  { name: "Home", path: "/" },
+  { name: "Products", path: "/products" },
+  { name: "Contact Us", path: "/contact" },
+];
+
 const socialIcons = [
   {
     src: "https://cdn.builder.io/api/v1/image/assets/TEMP/100c9a9662cfb7f59e59b24b876a5dada1ae0cdc6647d2993d9ac0a673c6a4bf?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
@@ -130,14 +136,15 @@ export const Footer = () => {
       <div className="flex flex-col w-full max-w-[1498px] max-md:max-w-full">
         {/* Footer Content */}
         <div className="flex justify-between items-start w-full max-w-[1461px] max-md:flex-col max-md:items-center max-md:text-center">
-
           {/* Menu Section */}
           <div className="flex flex-col text-black">
             <div className="text-3xl font-semibold">Menu</div>
             <div className="mt-7 text-xl font-medium">
               {menuItems.map((item) => (
-                <div key={item} className="mb-3">
-                  {item}
+                <div key={item.name} className="mb-3">
+                  <Link to={item.path} className="hover:text-blue-600">
+                    {item.name}
+                  </Link>
                 </div>
               ))}
             </div>
@@ -239,12 +246,11 @@ export const Footer = () => {
                 news and updates
               </div>
               <div className="relative mt-4">
-              {/* bottle image */}
+                {/* bottle image */}
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/21d8913f5c9f45590a2651b620ce11816f44bdb57c2ea1f56a4f35bbca97c0c3?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
                   alt="Featured content"
-                
                   className="object-contain w-[238px] h-[177px] aspect-[1.34] absolute -top-10 right-1"
                 />
                 <img
@@ -257,15 +263,15 @@ export const Footer = () => {
             </div>
           </div>
         </div>
-   
-      {/* Separator */}
-      <div className="flex mt-12 w-full h-px bg-neutral-200"></div>
 
-      {/* Copyright */}
-      <div className="text-center mt-4 text-base font-medium text-black">
-        Copyright © 2025 Tuler. All rights reserved.
+        {/* Separator */}
+        <div className="flex mt-12 w-full h-px bg-neutral-200"></div>
+
+        {/* Copyright */}
+        <div className="text-center mt-4 text-base font-medium text-black">
+          Copyright © 2025 Tuler. All rights reserved.
+        </div>
       </div>
-    </div>
     </footer>
   );
 };

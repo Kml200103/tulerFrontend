@@ -13,6 +13,37 @@ const AddressForm = ({ title, button, onClose, initialData }) => {
   } = useForm();
 
   const navigate = useNavigate();
+
+  const user = useSelector((state) => state.auth.user);
+  const id = user?.id;
+
+  console.log("initail", initialData);
+
+  const onSubmit = async (data) => {
+    const payload = { ...data, userId: id }; // Include userId in the payload
+
+    try {
+      // Make the API call to create or update the address
+      const { receiveObj } = await post(`/address/add/${id}`, payload);
+
+      reset(); // Reset the form after submission
+
+      // Check the response status
+      if (receiveObj.status === true) {
+        NotificationService.sendInfoMessage(receiveObj.message);
+        onClose(); // Close the dialog after successful submission
+        navigate("/profile"); // Redirect to the profile page
+      } else {
+        NotificationService.sendErrorMessage(
+          "Error creating or updating address"
+        );
+      }
+    } catch (error) {
+      console.error("Error adding address:", error);
+      NotificationService.sendErrorMessage(
+        "An error occurred while adding the address."
+      );
+
   const { id } = useSelector((state) => state.auth.user);
 
   // Pre-fill the form when editing
@@ -39,6 +70,7 @@ const AddressForm = ({ title, button, onClose, initialData }) => {
     } catch (error) {
       console.error("Error submitting address:", error);
       NotificationService.sendErrorMessage("An error occurred while processing the address.");
+
     }
   };
   

@@ -23,13 +23,13 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/Protected/ProtectedRoute";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux/store";
-
+import ProductPage from "./pages/AddProduct";
+import AllProducts from "./pages/AllProducts";
+import AdminProfile from "./AdminProfile";
 
 export default function App() {
   return (
     <Provider store={store}>
-
-
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <Loader />
@@ -46,7 +46,6 @@ export default function App() {
                     <Products />
                   </Layout.main>
                 ) : (
-
                   <Products />
                 )
               }
@@ -113,7 +112,6 @@ export default function App() {
               }
             />
 
-
             {/* Protected Routes */}
             <Route
               path="/checkout"
@@ -143,11 +141,45 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/add-product"
+              element={
+                Layout ? (
+                  <Layout.admin>
+                    <ProductPage />
+                  </Layout.admin>
+                ) : (
+                  <ProductPage />
+                )
+              }
+            />
+            <Route
+              path="/all-products"
+              element={
+                Layout ? (
+                  <Layout.admin>
+                    <AllProducts />
+                  </Layout.admin>
+                ) : (
+                  <AllProducts />
+                )
+              }
+            />
+            <Route
+              path="/adminProfile"
+              element={
+                Layout ? (
+                  <Layout.admin>
+                    <AdminProfile />
+                  </Layout.admin>
+                ) : (
+                  <AdminProfile />
+                )
+              }
+            />
           </Routes>
         </BrowserRouter>
       </PersistGate>
-
-
     </Provider>
   );
 }
