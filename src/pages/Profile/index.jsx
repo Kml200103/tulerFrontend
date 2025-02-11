@@ -1,64 +1,130 @@
-
-import React, { Profiler, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PencilIcon } from "@heroicons/react/24/outline";
 import AddressForm from "../../components/AddressForm";
 import ProfileUpdateDialog from "../../components/UpdateForm";
-import { Link } from "react-router";
-
-import  { useCallback, useEffect } from "react";
-import AddressDetails from "../../components/AddressCard";
-import { login } from "../../redux/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "../../redux/auth/authSlice";
 import { useGetUserQuery } from "../../services/http/userService";
-
-
-const profileData = [
-  { label: "Full Name", value: "John Doe" },
-  { label: "Mobile Number", value: "+91-1234 5678 21" },
-  { label: "Email ID", value: "JohnDoe256@gmail.com" },
-];
-
+import { del, get } from "../../services/http/axiosApi";
+import AddressModal from "../../components/AddressModal";
+import ConfirmModal from "../../components/ConfirmModal";
+import { NotificationService } from "../../services/Notifcation";
 
 const ProfilePage = () => {
-
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [addressIdToRemove, setAddressIdToRemove] = useState(null);
   const [isEditProfileDialog, setIsEditProfileDialog] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null); // State to store the address being edited
+  const dispatch = useDispatch();
+  const { data, isError, isLoading } = useGetUserQuery();
+  const user = useSelector((state) => state.auth.user);
+  const id = user?.id;
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (isError) {
+      dispatch(logout()); // Dispatch the logout action
+      navigate("/login");
+    } else if (data) {
+      dispatch(login(data)); // Log in user if data is valid
+    }
+  }, [data, isError, dispatch]);
 
-  const handleOpenAddDialog = () => {
-    setIsAddDialogOpen(true);
+
+
+  const handleRemove = async (id) => {
+    try {
+      const { receiveObj } = await del(`/address/${id}`);
+
+      if (receiveObj.success) {
+        NotificationService.sendSuccessMessage(`${receiveObj.message}`)
+
+        // Refresh the address list after deletion
+        await getAllAddress();
+
+        // Close the modal
+        setIsConfirmModalOpen(false);
+      } else {
+        console.error("Failed to delete address");
+      }
+    } catch (error) {
+      console.error("Error deleting address", error);
+    }
   };
 
-  const handleCloseAddDialog = () => {
-    setIsAddDialogOpen(false);
-  };
-  const handleOpenEditDialog = () => {
-    setIsEditDialogOpen(true);
+  const handleOpenConfirmModal = (id) => {
+    setAddressIdToRemove(id);
+    setIsConfirmModalOpen(true);
   };
 
-  const handleCloseEditDialog = () => {
-    setIsEditDialogOpen(false);
+  const handleCloseConfirmModal = () => {
+    setIsConfirmModalOpen(false);
   };
+  // Fetch addresses for the user
+  const getAllAddress = async () => {
+    try {
+      const { receiveObj } = await get(`/address/${id}`);
+      setAddresses(receiveObj.addresses || []); // Set addresses from the response
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      getAllAddress();
+    }
+  }, [id]); // Fetch addresses when the component mounts or when id changes
+
+  // Check if data is available and handle it safely
+  const profileData = data?.user
+    ? [
+      {
+        label: "Full Name",
+        value:
+          data.user.name.charAt(0).toUpperCase() + data.user.name.slice(1),
+      },
+      { label: "Mobile Number", value: data.user.phone || "N/A" },
+      { label: "Email ID", value: data.user.email || "N/A" },
+    ]
+    : [];
+
+
 
   const handleOpenEditProfileDialog = () => {
     setIsEditProfileDialog(true);
   };
 
+  // const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const handleOpenModal = (address = null) => {
+    setSelectedAddress(address);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedAddress(null);
+    getAllAddress(); // Refresh addresses after closing the modal
+  };
+
+
   const handleCloseEditProfileDialog = () => {
     setIsEditProfileDialog(false);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>; // Show loading state
+  }
 
-  const dispatch = useDispatch()
-
-  const { data, isError, isLoading, isSuccess } = useGetUserQuery()
-
-  useEffect(() => {
-    console.log("data", data);
-    if (data) {
-      dispatch(login(data));
-    }
-  }, [data])
+  if (isError) {
+    return <div>Error loading profile data.</div>; // Show error state
+  }
 
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px]">
@@ -68,12 +134,12 @@ const ProfilePage = () => {
             Profile Details
           </h1>
           <PencilIcon
-            className="h-6 w-6  mt-6 text-gray-500 cursor-pointer "
+            className="h-6 w-6 mt-6 text-gray-500 cursor-pointer"
             onClick={handleOpenEditProfileDialog}
           />
         </div>
         {isEditProfileDialog && (
-          <ProfileUpdateDialog onClose={handleCloseEditProfileDialog} />
+          <ProfileUpdateDialog onClose={handleCloseEditProfileDialog} userData={data?.user} />
         )}
         <div className="mt-16 w-full max-w-[653px] max-md:mt-10 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
@@ -105,119 +171,92 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Separator between Profile Details and Saved Addresses */}
         <hr className="my-8 border-t border-gray-300 w-full" />
 
-        <div className="flex items-center justify-between  gap-6 max-md:mt-10">
-          <h2 className="text-3xl font-semibold leading-loose text-neutral-700">
-            Saved Addresses
-          </h2>
-          <div className="flex text-lg font-medium text-black">
-            <button
-              className="px-8 py-4 bg-yellow-400 rounded-[30px]"
-              onClick={handleOpenAddDialog} // Open dialog on button click
-            >
-              + Add New Address
-            </button>
-            <Link to="/my-orders">
-              {" "}
-              {/* Link to My Orders page */}
-              <button className="px-8 py-4 bg-blue-500 text-white rounded-[30px] ml-4">
-                My Orders
-              </button>
-            </Link>
-          </div>
-        </div>
-        {isAddDialogOpen && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-5 w-4/5 max-w-2xl h-auto relative">
-              {" "}
-              {/* Increased width */}
-              {/* Close Button */}
+
+        <div>
+          {/* Header Section */}
+          <div className="flex items-center justify-between gap-6 max-md:mt-10">
+            <h2 className="text-3xl font-semibold leading-loose text-neutral-700">
+              Saved Addresses
+            </h2>
+            <div className="flex text-lg font-medium text-black">
               <button
-                className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-4xl p-2" // Increased size
-                onClick={handleCloseEditProfileDialog} // Close dialog on click
+                className="px-8 py-4 bg-yellow-400 rounded-[30px]"
+                onClick={() => handleOpenModal()}
               >
-                &times; {/* This is the "X" character */}
+                + Add New Address
               </button>
+              <Link to="/my-orders">
+                <button className="px-8 py-4 bg-blue-500 text-white rounded-[30px] ml-4">
+                  My Orders
+                </button>
+              </Link>
             </div>
           </div>
-        )}
-        <h3 className="mt-14 text-xl font-semibold leading-3 text-neutral-700 max-md:mt-10">
-          Default Address
-        </h3>
-        <div className="mt-10 flex flex-col font-medium rounded-none w-full">
-          <div className="flex flex-wrap gap-5 justify-between px-5 py-9 w-full bg-white shadow-[0px_0px_4px_rgba(0,0,0,0.15)] max-md:pr-5 max-md:max-w-full">
-            <div className="flex flex-col text-base text-black">
-              <div className="leading-6">
-                456 Elm Street, Suite 3, <br />
-                Los Angeles, CA, 90001, <br />
-                USA
-              </div>
-              <div className="mt-5">Mobile: +91-1234 5678 21</div>
-              <div className="flex justify-between mt-10 w-full">
-                <button
-                  className={`px-16 py-4 text-lg whitespace-nowrap bg-yellow-400 rounded-[30px] max-md:px-5`}
-                  onClick={handleOpenEditDialog}
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-            {isEditDialogOpen && ( // Assuming you have a state for edit dialog
-              <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                <div className="bg-white rounded-lg p-5 w-4/5 max-w-2xl h-auto relative">
-                  {/* Close Button */}
+
+          {/* Address List */}
+
+
+          <div className="mt-10 flex flex-col font-medium rounded-none w-full">
+            <h3 className="mb-0 text-xl font-semibold leading-3 text-neutral-700 max-md:mt-14">
+              Addresses
+            </h3>
+            {addresses.map((address, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap gap-5 justify-between px-5 py-9 w-full bg-white shadow-sm mt-8"
+              >
+                <div className="flex flex-col text-base text-black">
+                  <div className="leading-6">
+                    {address?.name} <br />
+                    {address.streetAddress}, <br />
+                    {address.city}, {address.state}, {address.pincode}, <br />
+                    {address.country}
+                  </div>
+                  <div className="mt-5">Mobile: {address.phoneNumber || "N/A"}</div>
+                  <div className="flex justify-between mt-10 w-full">
+                    <button
+                      className="px-16 py-4 text-lg bg-yellow-400 rounded-[30px] max-md:px-5"
+                      onClick={() => handleOpenModal(address)}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-col whitespace-nowrap">
+                  <div className="self-end px-4 py-1.5 text-base bg-zinc-300 rounded-[30px] text-stone-500">
+                    {address.addressType.charAt(0).toUpperCase() +
+                      address.addressType.slice(1)}
+                  </div>
                   <button
-                    className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-4xl p-2" // Increased size
-                    onClick={handleCloseEditDialog} // Close dialog on click
+                    className="px-16 py-4 mt-[140px] text-lg bg-yellow-400 rounded-[30px] max-md:px-5"
+                    onClick={() => handleOpenConfirmModal(address._id)}
                   >
-                    &times; {/* This is the "X" character */}
+                    Remove
                   </button>
-                  <AddressForm title="Edit" button="Update" />
                 </div>
               </div>
-            )}
-            <div className="flex flex-col whitespace-nowrap">
-              <div className="self-end px-4 py-1.5 text-base bg-zinc-300 rounded-[30px] text-stone-500">
-                Home
-              </div>
-              <button
-                className={`px-16 py-4 mt-[120px] text-lg whitespace-nowrap bg-yellow-400 rounded-[30px] max-md:px-5`}
-              >
-                Remove
-              </button>
-            </div>
+            ))}
           </div>
-        </div>
 
-        <div className="mt-10 flex flex-col font-medium rounded-none w-full">
-          <h3 className=" mb-0  text-xl font-semibold leading-3 text-neutral-700 max-md:mt-14 max-md:mb -2.5">
-            Other Address
-          </h3>
-          <div className="flex flex-wrap gap-5 justify-between px-5 py-9 w-full bg-white shadow-[0px_0px_4px_rgba(0,0,0,0.15)] max-md:pr-5 max-md:max-w-full mt-8">
-            <div className="flex flex-col text-base text-black">
-              <div className="leading-6">
-                456 Elm Street, Suite 3, <br />
-                Los Angeles, CA, 90001, <br />
-                USA
-              </div>
-              <div className="mt-5">Mobile: +91-1234 5678 21</div>
-              <div className="flex justify-between mt-10 w-full">
-                <button
-                  className={`px-16 py-4 text-lg whitespace-nowrap bg-yellow-400 rounded-[30px] max-md:px-5`}
-                  onClick={handleOpenEditDialog}
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-            <div className="flex flex-col whitespace-nowrap">
-              <div className="self-end px-4 py-1.5 text-base bg-zinc-300 rounded-[30px] text-stone-500">
-                Home
-              </div>
-            </div>
-          </div>
+          {/* Common Modal for Add/Edit */}
+          {/* {modalOpen &&  */}
+          <AddressModal
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+            initialValues={selectedAddress}
+          />
+
+
+          <ConfirmModal
+            open={isConfirmModalOpen}
+            onClose={handleCloseConfirmModal}
+            onConfirm={() => handleRemove(addressIdToRemove)}
+            title="Confirm Cancellation"
+            message="Are you sure you want to cancel this order?"
+          />
+
         </div>
       </div>
     </div>

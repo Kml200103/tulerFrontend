@@ -38,7 +38,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
           Update Profile
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/* Name Input */}
+          {/ Name Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">Name</label>
             <input
@@ -55,7 +55,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
             )}
           </div>
 
-          {/* Email Input */}
+          {/ Email Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
               Email
@@ -80,7 +80,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
             )}
           </div>
 
-          {/* Mobile Number Input */}
+          {/ Mobile Number Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
               Mobile Number
@@ -101,7 +101,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
             )}
           </div>
 
-          {/* Buttons */}
+          {/ Buttons /}
           <div className="flex justify-end mt-4">
             <button
               type="submit"
