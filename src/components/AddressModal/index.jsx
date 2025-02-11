@@ -12,8 +12,8 @@ const AddressModal = ({ isOpen, onClose, initialValues, button }) => {
     reset,
   } = useForm();
 
-  const { id } = useSelector((state) => state.auth.user);
-
+  const user = useSelector((state) => state.auth.user);
+const id=user?.id
   useEffect(() => {
     if (initialValues) {
       reset(initialValues); // Populate form with existing values for editing
