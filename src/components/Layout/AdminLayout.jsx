@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Header from "../Header";
 import { Footer } from "../Footer";
+import AdminHeader from "../AdminHeader";
 
-const TestLayout = ({ children }) => {
+const AdminLayout = ({ children }) => {
   const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
   const [isVisible, setIsVisible] = useState(false);
 
@@ -33,7 +34,7 @@ const TestLayout = ({ children }) => {
   return (
     <>
       <div className="">
-        <Footer />
+        <AdminHeader></AdminHeader>
         <div className="mt-10">{children}</div>
 
         <div className={`scrollToTopButton ${isVisible ? "visible" : ""}`}>
@@ -52,10 +53,10 @@ const TestLayout = ({ children }) => {
           </button>
         </div>
 
-        <Header />
+        <Footer />
       </div>
     </>
   );
 };
 
-export default TestLayout;
+export default AdminLayout;

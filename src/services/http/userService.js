@@ -1,38 +1,38 @@
-
 import { BaseService } from "../../redux/reduxQuery";
 import { apiUrl } from "../../utils/constants";
 
-
 export const UserService = BaseService.injectEndpoints({
-    endpoints: (builder) => ({
-        getUser: builder.query({
-            query: () => ({
-                url: `${apiUrl}/verify`,
-                method: "get",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-                },
-            }),
-        }),
-
-        loginUser: builder.mutation({
-            query: (body) => ({
-                url: `${apiUrl}/auth/login`,
-                method: "post",
-                data: body,
-            }),
-        }),
-        registerUser: builder.mutation({
-            query: (body) => ({
-                url: `${apiUrl}/register`,
-                method: "post",
-                data: body,
-            }),
-        }),
-
-       
+  endpoints: (builder) => ({
+    getUser: builder.query({
+      query: () => ({
+        url: `${apiUrl}/verify`,
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        },
+      }),
     }),
-    overrideExisting: false,
+
+    loginUser: builder.mutation({
+      query: (body) => ({
+        url: `${apiUrl}/auth/login`,
+        method: "post",
+        data: body,
+      }),
+    }),
+    registerUser: builder.mutation({
+      query: (body) => ({
+        url: `${apiUrl}/registerUpdate`,
+        method: "post",
+        data: body,
+      }),
+    }),
+  }),
+  overrideExisting: false,
 });
 
-export const {useGetUserQuery,useLoginUserMutation,useRegisterUserMutation}=UserService
+export const {
+  useGetUserQuery,
+  useLoginUserMutation,
+  useRegisterUserMutation,
+} = UserService;

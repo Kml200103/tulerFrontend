@@ -1,2 +1,2 @@
 export const MAINLAYOUT = "Main";
-export const TESTLAYOUT = "Test";
+export const ADMINLAYOUT = "Admin";

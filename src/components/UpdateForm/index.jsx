@@ -1,18 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 
 const ProfileUpdateDialog = ({ onClose }) => {
+  const user = useSelector((state) => state.auth.user);
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    // Handle form submission, e.g., send data to an API
-    console.log("Profile updated:", data);
+  useEffect(() => {
+    if (user) {
+      setValue("name", user.name || "");
+      setValue("email", user.email || "");
+      setValue("phoneNumber", user.phoneNumber || "");
+    }
+  }, [user, setValue]);
 
-    // Close the dialog after submission
+  const onSubmit = (data) => {
+    console.log("Profile updated:", data);
     onClose();
   };
 
@@ -20,10 +29,10 @@ const ProfileUpdateDialog = ({ onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-5 w-4/5 max-w-lg relative">
         <button
-          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-4xl p-2" // Increased size
-          onClick={onClose} // Close dialog on click
+          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-4xl p-2"
+          onClick={onClose}
         >
-          &times; {/* This is the "X" character */}
+          &times;
         </button>
         <h2 className="text-xl font-semibold mb-4 text-center">
           Update Profile
@@ -35,7 +44,6 @@ const ProfileUpdateDialog = ({ onClose }) => {
             <input
               type="text"
               {...register("name", { required: "Name is required" })}
-              placeholder="Enter your name"
               className={`w-full p-2 border ${
                 errors.name ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
@@ -61,7 +69,6 @@ const ProfileUpdateDialog = ({ onClose }) => {
                   message: "Please enter a valid email address",
                 },
               })}
-              placeholder="Enter your email"
               className={`w-full p-2 border ${
                 errors.email ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
@@ -72,6 +79,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
               </p>
             )}
           </div>
+
           {/* Mobile Number Input */}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
@@ -79,15 +87,16 @@ const ProfileUpdateDialog = ({ onClose }) => {
             </label>
             <input
               type="tel"
-              {...register("mobile", { required: "Mobile number is required" })}
-              placeholder="Enter your mobile number"
+              {...register("phoneNumber", {
+                required: "Mobile number is required",
+              })}
               className={`w-full p-2 border ${
-                errors.mobile ? "border-red-500" : "border-gray-300"
+                errors.phoneNumber ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
-            {errors.mobile && (
+            {errors.phoneNumber && (
               <p className="text-red-500 text-sm mt-2">
-                *{errors.mobile.message}
+                *{errors.phoneNumber.message}
               </p>
             )}
           </div>
@@ -98,7 +107,7 @@ const ProfileUpdateDialog = ({ onClose }) => {
               type="submit"
               className="text-blue-500 hover:text-blue-700 hover:underline"
             >
-              {`Update Profile`}
+              Update Profile
             </button>
           </div>
         </form>

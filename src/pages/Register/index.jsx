@@ -121,6 +121,37 @@ const Register = () => {
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
           )}
         </div>
+        <div className="mt-4">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Phone Number
+          </label>
+          <input
+            id="phone"
+            type="text"
+            maxLength={10}
+            {...register("phone", {
+              required: "Phone number is required",
+              pattern: {
+                value: /^[6-9]\d{9}$/, // Must start with 6-9 and followed by 9 digits
+                message:
+                  "Invalid phone number format. Must be 10 digits and start with 6-9.",
+              },
+              maxLength: {
+                value: 10,
+                message: "Phone number must be exactly 10 digits.",
+              },
+            })}
+            className={`px-2.5 py-5 mt-3 w-full text-md whitespace-nowrap bg-white rounded-xl border ${
+              errors.phone ? "border-red-400" : "border-gray-300"
+            } border-solid text-neutral-700`}
+          />
+          {errors.phone && (
+            <p className="text-red-400 text-sm mt-3">*{errors.phone.message}</p>
+          )}
+        </div>
 
         {/* Password input */}
         <div className="mt-4 relative">

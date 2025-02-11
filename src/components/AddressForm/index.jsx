@@ -1,5 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { post } from "../../services/http/axiosApi";
+import { useNavigate } from "react-router";
 
 const AddressForm = ({ title, button }) => {
   const {
@@ -8,11 +11,37 @@ const AddressForm = ({ title, button }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    // Here you can handle the form submission, e.g., send data to an API
-    console.log("Address added:", data);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
+  const id = user?.id;
 
-    // Close the dialog after submission
+  console.log("initail", initialData);
+
+  const onSubmit = async (data) => {
+    const payload = { ...data, userId: id }; // Include userId in the payload
+
+    try {
+      // Make the API call to create or update the address
+      const { receiveObj } = await post(`/address/add/${id}`, payload);
+
+      reset(); // Reset the form after submission
+
+      // Check the response status
+      if (receiveObj.status === true) {
+        NotificationService.sendInfoMessage(receiveObj.message);
+        onClose(); // Close the dialog after successful submission
+        navigate("/profile"); // Redirect to the profile page
+      } else {
+        NotificationService.sendErrorMessage(
+          "Error creating or updating address"
+        );
+      }
+    } catch (error) {
+      console.error("Error adding address:", error);
+      NotificationService.sendErrorMessage(
+        "An error occurred while adding the address."
+      );
+    }
   };
 
   return (
