@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
 import { useSelector } from "react-redux";
-import { Link } from "react-router";
+import { Link } from "react-router"; // Use react-router-dom
 
 export default function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [cartData, setCartData] = useState(null);
   const [quantities, setQuantities] = useState({}); // State to hold quantities
+  const [updating, setUpdating] = useState(false); // Prevent multiple API calls
 
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
 
+  // Fetch Cart Data
   const fetchCartData = useCallback(async () => {
     if (!id) return;
     try {
@@ -33,27 +35,36 @@ export default function Cart() {
     fetchCartData();
   }, [fetchCartData]);
 
-  const toggleCart = useCallback(() => {
-    setIsFadingOut(true);
-    setTimeout(() => {
-      setIsCartOpen(false);
-      setIsFadingOut(false);
-    }, 300);
-  }, []);
+  // Optimized quantity update function
+  const updateQuantity = useCallback(
+    async (productId, weight, change) => {
+      if (updating) return; // Prevent multiple requests at the same time
+      setUpdating(true);
 
-  const cartItems = useMemo(() => {
-    return (
-      cartData?.items?.map((item) => ({
-        id: item._id,
-        image: item.productId?.images?.[0] || "",
-        title: item.productId?.name || "Unknown Product",
-        price: item.price || 0,
-        quantity: quantities[item._id] || 1, // Use quantities state
-        weight: item.weight,
-      })) || []
-    );
-  }, [cartData, quantities]);
+      setQuantities((prev) => {
+        const newQuantity = Math.max((prev[productId] || 1) + change, 1);
+        return { ...prev, [productId]: newQuantity };
+      });
 
+      try {
+        const newQuantity = Math.max((quantities[productId] || 1) + change, 1);
+
+        await put("/cart/update", {
+          userId: id,
+          productId,
+          weight,
+          quantity: newQuantity,
+        });
+
+        fetchCartData(); // Refresh cart
+      } catch (error) {
+        console.error("Error updating cart quantity:", error);
+      } finally {
+        setUpdating(false);
+      }
+    },
+    [id, updating, quantities, fetchCartData]
+  );
 
   return (
     <div
@@ -61,7 +72,6 @@ export default function Cart() {
         isCartOpen ? "open" : "closed"
       } ${isFadingOut ? "fade-out" : ""}`}
     >
-      {/* Header */}
       <div className="flex items-center justify-between">
         <img
           loading="lazy"
@@ -70,7 +80,13 @@ export default function Cart() {
           className="object-contain w-10"
         />
         <button
-          onClick={toggleCart}
+          onClick={() => {
+            setIsFadingOut(true);
+            setTimeout(() => {
+              setIsCartOpen(false);
+              setIsFadingOut(false);
+            }, 300);
+          }}
           className="text-2xl font-bold text-gray-500 hover:text-gray-800"
         >
           &times;
@@ -79,26 +95,22 @@ export default function Cart() {
 
       <div className="mt-6 w-full bg-neutral-200 h-[1px]" />
 
-      {/* Cart Items */}
       <div className="overflow-y-auto flex-grow">
-        {cartItems.length > 0 ? (
-          cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex gap-7 items-center self-start mt-8 ml-6 font-semibold"
-            >
+        {cartData?.items?.length > 0 ? (
+          cartData.items.map((item) => (
+            <div key={item._id} className="flex gap-7 items-center mt-8 ml-6 font-semibold">
               <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                 <button
-                  onClick={() => updateQuantity(item.id, 1)}
+                  onClick={() => updateQuantity(item.productId._id, item.weight, 1)}
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
                 >
                   +
                 </button>
                 <span className="py-2 text-lg font-semibold">
-                  {quantities[item.id] || 1}
+                  {quantities[item._id] || 1}
                 </span>
                 <button
-                  onClick={() => updateQuantity(item.id, -1)}
+                  onClick={() => updateQuantity(item.productId._id, item.weight, -1)}
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
                 >
                   -
@@ -106,27 +118,14 @@ export default function Cart() {
               </div>
               <img
                 loading="lazy"
-                src={item.image}
-                alt={item.title}
+                src={item.productId?.images?.[0] || ""}
+                alt={item.productId?.name || "Unknown Product"}
                 className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
               />
               <div className="flex flex-col self-stretch my-auto text-sm">
-                <div className="text-neutral-900">{item.title}</div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-gray-600">Quantity:</span>
-                  <span className="text-neutral-900">
-                    {quantities[item.id] || 1}
-                  </span>
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-gray-600">Price:</span>
-                  <span className="text-black">${item.price.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between mt-1">
-                  <span className="text-gray-600">Weight:</span>
-                  <span className="text-black">{item.weight}</span>{" "}
-                  {/* Assuming weight is in kg */}
-                </div>
+                <div className="text-neutral-900">{item.productId?.name}</div>
+                <div className="text-gray-600 mt-1">Price: ${item.price.toFixed(2)}</div>
+                <div className="text-gray-600 mt-1">Weight: {item.weight}</div>
               </div>
             </div>
           ))
@@ -135,7 +134,6 @@ export default function Cart() {
         )}
       </div>
 
-      {/* Checkout */}
       <Link
         to="/checkout"
         className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"

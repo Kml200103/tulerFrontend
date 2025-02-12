@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import { get, post } from "../../services/http/axiosApi";
+import { del, get, post } from "../../services/http/axiosApi";
+import CategoryModal from "../../components/Modals/categoryModal";
 
 const ProductPage = () => {
   const {
@@ -29,6 +30,63 @@ const ProductPage = () => {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
 
+
+
+  const handleImagePreview = (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setValue("images", files); // Explicitly update form value
+      const imageUrls = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPreviewImages(imageUrls);
+    }
+  };
+
+
+   const addCategory = async (name) => {
+        const result = await post("/category/createUpdate", { name });
+        console.log("Add Category Response:", result); // Debugging
+      
+        if (result.isSuccess && result.receiveObj) {
+         setIsCategoryDialogOpen(false)
+        } else {
+          console.error("Failed to add category:", result.receiveObj);
+        }
+      };
+      
+
+    // Update category via API
+    const updateCategory = async (id, newName) => {
+        const result = await post(`/category/createUpdate`, { name: newName,_id:id });
+        if (result.isSuccess) {
+          setIsCategoryDialogOpen(false)
+        } else {
+            console.error("Failed to update category:", result.receiveObj);
+        }
+    };
+
+    // Delete category via API
+    const deleteCategory = async (id) => {
+     
+        const result = await del(`/category/${id}`);
+        if (result.isSuccess) {
+            setIsCategoryDialogOpen(false)
+        } else {
+            console.error("Failed to delete category:", result.receiveObj);
+        }
+    };
+
+  const getCategory = async () => {
+    const result = await get("/category/all");
+    console.log("API Response:", result); // Debugging
+    if (result.isSuccess) {
+      console.log("Categories received:", result.receiveObj.categories);
+      setCategories(result.receiveObj.categories);
+    } else {
+      console.error("Failed to get categories:", result.receiveObj);
+    }
+  };
   const onSubmit = async (data) => {
     const formData = new FormData();
 
@@ -37,11 +95,12 @@ const ProductPage = () => {
     formData.append("description", data.description);
     formData.append("productId", data.productId || "");
 
-    if (data.images && data.images.length > 0) {
+    if (data.images) {
       Array.from(data.images).forEach((file) => {
-        formData.append("images", file);
+        formData.append("images[]", file); // Ensuring array format for backend compatibility
       });
     }
+
 
     // Append each variant separately
     data.variants.forEach((variant, index) => {
@@ -61,42 +120,6 @@ const ProductPage = () => {
       console.error("Failed to save product:", result.receiveObj);
     }
   };
-
-  const handleImagePreview = (e) => {
-    const files = e.target.files;
-    if (files) {
-      const imageUrls = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setPreviewImages(imageUrls);
-    }
-  };
-
-  const addCategory = async () => {
-    if (!newCategory.trim()) return;
-
-    const result = await post("/category/createUpdate", { name: newCategory });
-
-    if (result.isSuccess) {
-      setCategories([...categories, result.receiveObj]); // Update category list
-      setNewCategory("");
-      setIsCategoryDialogOpen(false); // Close dialog
-    } else {
-      console.error("Failed to add category:", result.receiveObj);
-    }
-  };
-
-  const getCategory = async () => {
-    const result = await get("/category/all");
-    console.log("API Response:", result); // Debugging
-    if (result.isSuccess) {
-      console.log("Categories received:", result.receiveObj.categories);
-      setCategories(result.receiveObj.categories);
-    } else {
-      console.error("Failed to get categories:", result.receiveObj);
-    }
-  };
-
   useEffect(() => {
     getCategory();
   }, []);
@@ -150,7 +173,7 @@ const ProductPage = () => {
                   onClick={() => setIsCategoryDialogOpen(true)}
                   className="bg-blue-500 text-white px-3 py-1 rounded"
                 >
-                  + Add
+                  Manage Categories
                 </button>
               </div>
               <div className="mt-2">
@@ -177,7 +200,7 @@ const ProductPage = () => {
             </div>
 
             {/* Dialog for Adding New Category */}
-            {isCategoryDialogOpen && (
+            {/* {isCategoryDialogOpen && (
               <div className="fixed inset-0 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded shadow-lg w-96">
                   <h3 className="text-lg font-semibold mb-4">
@@ -206,7 +229,7 @@ const ProductPage = () => {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             <div>
               <label
@@ -385,6 +408,18 @@ const ProductPage = () => {
           </form>
         </div>
       </div>
+
+
+
+      <CategoryModal
+        isOpen={isCategoryDialogOpen}
+        onClose={() => setIsCategoryDialogOpen(false)}
+        categories={categories}
+        addCategory={addCategory}
+        deleteCategory={deleteCategory}
+        updateCategory={updateCategory}
+        getCategory={getCategory}
+      />
     </div>
   );
 };
