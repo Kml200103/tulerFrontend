@@ -26,7 +26,7 @@ const ProfilePage = () => {
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
   const userRole = user?.role;
-
+ 
   const navigate = useNavigate();
 
   localStorage.setItem("userRole", userRole);
