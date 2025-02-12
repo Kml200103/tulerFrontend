@@ -47,7 +47,7 @@ function ProductCard({ userId, product }) {
 
       {/* Product Info */}
       <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
-      <p className="mt-2 text-sm text-gray-600">{product.description}</p>
+      {/* <p className="mt-2 text-sm text-gray-600">{product.description}</p> */}
 
       {/* Variant Selector */}
       <div className="mt-4">
