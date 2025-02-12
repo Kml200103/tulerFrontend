@@ -215,7 +215,7 @@ const ProfilePage = () => {
                 <div className="flex flex-col text-base text-black">
                   <div className="leading-6">
                     {address?.name} <br />
-                    {address?.street}, <br />
+                    {address?.streetAddress}, <br />
                     {address.city}, {address.state}, {address.pincode}, <br />
                     {address.country}
                   </div>

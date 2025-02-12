@@ -97,7 +97,7 @@ const ProductPage = () => {
 
     if (data.images) {
       Array.from(data.images).forEach((file) => {
-        formData.append("images[]", file); // Ensuring array format for backend compatibility
+        formData.append("images", file); // Ensuring array format for backend compatibility
       });
     }
 

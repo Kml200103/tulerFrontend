@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
 import { useSelector } from "react-redux";
-import { Link } from "react-router"; // Use react-router-dom
+import { Link } from "react-router"; // Fixed import for react-router-dom
 
 export default function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [cartData, setCartData] = useState(null);
-  const [quantities, setQuantities] = useState({}); // State to hold quantities
   const [updating, setUpdating] = useState(false); // Prevent multiple API calls
 
   const user = useSelector((state) => state.auth.user);
@@ -19,13 +18,6 @@ export default function Cart() {
     try {
       const { receiveObj } = await get(`/cart/${id}`);
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
-
-      // Initialize quantities state
-      const initialQuantities = {};
-      receiveObj?.cart?.items.forEach((item) => {
-        initialQuantities[item._id] = item.quantity;
-      });
-      setQuantities(initialQuantities);
     } catch (error) {
       console.error("Error fetching cart data:", error);
     }
@@ -35,35 +27,42 @@ export default function Cart() {
     fetchCartData();
   }, [fetchCartData]);
 
-  // Optimized quantity update function
+  // Update quantity and refresh cart
   const updateQuantity = useCallback(
     async (productId, weight, change) => {
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
-      setQuantities((prev) => {
-        const newQuantity = Math.max((prev[productId] || 1) + change, 1);
-        return { ...prev, [productId]: newQuantity };
-      });
+      // Get current quantity from cartData instead of local state
+      const currentItem = cartData?.items?.find(
+        (item) => item.productId._id === productId && item.weight === weight
+      );
+
+      if (!currentItem) {
+        console.error("Item not found in cart");
+        setUpdating(false);
+        return;
+      }
+
+      const newQuantity = Math.max(currentItem.quantity + change, 1);
 
       try {
-        const newQuantity = Math.max((quantities[productId] || 1) + change, 1);
-
         await put("/cart/update", {
           userId: id,
           productId,
           weight,
-          quantity: newQuantity,
+          quantity: newQuantity, // Send updated quantity to API
         });
 
-        fetchCartData(); // Refresh cart
+        // Refresh cart after update
+        await fetchCartData();
       } catch (error) {
         console.error("Error updating cart quantity:", error);
       } finally {
         setUpdating(false);
       }
     },
-    [id, updating, quantities, fetchCartData]
+    [id, updating, fetchCartData, cartData]
   );
 
   return (
@@ -103,15 +102,17 @@ export default function Cart() {
                 <button
                   onClick={() => updateQuantity(item.productId._id, item.weight, 1)}
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
+                  disabled={updating} // Disable button while updating
                 >
                   +
                 </button>
                 <span className="py-2 text-lg font-semibold">
-                  {quantities[item._id] || 1}
+                  {item.quantity} {/* Directly use cartData for real-time updates */}
                 </span>
                 <button
                   onClick={() => updateQuantity(item.productId._id, item.weight, -1)}
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
+                  disabled={updating} // Disable button while updating
                 >
                   -
                 </button>
