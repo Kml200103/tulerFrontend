@@ -3,7 +3,6 @@ import ProductCard from "./ProductCard";
 import { get } from "../../services/http/axiosApi";
 import { useSelector } from "react-redux";
 
-
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
@@ -12,7 +11,7 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
-  const { id } = useSelector((state) => state.auth.user);
+  // const { id } = useSelector((state) => state.auth.user);
   // Fetch products from API only once
   useEffect(() => {
     const fetchProducts = async () => {
@@ -20,7 +19,7 @@ const Products = () => {
       try {
         const response = await get("/products"); // Replace with actual API
         // const data = await response.json();
-        console.log('response', response)
+        console.log("response", response);
         if (response.isSuccess) {
           setProducts(response?.receiveObj?.products);
         } else {
@@ -68,7 +67,7 @@ const Products = () => {
     [minPrice, maxPrice]
   );
 
-  console.log('filtered', filteredProducts)
+  console.log("filtered", filteredProducts);
 
   return (
     <div className="container flex overflow-hidden flex-col bg-white">
@@ -236,8 +235,6 @@ const Products = () => {
             </div>
           )}
         </div> */}
-
-
       </div>
     </div>
   );

@@ -25,14 +25,13 @@ const ProfilePage = () => {
   const { data, isError, isLoading } = useGetUserQuery();
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
+  const userRole = user?.role;
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  console.log('data', data)
-
+  localStorage.setItem("userRole", userRole);
 
   useEffect(() => {
-
     if (isError) {
       dispatch(logout()); // Dispatch the logout action
       navigate("/login");
@@ -41,13 +40,12 @@ const ProfilePage = () => {
     }
   }, [data, isError, dispatch]);
 
-
   const handleRemove = async (id) => {
     try {
       const { receiveObj } = await del(`/address/${id}`);
 
       if (receiveObj.success) {
-        NotificationService.sendSuccessMessage(`${receiveObj.message}`)
+        NotificationService.sendSuccessMessage(`${receiveObj.message}`);
 
         // Refresh the address list after deletion
         await getAllAddress();
@@ -87,19 +85,19 @@ const ProfilePage = () => {
   }, [id]); // Fetch addresses when the component mounts or when id changes
 
   // Check if data is available and handle it safely
+  console.log(data);
+
   const profileData = data?.user
     ? [
-      {
-        label: "Full Name",
-        value:
-          data.user.name.charAt(0).toUpperCase() + data.user.name.slice(1),
-      },
-      { label: "Mobile Number", value: data.user.phone || "N/A" },
-      { label: "Email ID", value: data.user.email || "N/A" },
-    ]
+        {
+          label: "Full Name",
+          value:
+            data.user.name.charAt(0).toUpperCase() + data.user.name.slice(1),
+        },
+        { label: "Mobile Number", value: data.user.phone || "N/A" },
+        { label: "Email ID", value: data.user.email || "N/A" },
+      ]
     : [];
-
-
 
   const handleOpenEditProfileDialog = () => {
     setIsEditProfileDialog(true);
@@ -116,10 +114,9 @@ const ProfilePage = () => {
     setSelectedAddress(null);
 
     setModalOpen(false);
-    getAllAddress(); 
+    getAllAddress();
     // Refresh addresses after closing the modal
   };
-
 
   const handleCloseEditProfileDialog = () => {
     setIsEditProfileDialog(false);
@@ -132,8 +129,6 @@ const ProfilePage = () => {
   if (isError) {
     return <div>Error loading profile data.</div>; // Show error state
   }
-
-
 
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px]">
@@ -148,7 +143,10 @@ const ProfilePage = () => {
           />
         </div>
         {isEditProfileDialog && (
-          <ProfileUpdateDialog onClose={handleCloseEditProfileDialog} userData={data?.user} />
+          <ProfileUpdateDialog
+            onClose={handleCloseEditProfileDialog}
+            userData={data?.user}
+          />
         )}
         <div className="mt-16 w-full max-w-[653px] max-md:mt-10 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
@@ -182,7 +180,6 @@ const ProfilePage = () => {
 
         <hr className="my-8 border-t border-gray-300 w-full" />
 
-
         <div>
           {/* Header Section */}
           <div className="flex items-center justify-between gap-6 max-md:mt-10">
@@ -206,7 +203,6 @@ const ProfilePage = () => {
 
           {/* Address List */}
 
-
           <div className="mt-10 flex flex-col font-medium rounded-none w-full">
             <h3 className="mb-0 text-xl font-semibold leading-3 text-neutral-700 max-md:mt-14">
               Addresses
@@ -219,11 +215,13 @@ const ProfilePage = () => {
                 <div className="flex flex-col text-base text-black">
                   <div className="leading-6">
                     {address?.name} <br />
-                    {address.streetAddress}, <br />
+                    {address?.street}, <br />
                     {address.city}, {address.state}, {address.pincode}, <br />
                     {address.country}
                   </div>
-                  <div className="mt-5">Mobile: {address.phoneNumber || "N/A"}</div>
+                  <div className="mt-5">
+                    Mobile: {address.phoneNumber || "N/A"}
+                  </div>
                   <div className="flex justify-between mt-10 w-full">
                     <button
                       className="px-16 py-4 text-lg bg-yellow-400 rounded-[30px] max-md:px-5"
@@ -257,7 +255,6 @@ const ProfilePage = () => {
             initialValues={selectedAddress}
           />
 
-
           <ConfirmModal
             open={isConfirmModalOpen}
             onClose={handleCloseConfirmModal}
@@ -265,7 +262,6 @@ const ProfilePage = () => {
             title="Confirm Cancellation"
             message="Are you sure you want to cancel this order?"
           />
-
         </div>
       </div>
     </div>
