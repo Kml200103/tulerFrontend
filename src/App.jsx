@@ -144,8 +144,12 @@ export default function App() {
             <Route
               path="/add-product"
               element={
-                Layout ? (
-                  <Layout.admin>
+                <ProtectedRoute>
+                  {Layout ? (
+                    <Layout.admin>
+                      <ProductPage />
+                    </Layout.admin>
+                  ) : (
                     <ProductPage />
                   </Layout.admin>
                 ) : (
@@ -156,25 +160,28 @@ export default function App() {
             <Route
               path="/all-products"
               element={
-                Layout ? (
-                  <Layout.admin>
+                <ProtectedRoute>
+                  {Layout ? (
+                    <Layout.admin>
+                      <AllProducts />
+                    </Layout.admin>
+                  ) : (
                     <AllProducts />
-                  </Layout.admin>
-                ) : (
-                  <AllProducts />
-                )
+                  )}
+                </ProtectedRoute>
               }
             />
             <Route
               path="/adminProfile"
               element={
-                Layout ? (
+                <ProtectedRoute>
+                  Layout ? (
                   <Layout.admin>
                     <AdminProfile />
                   </Layout.admin>
-                ) : (
-                  <AdminProfile />
-                )
+                  ) : (
+                  <AdminProfile />)
+                </ProtectedRoute>
               }
             />
           </Routes>
