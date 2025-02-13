@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import ProductCard from "./ProductCard";
 import { get } from "../../services/http/axiosApi";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
@@ -11,7 +11,8 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
-  const { id } = useSelector((state) => state?.auth?.user);
+  // const {id}= useSelector((state) => state?.auth?.user);
+  // const id=user?.id
   // Fetch products from API only once
   useEffect(() => {
     const fetchProducts = async () => {
@@ -203,7 +204,7 @@ const Products = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <ProductCard key={product._id} userId={id} product={product} />
+              <ProductCard key={product._id}  product={product} />
             ))}
           </div>
         </div>

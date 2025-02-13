@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { post } from "../../services/http/axiosApi";
+import { useSelector } from "react-redux";
+import { NotificationService } from "../../services/Notifcation";
 
-function ProductCard({ userId, product }) {
+function ProductCard({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]); // Default to first variant
-
+  const user = useSelector((state) => state.auth.user)
+  const userId = user?.id
   const handleVariantChange = (event) => {
     const selectedId = event.target.value;
     const variant = product.variants.find((v) => v._id === selectedId);
@@ -11,25 +14,34 @@ function ProductCard({ userId, product }) {
   };
 
   const handleAddToCart = async () => {
-    if (!userId || !selectedVariant) {
-      alert("Please select a variant before adding to cart.");
+    if (!userId) {
+      NotificationService.sendErrorMessage("Please Login First");
+      return;
+    }
+    if(!selectedVariant){
+      NotificationService.sendErrorMessage("Please select a variant before adding to cart.");
       return;
     }
 
     try {
-      const response = await post("/cart/add", {
-        userId,
-        productId: product._id,
-        weight: selectedVariant.weight,
-        quantity: 1,
-        price: selectedVariant.price,
-      });
 
-      if (response.status === 200 || response.data?.success) {
-        alert("Product added to cart successfully!");
-      } else {
-        alert("Failed to add product to cart.");
+      if (userId) {
+        const response = await post("/cart/add", {
+          userId,
+          productId: product._id,
+          weight: selectedVariant.weight,
+          quantity: 1,
+          price: selectedVariant.price,
+        });
+
+        if (response.status === 200 || response.data?.success) {
+          alert("Product added to cart successfully!");
+        } else {
+          alert("Failed to add product to cart.");
+        }
       }
+     
+
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");
