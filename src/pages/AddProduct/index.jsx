@@ -30,8 +30,6 @@ const ProductPage = () => {
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
 
-
-
   const handleImagePreview = (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -43,39 +41,39 @@ const ProductPage = () => {
     }
   };
 
+  const addCategory = async (name) => {
+    const result = await post("/category/createUpdate", { name });
+    console.log("Add Category Response:", result); // Debugging
 
-   const addCategory = async (name) => {
-        const result = await post("/category/createUpdate", { name });
-        console.log("Add Category Response:", result); // Debugging
-      
-        if (result.isSuccess && result.receiveObj) {
-         setIsCategoryDialogOpen(false)
-        } else {
-          console.error("Failed to add category:", result.receiveObj);
-        }
-      };
-      
+    if (result.isSuccess && result.receiveObj) {
+      setIsCategoryDialogOpen(false);
+    } else {
+      console.error("Failed to add category:", result.receiveObj);
+    }
+  };
 
-    // Update category via API
-    const updateCategory = async (id, newName) => {
-        const result = await post(`/category/createUpdate`, { name: newName,_id:id });
-        if (result.isSuccess) {
-          setIsCategoryDialogOpen(false)
-        } else {
-            console.error("Failed to update category:", result.receiveObj);
-        }
-    };
+  // Update category via API
+  const updateCategory = async (id, newName) => {
+    const result = await post(`/category/createUpdate`, {
+      name: newName,
+      _id: id,
+    });
+    if (result.isSuccess) {
+      setIsCategoryDialogOpen(false);
+    } else {
+      console.error("Failed to update category:", result.receiveObj);
+    }
+  };
 
-    // Delete category via API
-    const deleteCategory = async (id) => {
-     
-        const result = await del(`/category/${id}`);
-        if (result.isSuccess) {
-            setIsCategoryDialogOpen(false)
-        } else {
-            console.error("Failed to delete category:", result.receiveObj);
-        }
-    };
+  // Delete category via API
+  const deleteCategory = async (id) => {
+    const result = await del(`/category/${id}`);
+    if (result.isSuccess) {
+      setIsCategoryDialogOpen(false);
+    } else {
+      console.error("Failed to delete category:", result.receiveObj);
+    }
+  };
 
   const getCategory = async () => {
     const result = await get("/category/all");
@@ -93,14 +91,17 @@ const ProductPage = () => {
     formData.append("name", data.name);
     formData.append("categoryId", data.categoryId);
     formData.append("description", data.description);
-    formData.append("productId", data.productId || "");
+
+    // Only append productId if it exists
+    if (data.productId) {
+      formData.append("productId", data.productId);
+    }
 
     if (data.images) {
       Array.from(data.images).forEach((file) => {
-        formData.append("images[]", file); // Ensuring array format for backend compatibility
+        formData.append("images", file); // Ensuring array format for backend compatibility
       });
     }
-
 
     // Append each variant separately
     data.variants.forEach((variant, index) => {
@@ -408,8 +409,6 @@ const ProductPage = () => {
           </form>
         </div>
       </div>
-
-
 
       <CategoryModal
         isOpen={isCategoryDialogOpen}

@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
+import React, { useEffect, useState, useCallback } from "react";
+import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
 import { useSelector } from "react-redux";
-import { Link } from "react-router"; // Use react-router-dom
+import { Link } from "react-router"; // Fixed import for react-router-dom
 
 export default function Cart() {
   const [isCartOpen, setIsCartOpen] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [cartData, setCartData] = useState(null);
-  const [quantities, setQuantities] = useState({}); // State to hold quantities
   const [updating, setUpdating] = useState(false); // Prevent multiple API calls
 
   const user = useSelector((state) => state.auth.user);
@@ -19,13 +18,6 @@ export default function Cart() {
     try {
       const { receiveObj } = await get(`/cart/${id}`);
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
-
-      // Initialize quantities state
-      const initialQuantities = {};
-      receiveObj?.cart?.items.forEach((item) => {
-        initialQuantities[item._id] = item.quantity;
-      });
-      setQuantities(initialQuantities);
     } catch (error) {
       console.error("Error fetching cart data:", error);
     }
@@ -35,37 +27,78 @@ export default function Cart() {
     fetchCartData();
   }, [fetchCartData]);
 
-  // Optimized quantity update function
+  // Update quantity and refresh cart
   const updateQuantity = useCallback(
     async (productId, weight, change) => {
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
-      setQuantities((prev) => {
-        const newQuantity = Math.max((prev[productId] || 1) + change, 1);
-        return { ...prev, [productId]: newQuantity };
-      });
+      // Get current quantity from cartData instead of local state
+      const currentItem = cartData?.items?.find(
+        (item) => item.productId._id === productId && item.weight === weight
+      );
+
+      if (!currentItem) {
+        console.error("Item not found in cart");
+        setUpdating(false);
+        return;
+      }
+
+      const newQuantity = Math.max(currentItem.quantity + change, 1);
 
       try {
-        const newQuantity = Math.max((quantities[productId] || 1) + change, 1);
-
         await put("/cart/update", {
           userId: id,
           productId,
           weight,
-          quantity: newQuantity,
+          quantity: newQuantity, // Send updated quantity to API
         });
 
-        fetchCartData(); // Refresh cart
+        // Refresh cart after update
+        await fetchCartData();
       } catch (error) {
         console.error("Error updating cart quantity:", error);
       } finally {
         setUpdating(false);
       }
     },
-    [id, updating, quantities, fetchCartData]
+    [id, updating, fetchCartData, cartData]
   );
 
+  const removeItem = useCallback(
+    async (productId, weight) => {
+      if (updating) return;
+      setUpdating(true);
+
+      try {
+        await del("/cart/remove", {
+          userId: id,
+          productId,
+          weight,
+        });
+
+        await fetchCartData();
+      } catch (error) {
+        console.error("Error removing item from cart:", error);
+      } finally {
+        setUpdating(false);
+      }
+    },
+    [id, updating, fetchCartData]
+  );
+
+  const clearCart = useCallback(async () => {
+    if (!id) return;
+    setUpdating(true);
+    try {
+      await del(`/cart/clear/${id}`);
+      setCartData({ items: [], totalPrice: 0 });
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+    } finally {
+      setUpdating(false);
+    }
+  }, [id]);
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${
@@ -92,39 +125,73 @@ export default function Cart() {
           &times;
         </button>
       </div>
+      <button
+        onClick={clearCart}
+        className="w-full mt-4 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 disabled:opacity-50"
+        disabled={updating}
+      >
+        Clear Cart
+      </button>
 
       <div className="mt-6 w-full bg-neutral-200 h-[1px]" />
 
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
           cartData.items.map((item) => (
-            <div key={item._id} className="flex gap-7 items-center mt-8 ml-6 font-semibold">
+            <div
+              key={item._id}
+              className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
+            >
+              {/* Remove Button */}
+              <button
+                onClick={() => removeItem(item.productId._id, item.weight)}
+                className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
+              >
+                Remove
+              </button>
+
+              {/* Quantity Control */}
               <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                 <button
-                  onClick={() => updateQuantity(item.productId._id, item.weight, 1)}
+                  onClick={() =>
+                    updateQuantity(item.productId._id, item.weight, 1)
+                  }
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
+                  disabled={updating}
                 >
                   +
                 </button>
                 <span className="py-2 text-lg font-semibold">
-                  {quantities[item._id] || 1}
+                  {item.quantity}
                 </span>
                 <button
-                  onClick={() => updateQuantity(item.productId._id, item.weight, -1)}
+                  onClick={() =>
+                    updateQuantity(item.productId._id, item.weight, -1)
+                  }
                   className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
+                  disabled={updating}
                 >
                   -
                 </button>
               </div>
+
+              {/* Product Image */}
               <img
                 loading="lazy"
                 src={item.productId?.images?.[0] || ""}
                 alt={item.productId?.name || "Unknown Product"}
                 className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
               />
+
+              {/* Product Details */}
               <div className="flex flex-col self-stretch my-auto text-sm">
                 <div className="text-neutral-900">{item.productId?.name}</div>
-                <div className="text-gray-600 mt-1">Price: ${item.price.toFixed(2)}</div>
+                <div className="text-gray-600 mt-1">
+                  Price: ${item.price.toFixed(2)}
+                </div>
+                <div className="text-gray-600 mt-1">
+                  Quantity: {item.quantity}
+                </div>
                 <div className="text-gray-600 mt-1">Weight: {item.weight}</div>
               </div>
             </div>
@@ -133,7 +200,6 @@ export default function Cart() {
           <p className="text-center text-gray-500 mt-4">Your cart is empty</p>
         )}
       </div>
-
       <Link
         to="/checkout"
         className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"

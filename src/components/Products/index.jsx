@@ -11,7 +11,7 @@ const Products = () => {
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
-  const { id } = useSelector((state) => state.auth.user);
+  const { id } = useSelector((state) => state?.auth?.user);
   // Fetch products from API only once
   useEffect(() => {
     const fetchProducts = async () => {
