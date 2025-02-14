@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useRegisterUserMutation } from "../../services/http/userService";
+import { NotificationService } from "../../services/Notifcation";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +14,7 @@ const Register = () => {
     setError,
   } = useForm();
 
+  const navigate = useNavigate();
   const validatePassword = (password) => {
     const validations = {
       minLength: password.length >= 8,
@@ -56,9 +58,24 @@ const Register = () => {
   const onSubmit = async (data) => {
     if (validatePassword(data.password)) {
       console.log(data);
-      await registerUser(data).then((res) => {
-        console.log("res", res);
-      });
+      try {
+        const res = await registerUser(data);
+        if (res.data.success) {
+          NotificationService.sendSuccessMessage(res.data.message);
+          navigate("/login");
+        } else {
+          NotificationService.sendErrorMessage(
+            res.data.error || "An error occurred during registration."
+          );
+        }
+      } catch (error) {
+        // Handle any unexpected errors
+        NotificationService.sendErrorMessage(
+          error.response?.data?.error || "An unexpected error occurred."
+        );
+      }
+    } else {
+      NotificationService.sendErrorMessage("Password validation failed.");
     }
   };
 

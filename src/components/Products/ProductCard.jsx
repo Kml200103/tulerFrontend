@@ -5,8 +5,8 @@ import { NotificationService } from "../../services/Notifcation";
 
 function ProductCard({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]); // Default to first variant
-  const user = useSelector((state) => state.auth.user)
-  const userId = user?.id
+  const user = useSelector((state) => state.auth.user);
+  const userId = user?.id;
   const handleVariantChange = (event) => {
     const selectedId = event.target.value;
     const variant = product.variants.find((v) => v._id === selectedId);
@@ -18,13 +18,14 @@ function ProductCard({ product }) {
       NotificationService.sendErrorMessage("Please Login First");
       return;
     }
-    if(!selectedVariant){
-      NotificationService.sendErrorMessage("Please select a variant before adding to cart.");
+    if (!selectedVariant) {
+      NotificationService.sendErrorMessage(
+        "Please select a variant before adding to cart."
+      );
       return;
     }
 
     try {
-
       if (userId) {
         const response = await post("/cart/add", {
           userId,
@@ -33,15 +34,18 @@ function ProductCard({ product }) {
           quantity: 1,
           price: selectedVariant.price,
         });
-
-        if (response.status === 200 || response.data?.success) {
-          alert("Product added to cart successfully!");
+        if (response.receiveObj) {
+          NotificationService.sendSuccessMessage(response.receiveObj.message);
         } else {
-          alert("Failed to add product to cart.");
+          NotificationService.sendErrorMessage(response.receiveObj.message);
         }
-      }
-     
 
+        // if (response.status === 200 || response.data?.success) {
+        //   alert("Product added to cart successfully!");
+        // } else {
+        //   alert("Failed to add product to cart.");
+        // }
+      }
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");

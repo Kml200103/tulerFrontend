@@ -3,8 +3,8 @@ import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have
 import { useSelector } from "react-redux";
 import { Link } from "react-router"; // Fixed import for react-router-dom
 
-export default function Cart() {
-  const [isCartOpen, setIsCartOpen] = useState(true);
+export default function Cart({ onClose }) {
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [cartData, setCartData] = useState(null);
   const [updating, setUpdating] = useState(false); // Prevent multiple API calls
@@ -99,6 +99,7 @@ export default function Cart() {
       setUpdating(false);
     }
   }, [id]);
+
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${
@@ -112,26 +113,26 @@ export default function Cart() {
           alt="Cart Icon"
           className="object-contain w-10"
         />
+
         <button
           onClick={() => {
             setIsFadingOut(true);
-            setTimeout(() => {
-              setIsCartOpen(false);
-              setIsFadingOut(false);
-            }, 300);
+            onClose();
           }}
           className="text-2xl font-bold text-gray-500 hover:text-gray-800"
         >
           &times;
         </button>
       </div>
-      <button
-        onClick={clearCart}
-        className="w-full mt-4 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 disabled:opacity-50"
-        disabled={updating}
-      >
-        Clear Cart
-      </button>
+      {cartData?.items?.length > 0 && (
+        <button
+          onClick={clearCart}
+          className="w-full mt-4 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 disabled:opacity-50"
+          disabled={updating}
+        >
+          Clear Cart
+        </button>
+      )}
 
       <div className="mt-6 w-full bg-neutral-200 h-[1px]" />
 
@@ -197,18 +198,25 @@ export default function Cart() {
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 mt-4">Your cart is empty</p>
+          <p className="text-center text-gray-500 mt-4">Your Cart is Empty</p>
         )}
       </div>
-      <Link
-        to="/checkout"
-        className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"
-      >
-        <span className="text-sm font-semibold">Checkout</span>
-        <span className="px-5 py-2.5 text-base font-bold bg-yellow-400 text-black rounded-xl">
-          ${cartData?.totalPrice?.toFixed(2) || "0.00"}
-        </span>
-      </Link>
+
+      {cartData?.items?.length > 0 ? (
+        <Link
+          to="/checkout"
+          className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"
+        >
+          <span className="text-sm font-semibold">Checkout</span>
+          <span className="px-5 py-2.5 text-base font-bold bg-yellow-400 text-black rounded-xl">
+            ${cartData?.totalPrice?.toFixed(2) || "0.00"}
+          </span>
+        </Link>
+      ) : (
+        <p className="text-center text-red-500 mt-4">
+          Please add products to your cart to proceed to checkout.
+        </p>
+      )}
     </div>
   );
 }

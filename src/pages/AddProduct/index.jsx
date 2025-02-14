@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { del, get, post } from "../../services/http/axiosApi";
 import CategoryModal from "../../components/Modals/categoryModal";
+import { NotificationService } from "../../services/Notifcation";
 
 const ProductPage = () => {
   const {
@@ -85,6 +86,7 @@ const ProductPage = () => {
       console.error("Failed to get categories:", result.receiveObj);
     }
   };
+
   const onSubmit = async (data) => {
     const formData = new FormData();
 
@@ -110,15 +112,26 @@ const ProductPage = () => {
       formData.append(`variants[${index}][quantity]`, variant.quantity);
     });
 
-    const result = await post("/product", formData, {
-      "Content-Type": "multipart/form-data",
-    });
+    try {
+      const result = await post("/product", formData, {
+        "Content-Type": "multipart/form-data",
+      });
 
-    if (result.isSuccess) {
-      console.log("Product saved successfully:", result.receiveObj);
-      reset();
-    } else {
-      console.error("Failed to save product:", result.receiveObj);
+      if (result.isSuccess) {
+        console.log("Product saved successfully:", result.receiveObj);
+        NotificationService.sendSuccessMessage("Product saved successfully!");
+        reset();
+      } else {
+        console.error("Failed to save product:", result.receiveObj);
+        NotificationService.sendErrorMessage(
+          `Failed to save product: ${result.receiveObj.message}`
+        );
+      }
+    } catch (error) {
+      console.error("Error during product submission:", error);
+      NotificationService.sendErrorMessage(
+        "An error occurred while saving the product."
+      );
     }
   };
   useEffect(() => {

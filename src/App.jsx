@@ -20,7 +20,8 @@ import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux/store";
 import ProductPage from "./pages/AddProduct";
 import AllProducts from "./pages/AllProducts";
-import AdminProfile from "./AdminProfile";
+import AdminProfile from "./components/AdminProfile";
+import AdminOrders from "./pages/AdminOrders";
 
 export default function App() {
   return (
@@ -35,27 +36,75 @@ export default function App() {
 
             <Route
               path="/products"
-              element={Layout ? <Layout.main><Products /></Layout.main> : <Products />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <Products />
+                  </Layout.main>
+                ) : (
+                  <Products />
+                )
+              }
             />
             <Route
               path="/about"
-              element={Layout ? <Layout.main><About /></Layout.main> : <About />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <About />
+                  </Layout.main>
+                ) : (
+                  <About />
+                )
+              }
             />
             <Route
               path="/contact"
-              element={Layout ? <Layout.main><ContactPage /></Layout.main> : <ContactPage />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ContactPage />
+                  </Layout.main>
+                ) : (
+                  <ContactPage />
+                )
+              }
             />
             <Route
               path="/my-orders"
-              element={Layout ? <Layout.main><MyOrders /></Layout.main> : <MyOrders />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <MyOrders />
+                  </Layout.main>
+                ) : (
+                  <MyOrders />
+                )
+              }
             />
             <Route
               path="/forgot-password"
-              element={Layout ? <Layout.main><ForgotPassword /></Layout.main> : <ForgotPassword />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ForgotPassword />
+                  </Layout.main>
+                ) : (
+                  <ForgotPassword />
+                )
+              }
             />
             <Route
               path="/reset-password"
-              element={Layout ? <Layout.main><ResetPassword /></Layout.main> : <ResetPassword />}
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ResetPassword />
+                  </Layout.main>
+                ) : (
+                  <ResetPassword />
+                )
+              }
             />
 
             {/* Protected Routes */}
@@ -63,7 +112,13 @@ export default function App() {
               path="/checkout"
               element={
                 <ProtectedRoute>
-                  {Layout ? <Layout.main><Checkout /></Layout.main> : <Checkout />}
+                  {Layout ? (
+                    <Layout.main>
+                      <Checkout />
+                    </Layout.main>
+                  ) : (
+                    <Checkout />
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -71,7 +126,13 @@ export default function App() {
               path="/profile"
               element={
                 <ProtectedRoute>
-                  {Layout ? <Layout.main><ProfilePage /></Layout.main> : <ProfilePage />}
+                  {Layout ? (
+                    <Layout.main>
+                      <ProfilePage />
+                    </Layout.main>
+                  ) : (
+                    <ProfilePage />
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -79,7 +140,13 @@ export default function App() {
               path="/add-product"
               element={
                 <ProtectedRoute>
-                  {Layout ? <Layout.admin><ProductPage /></Layout.admin> : <ProductPage />}
+                  {Layout ? (
+                    <Layout.admin>
+                      <ProductPage />
+                    </Layout.admin>
+                  ) : (
+                    <ProductPage />
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -87,7 +154,27 @@ export default function App() {
               path="/all-products"
               element={
                 <ProtectedRoute>
-                  {Layout ? <Layout.admin><AllProducts /></Layout.admin> : <AllProducts />}
+                  {Layout ? (
+                    <Layout.admin>
+                      <AllProducts />
+                    </Layout.admin>
+                  ) : (
+                    <AllProducts />
+                  )}
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/all-orders"
+              element={
+                <ProtectedRoute>
+                  {Layout ? (
+                    <Layout.admin>
+                      <AdminOrders />
+                    </Layout.admin>
+                  ) : (
+                    <AdminOrders />
+                  )}
                 </ProtectedRoute>
               }
             />
@@ -95,11 +182,16 @@ export default function App() {
               path="/adminProfile"
               element={
                 <ProtectedRoute>
-                  {Layout ? <Layout.admin><AdminProfile /></Layout.admin> : <AdminProfile />}
+                  {Layout ? (
+                    <Layout.admin>
+                      <AdminProfile />
+                    </Layout.admin>
+                  ) : (
+                    <AdminProfile />
+                  )}
                 </ProtectedRoute>
               }
             />
-            
           </Routes>
         </BrowserRouter>
       </PersistGate>

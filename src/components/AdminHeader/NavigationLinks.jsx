@@ -4,6 +4,7 @@ import { NavLink } from "react-router";
 const navItems = [
   { text: "Products", path: "/all-products" },
   { text: "Add Product", path: "/add-product" },
+  { text: "All Orders", path: "/all-orders" },
 ];
 
 export default function NavigationLinks() {

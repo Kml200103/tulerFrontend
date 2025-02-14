@@ -81,7 +81,7 @@ export default function SocialIcons({ toggleSearchInput }) {
         >
           <img
             loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/6a8d69cd46160b47eb3fdea162aaedfd579586976de6fd46e47a24c2265316ce?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec080 5"
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/6a8d69cd46160b47eb3fdea162aaedfd579586976de6fd46e47a24c2265316ce?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
             className="object-contain shrink-0 aspect-square w-8 "
           />
         </button>
@@ -140,7 +140,7 @@ export default function SocialIcons({ toggleSearchInput }) {
       {isCartOpen && (
         <div ref={cartRef}>
           {/* Attach the ref to the cart */}
-          <Cart />
+          <Cart onClose={toggleCart} />
         </div>
       )}
     </div>
