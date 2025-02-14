@@ -2,11 +2,13 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import ProductCard from "./ProductCard";
 import { get } from "../../services/http/axiosApi";
 import Pagination from "../Pagination";
+import { useNavigate } from "react-router";
 // import { useSelector } from "react-redux";
 
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]); // Store API products
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
@@ -15,27 +17,34 @@ const Products = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await get("/products"); // Replace with actual API
-        // const data = await response.json();
-        console.log("response", response);
-        if (response.isSuccess) {
-          setProducts(response?.receiveObj?.products);
-        } else {
-          throw new Error("Failed to fetch products");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchProducts();
-  }, []);
+  useEffect(() => {
+    // Check user role and navigate if admin
+    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored in local storage
+    if (userRole === "admin") {
+      navigate("/all-products"); // Redirect to /all-products if admin
+    } else {
+      fetchProducts(); // Fetch products if not admin
+    }
+  }, [navigate]);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await get("/products"); // Replace with actual API
+      // const data = await response.json();
+      console.log("response", response);
+      if (response.isSuccess) {
+        setProducts(response?.receiveObj?.products);
+      } else {
+        throw new Error("Failed to fetch products");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Debounce function to avoid frequent filtering
   const debounce = (func, delay) => {
