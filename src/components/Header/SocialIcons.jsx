@@ -75,14 +75,15 @@ export default function SocialIcons({ toggleSearchInput }) {
         </button>
 
         <button
-          className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
+          className="relative p-2 bg-transparent hover:bg-gray-200 rounded-full"
           aria-label="Visit our Social media icon 3"
           onClick={toggleCart}
         >
           <img
             loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/6a8d69cd46160b47eb3fdea162aaedfd579586976de6fd46e47a24c2265316ce?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-            className="object-contain shrink-0 aspect-square w-8 "
+            src="/cart.svg" // Correct path to the SVG in the public folder
+            className="object-contain shrink-0 aspect-square w-[25px]"
+            alt="Cart icon"
           />
         </button>
       </div>

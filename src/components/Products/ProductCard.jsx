@@ -33,6 +33,7 @@ function ProductCard({ product }) {
           weight: selectedVariant.weight,
           quantity: 1,
           price: selectedVariant.price,
+          variantId: selectedVariant._id,
         });
         if (response.receiveObj) {
           NotificationService.sendSuccessMessage(response.receiveObj.message);
@@ -46,6 +47,7 @@ function ProductCard({ product }) {
         //   alert("Failed to add product to cart.");
         // }
       }
+      console.log("selectedVariant", selectedVariant);
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");
@@ -54,18 +56,15 @@ function ProductCard({ product }) {
 
   return (
     <div className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md">
-      {/* Product Image */}
       <img
         src={product.images[0]}
         alt={product.name}
         className="w-full h-48 object-cover rounded-xl"
       />
 
-      {/* Product Info */}
       <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
-      {/* <p className="mt-2 text-sm text-gray-600">{product.description}</p> */}
+      {/* {/ <p className="mt-2 text-sm text-gray-600">{product.description}</p> /} */}
 
-      {/* Variant Selector */}
       <div className="mt-4">
         <label className="block text-sm font-semibold">Choose Weight:</label>
         <select
@@ -81,7 +80,6 @@ function ProductCard({ product }) {
         </select>
       </div>
 
-      {/* Add to Cart Button */}
       <button
         onClick={handleAddToCart}
         className="mt-4 w-full py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"

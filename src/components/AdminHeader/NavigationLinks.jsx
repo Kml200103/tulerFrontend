@@ -7,7 +7,7 @@ const navItems = [
   { text: "All Orders", path: "/all-orders" },
 ];
 
-export default function NavigationLinks() {
+export default function AdminNavigationLinks() {
   return (
     <div className="flex gap-6 text-lg text-black">
       {navItems.map((item, index) => (

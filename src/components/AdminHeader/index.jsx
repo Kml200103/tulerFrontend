@@ -1,7 +1,8 @@
 import React from "react";
-import NavigationLinks from "./NavigationLinks";
-import SocialIcons from "./SocialIcons";
+
 import { Link } from "react-router";
+import AdminNavigationLinks from "./NavigationLinks";
+import AdminSocialIcons from "./SocialIcons";
 
 const AdminHeader = () => {
   return (
@@ -19,8 +20,8 @@ const AdminHeader = () => {
         />
       </Link>
       <div className="flex flex-col md:flex-row gap-6 items-center w-full md:w-auto">
-        <NavigationLinks />
-        <SocialIcons />
+        <AdminNavigationLinks />
+        <AdminSocialIcons />
       </div>
     </nav>
   );
