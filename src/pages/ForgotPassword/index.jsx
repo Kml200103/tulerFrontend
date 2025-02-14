@@ -1,5 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { post } from "../../services/http/axiosApi";
+import { NotificationService } from "../../services/Notifcation";
 
 const ForgotPassword = () => {
   const {
@@ -8,9 +10,17 @@ const ForgotPassword = () => {
     formState: { errors },
   } = useForm();
 
-  const handlePassword = (data) => {
-    // Handle password reset logic here
-    console.log(data);
+  const handlePassword = async (data) => {
+    try {
+      const { receiveObj } = await post("/forgot-password", data);
+      if (receiveObj.status == true) {
+        NotificationService.sendSuccessMessage(receiveObj.message);
+      } else {
+        NotificationService.sendErrorMessage(receiveObj.message);
+      }
+    } catch (error) {
+      NotificationService.sendErrorMessage("Unexpected Error");
+    }
   };
 
   return (

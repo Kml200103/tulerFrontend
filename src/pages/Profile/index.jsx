@@ -34,8 +34,11 @@ const ProfilePage = () => {
 
   useEffect(() => {
     if (isError) {
-      dispatch(logout());
-      navigate("/login");
+      // Check if the error is due to token expiration
+      if (isError) {
+        dispatch(logout());
+        navigate("/login");
+      }
     } else if (data) {
       dispatch(login(data));
     }

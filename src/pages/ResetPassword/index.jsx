@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate, useSearchParams } from "react-router";
+import { post } from "../../services/http/axiosApi";
+import { NotificationService } from "../../services/Notifcation";
 
 export const ResetPassword = () => {
   const {
@@ -11,43 +14,19 @@ export const ResetPassword = () => {
 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
-  //   const router = useRouter();
-  //   const { email, token } = router.query;
+  const [searchParams] = useSearchParams(); // Get search params
+  const navigate = useNavigate(); // Use navigate instead of router
 
-  //   const hasValidatedToken = useRef(false); // Ref to track if token has been validated
+  // Extract email and token from search params
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
 
-  //   const validateToken = async () => {
-  //     try {
-  //       const { receiveObj } = await post(
-  //         `/user/validate-reset-token/${email}/${token}`,
-  //         token
-  //       );
-  //       console.log(receiveObj);
-
-  //       if (receiveObj.status === false) {
-  //         NotificationService.sendErrorMessage("Invalid or expired token.");
-  //         router.push("/forgot-password/user");
-  //       } else if (receiveObj.status === true) {
-  //         router.push(`/reset-password/user?email=${email}&token=${token}`);
-  //       }
-  //     } catch (error) {
-  //       NotificationService.sendErrorMessage(
-  //         "An error occurred while validating the token."
-  //       );
-  //       router.push("/forgot-password/user");
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     if (!email || !token) {
-  //       router.push("/forgot-password/user");
-  //       return;
-  //     }
-  //     if (!hasValidatedToken.current && email && token) {
-  //       hasValidatedToken.current = true; // Mark as validated
-  //       validateToken(); // Call the validateToken function
-  //     }
-  //   }, [email, token, router]);
+  useEffect(() => {
+    if (!email || !token) {
+      navigate("/forgot-password");
+      return;
+    }
+  }, [email, token, navigate]);
 
   const validatePassword = (password) => {
     const minLength = password.length >= 8;
@@ -68,25 +47,23 @@ export const ResetPassword = () => {
   };
 
   const handleResetPassword = async (data) => {
-    console.log(data);
+    const payload = { password: data.newPassword, token, email };
 
-    // try {
-    //   const { receiveObj } = await post(
-    //     `/user/reset-password/${email}/${token}`,
-    //     { password: newPassword }
-    //   );
+    try {
+      const { receiveObj } = await post(`/reset-password`, payload);
 
-    //   if (receiveObj.status === true) {
-    //     NotificationService.sendInfoMessage(receiveObj.message);
-    //     router.push("/login");
-    //   } else {
-    //     NotificationService.sendErrorMessage(receiveObj.message);
-    //   }
-    // } catch (error) {
-    //   NotificationService.sendErrorMessage(
-    //     "An error occurred while resetting your password."
-    //   );
-    // }
+      if (receiveObj.status === true) {
+        NotificationService.sendSuccessMessage(receiveObj.message);
+        navigate("/login");
+      } else {
+        NotificationService.sendErrorMessage(receiveObj.message);
+        navigate("/forgot-password");
+      }
+    } catch (error) {
+      NotificationService.sendErrorMessage(
+        "An error occurred while resetting your password."
+      );
+    }
   };
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
