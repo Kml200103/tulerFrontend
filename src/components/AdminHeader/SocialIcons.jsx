@@ -77,7 +77,7 @@ export default function SocialIcons() {
             <div>
               <div className="mt-2">
                 <Link
-                  to="/profile"
+                  to="/adminProfile"
                   className="block text-black text-center hover:underline"
                 >
                   Profile

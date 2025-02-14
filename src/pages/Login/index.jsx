@@ -19,25 +19,33 @@ const Login = () => {
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
+  const userRole = localStorage.getItem("userRole");
   const onSubmit = async (data) => {
-    console.log(data);
+    try {
+      const response = await loginUser(data).unwrap();
 
-    await loginUser(data).then((res) => {
-      if (res?.data) {
-        localStorage.setItem("userToken", res?.data?.token);
+      if (response?.token) {
+        localStorage.setItem("userToken", response?.token);
       }
-      if (res.data.success) {
+      if (response.success === true) {
         NotificationService.sendSuccessMessage("Login successful!");
-        navigate("/profile");
+        navigate(response?.redirectUrl);
       } else {
-        NotificationService.sendErrorMessage("Login failed. Please try again.");
+        NotificationService.sendErrorMessage(response.message);
       }
-    });
+    } catch (error) {
+      // console.log('error', error)
+      // NotificationService.sendErrorMessage(error.message)
+    }
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
+    if (isLoggedIn && userRole === "admin") {
+      navigate("/adminProfile");
+    } else if (isLoggedIn && userRole === "buyer") {
+      navigate("/profile");
+    } else {
+      navigate("/login");
     }
   }, [isLoggedIn, navigate]);
 
@@ -54,7 +62,6 @@ const Login = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Email input */}
         <div className="mt-4">
           <label
             htmlFor="email"
@@ -77,7 +84,7 @@ const Login = () => {
             <p className="text-red-400 text-sm mt-3">*{errors.email.message}</p>
           )}
         </div>
-        {/* Password input */}
+
         {/* <div className="mt-4 relative">
           <div className="flex justify-between items-center">
             <label

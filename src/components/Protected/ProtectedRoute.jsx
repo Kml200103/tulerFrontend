@@ -14,19 +14,29 @@ const ProtectedRoute = ({ children }) => {
     return userRole; // Returns the user role (e.g., "buyer", "admin")
   };
 
-  const isBuyer = getUserRole() === "buyer";
+  const userRole = getUserRole();
+  const currentPath = window.location.pathname;
 
   // If the user is not authenticated, redirect to the login page
   if (!authenticate()) {
     return <Navigate to="/login" replace />;
   }
 
-  // If the user is a buyer, restrict access to certain routes
-  const restrictedRoutes = ["/all-products", "/add-product"];
-  const currentPath = window.location.pathname;
+  // Restricted routes based on user role
+  const buyerRestrictedRoutes = [
+    "/all-products",
+    "/add-product",
+    "/adminProfile",
+    "/all-orders",
+  ];
+  const adminRestrictedRoutes = ["/", "/products", "/profile", "/checkout"];
 
-  if (isBuyer && restrictedRoutes.includes(currentPath)) {
-    return <Navigate to="/" replace />; // Redirect to home or another page
+  if (userRole === "buyer" && buyerRestrictedRoutes.includes(currentPath)) {
+    return <Navigate to="/" replace />; // Redirect buyer to home
+  }
+
+  if (userRole === "admin" && adminRestrictedRoutes.includes(currentPath)) {
+    return <Navigate to="/adminProfile" replace />; // Redirect admin to admin profile
   }
 
   // If authenticated and not restricted, render the children components

@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { post } from "../../services/http/axiosApi";
+import { NotificationService } from "../../services/Notifcation";
+import { useGetUserQuery } from "../../services/http/userService";
 
 const ProfileUpdateDialog = ({ onClose }) => {
   const user = useSelector((state) => state.auth.user);
+  const id = user?.id;
+  const { refetch } = useGetUserQuery(); // Get the refetch method
 
   const {
     register,
@@ -16,12 +21,21 @@ const ProfileUpdateDialog = ({ onClose }) => {
     if (user) {
       setValue("name", user.name || "");
       setValue("email", user.email || "");
-      setValue("phoneNumber", user.phoneNumber || "");
+      setValue("phone", user.phone || "");
     }
   }, [user, setValue]);
 
-  const onSubmit = (data) => {
-    console.log("Profile updated:", data);
+  const onSubmit = async (data) => {
+    const payload = { ...data, id };
+
+    const { receiveObj } = await post("/registerUpdate", payload);
+    if (receiveObj.success === true) {
+      refetch();
+
+      NotificationService.sendSuccessMessage(receiveObj.message);
+    } else {
+      NotificationService.sendErrorMessage(receiveObj.error);
+    }
     onClose();
   };
 
@@ -38,7 +52,6 @@ const ProfileUpdateDialog = ({ onClose }) => {
           Update Profile
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          {/ Name Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">Name</label>
             <input
@@ -55,13 +68,14 @@ const ProfileUpdateDialog = ({ onClose }) => {
             )}
           </div>
 
-          {/ Email Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
               Email
             </label>
             <input
               type="email"
+              disabled
+              readOnly
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -80,28 +94,26 @@ const ProfileUpdateDialog = ({ onClose }) => {
             )}
           </div>
 
-          {/ Mobile Number Input /}
           <div className="mb-4">
             <label className="block mb-1 font-medium text-gray-700">
               Mobile Number
             </label>
             <input
               type="tel"
-              {...register("phoneNumber", {
+              {...register("phone", {
                 required: "Mobile number is required",
               })}
               className={`w-full p-2 border ${
-                errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                errors.phone ? "border-red-500" : "border-gray-300"
               } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
-            {errors.phoneNumber && (
+            {errors.phone && (
               <p className="text-red-500 text-sm mt-2">
-                *{errors.phoneNumber.message}
+                *{errors.phone.message}
               </p>
             )}
           </div>
 
-          {/ Buttons /}
           <div className="flex justify-end mt-4">
             <button
               type="submit"

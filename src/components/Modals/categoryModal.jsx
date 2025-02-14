@@ -1,6 +1,14 @@
 import { useState } from "react";
 
-const CategoryModal = ({ isOpen, onClose, categories, getCategory, addCategory, deleteCategory, updateCategory }) => {
+const CategoryModal = ({
+  isOpen,
+  onClose,
+  categories,
+  getCategory,
+  addCategory,
+  deleteCategory,
+  updateCategory,
+}) => {
   const [newCategory, setNewCategory] = useState("");
   const [editCategory, setEditCategory] = useState(null);
 
@@ -26,9 +34,31 @@ const CategoryModal = ({ isOpen, onClose, categories, getCategory, addCategory, 
   return (
     isOpen && (
       <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-        <div className="bg-white p-6 rounded shadow-lg w-96">
-          <h3 className="text-lg font-semibold mb-4">Manage Categories</h3>
-
+        <div className="bg-white p-6 rounded shadow-lg w-1/2">
+          {" "}
+          {/* Increased width */}
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Manage Categories</h3>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
           {/* Add New Category */}
           <div className="mb-4">
             <input
@@ -40,21 +70,25 @@ const CategoryModal = ({ isOpen, onClose, categories, getCategory, addCategory, 
             />
             <button
               onClick={handleAdd}
-              className="mt-2 w-full bg-blue-600 text-white px-4 py-2 rounded"
+              className="mt-4 text-blue-600 hover:underline" // Removed background color
             >
               Add Category
             </button>
           </div>
-
           {/* List of Categories */}
           <ul className="max-h-40 overflow-auto">
             {categories.map((category) => (
-              <li key={category._id} className="flex justify-between items-center py-1">
+              <li
+                key={category._id}
+                className="flex justify-between items-center py-1"
+              >
                 {editCategory?._id === category._id ? (
                   <input
                     type="text"
                     value={editCategory.name}
-                    onChange={(e) => setEditCategory({ ...editCategory, name: e.target.value })}
+                    onChange={(e) =>
+                      setEditCategory({ ...editCategory, name: e.target.value })
+                    }
                     className="border p-1 rounded"
                   />
                 ) : (
@@ -65,21 +99,21 @@ const CategoryModal = ({ isOpen, onClose, categories, getCategory, addCategory, 
                   {editCategory?._id === category._id ? (
                     <button
                       onClick={handleUpdate}
-                      className="bg-green-500 text-white px-2 py-1 rounded"
+                      className="text-green-500 hover:underline" // Removed background color
                     >
                       Save
                     </button>
                   ) : (
                     <button
                       onClick={() => setEditCategory(category)}
-                      className="bg-yellow-500 text-white px-2 py-1 rounded"
+                      className="text-yellow-500 hover:underline" // Removed background color
                     >
                       Edit
                     </button>
                   )}
                   <button
                     onClick={() => handleDelete(category._id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="text-red-500 hover:underline" // Removed background color
                   >
                     Delete
                   </button>
@@ -87,13 +121,6 @@ const CategoryModal = ({ isOpen, onClose, categories, getCategory, addCategory, 
               </li>
             ))}
           </ul>
-
-          {/* Close Button */}
-          <div className="flex justify-end mt-4">
-            <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
-              Close
-            </button>
-          </div>
         </div>
       </div>
     )

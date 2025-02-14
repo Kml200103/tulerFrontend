@@ -1,40 +1,50 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import ProductCard from "./ProductCard";
 import { get } from "../../services/http/axiosApi";
+import Pagination from "../Pagination";
+import { useNavigate } from "react-router";
 // import { useSelector } from "react-redux";
 
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]); // Store API products
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
-  // const {id}= useSelector((state) => state?.auth?.user);
-  // const id=user?.id
-  // Fetch products from API only once
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await get("/products"); // Replace with actual API
-        // const data = await response.json();
-        console.log("response", response);
-        if (response.isSuccess) {
-          setProducts(response?.receiveObj?.products);
-        } else {
-          throw new Error("Failed to fetch products");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchProducts();
-  }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+
+  useEffect(() => {
+    // Check user role and navigate if admin
+    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored in local storage
+    if (userRole === "admin") {
+      navigate("/all-products"); // Redirect to /all-products if admin
+    } else {
+      fetchProducts(); // Fetch products if not admin
+    }
+  }, [navigate]);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await get("/products"); // Replace with actual API
+      // const data = await response.json();
+      console.log("response", response);
+      if (response.isSuccess) {
+        setProducts(response?.receiveObj?.products);
+      } else {
+        throw new Error("Failed to fetch products");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Debounce function to avoid frequent filtering
   const debounce = (func, delay) => {
@@ -52,6 +62,12 @@ const Products = () => {
       return minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
     });
   }, [products, minPrice, maxPrice]);
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
   // Handle price input changes with debounce
   const handleChange = useCallback(
@@ -81,7 +97,9 @@ const Products = () => {
           </div>
           <div className="flex gap-5 mt-2 text-center text-stone-500">
             <div className="flex-auto my-auto text-xs">
-              Showing 1 - {filteredProducts.length} of {products.length} item(s)
+              Showing {indexOfFirstProduct + 1} -{" "}
+              {Math.min(indexOfLastProduct, filteredProducts.length)} of{" "}
+              {filteredProducts.length} item(s)
             </div>
             <div className="flex gap-2 px-2 py-2 text-sm font-semibold bg-neutral-200">
               <div>SORT BY</div>
@@ -204,38 +222,19 @@ const Products = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <ProductCard key={product._id}  product={product} />
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         </div>
-
-        {/* Handle Loading & Error States */}
-        {/* {isLoading ? (
-            <p>Loading products...</p>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            <div className="flex gap-5 max-md:flex-col max-md:mt-5 max-md:max-w-full">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
-                  <div
-                    className="flex flex-col w-[30%] max-md:w-full mb-5"
-                    key={product._id}
-                  >
-                    <ProductCard
-                      imageSrc={product.images[0]}
-                      title={product.name}
-                      priceRange={`$${Math.min(...product.variants.map((v) => v.price))}`} // Show lowest price
-                      discount="10%" // Add dynamic discount if needed
-                    />
-                  </div>
-                ))
-              ) : (
-                <p>No products found in this range.</p>
-              )}
-            </div>
-          )}
-        </div> */}
+      </div>
+      <div className="mt-6">
+        <Pagination
+          totalItems={filteredProducts.length}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          setPageSize={setItemsPerPage}
+        />
       </div>
     </div>
   );
