@@ -33,6 +33,7 @@ const ProfilePage = () => {
   localStorage.setItem("userRole", userRole);
 
   useEffect(() => {
+   
     if (isError) {
       // Check if the error is due to token expiration
       if (isError) {
@@ -44,6 +45,7 @@ const ProfilePage = () => {
     }
   }, [data, isError, dispatch]);
 
+  
   const handleRemove = async (id) => {
     try {
       const { receiveObj } = await del(`/address/${id}`);

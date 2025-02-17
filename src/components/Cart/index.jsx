@@ -193,9 +193,9 @@ export default function Cart({ onClose }) {
                 <div className="text-gray-600 mt-1">
                   Quantity: {item.quantity}
                 </div>
-                <div className="text-gray-600 mt-1">
-                  Weight: {item.variant.weight}
-                </div>
+
+                <div className="text-gray-600 mt-1">Weight: {item.variant.weight}</div>
+
               </div>
             </div>
           ))

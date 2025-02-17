@@ -66,12 +66,15 @@ const Checkout = () => {
       userId,
       addressId: selectedAddress._id, // Address ID from selected address
       items: cartData?.items.map((item) => {
-        console.log("item", item);
-        return {
-          varientId: item.variant._id,
-          productId: item.productId, // Ensure it's the correct product ID
-          quantity: item.quantity,
-        };
+
+        return (
+          {
+            variantId: item.variant._id,
+            productId: item.productId, // Ensure it's the correct product ID
+            quantity: item.quantity,
+          }
+        )
+
       }),
       totalPrice: cartData.totalPrice,
     };
@@ -92,12 +95,13 @@ const Checkout = () => {
     <div className="container flex flex-col py-4 mx-auto w-full bg-white min-h-screen">
       <div className="flex gap-5 justify-between items-center w-full text-sm">
         <div className="flex flex-col w-full text-black">
-          <div className="text-neutral-700">
-            Deliver to: <b>{selectedAddress?.name}</b>
-          </div>
+
+          <div className="text-neutral-700">Deliver to: <b>{selectedAddress?.name}</b></div>
           <div className="leading-5 text-neutral-600">
             {selectedAddress
-              ? `${selectedAddress.streetAddress}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}, ${selectedAddress.pincode}`
+              ?
+              `${selectedAddress.streetAddress}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}, ${selectedAddress.pincode}`
+
               : "No address selected"}
           </div>
         </div>
@@ -180,14 +184,14 @@ const Checkout = () => {
       <div className="flex flex-col items-start px-7 mt-7 w-full text-sm font-semibold">
         {cartData.items.length > 0 ? (
           cartData.items.map((item, index) => {
+
+
             const { productId, quantity, productName, images } = item;
-            {
-              / const { name, images, variants } = productId; /;
-            }
-            const { weight, price } = item?.variant;
-            {
-              / const firstVariant = variants?.[0] || {}; /;
-            }
+            {/* const { name, images, variants } = productId; */ }
+            const { weight, price } = item?.variant
+            {/* const firstVariant = variants?.[0] || {}; */ }
+
+
             return (
               <CardItem
                 key={index}
