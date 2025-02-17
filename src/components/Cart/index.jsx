@@ -143,7 +143,7 @@ export default function Cart({ onClose }) {
               key={item._id}
               className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
             >
-              {/* Remove Button */}
+              {/ Remove Button /}
               <button
                 onClick={() => removeItem(item.productId._id, item.weight)}
                 className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
@@ -151,7 +151,7 @@ export default function Cart({ onClose }) {
                 Remove
               </button>
 
-              {/* Quantity Control */}
+              {/ Quantity Control /}
               <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                 <button
                   onClick={() =>
@@ -176,7 +176,7 @@ export default function Cart({ onClose }) {
                 </button>
               </div>
 
-              {/* Product Image */}
+              {/ Product Image /}
               <img
                 loading="lazy"
                 src={item?.images?.[0] || ""}
@@ -184,7 +184,7 @@ export default function Cart({ onClose }) {
                 className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
               />
 
-              {/* Product Details */}
+              {/ Product Details /}
               <div className="flex flex-col self-stretch my-auto text-sm">
                 <div className="text-neutral-900">{item.productName}</div>
                 <div className="text-gray-600 mt-1">
@@ -193,7 +193,9 @@ export default function Cart({ onClose }) {
                 <div className="text-gray-600 mt-1">
                   Quantity: {item.quantity}
                 </div>
+
                 <div className="text-gray-600 mt-1">Weight: {item.variant.weight}</div>
+
               </div>
             </div>
           ))

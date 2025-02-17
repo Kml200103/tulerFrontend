@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router"; // Make sure to import Link fr
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/auth/authSlice";
 
-export default function SocialIcons() {
+export default function AdminSocialIcons() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { isLoggedIn } = useSelector((state) => state.auth);

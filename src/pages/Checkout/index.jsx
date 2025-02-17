@@ -66,7 +66,7 @@ const Checkout = () => {
       userId,
       addressId: selectedAddress._id, // Address ID from selected address
       items: cartData?.items.map((item) => {
-        console.log('item', item)
+
         return (
           {
             variantId: item.variant._id,
@@ -74,6 +74,7 @@ const Checkout = () => {
             quantity: item.quantity,
           }
         )
+
       }),
       totalPrice: cartData.totalPrice,
     };
@@ -94,11 +95,13 @@ const Checkout = () => {
     <div className="container flex flex-col py-4 mx-auto w-full bg-white min-h-screen">
       <div className="flex gap-5 justify-between items-center w-full text-sm">
         <div className="flex flex-col w-full text-black">
+
           <div className="text-neutral-700">Deliver to: <b>{selectedAddress?.name}</b></div>
           <div className="leading-5 text-neutral-600">
             {selectedAddress
               ?
               `${selectedAddress.streetAddress}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}, ${selectedAddress.pincode}`
+
               : "No address selected"}
           </div>
         </div>
@@ -114,7 +117,7 @@ const Checkout = () => {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-[1000px] h-auto max-h-[90vh] relative flex flex-col shadow-lg">
             {" "}
-            {/* Increased width and height */}
+            {/ Increased width and height /}
             <button
               onClick={handleCloseDialog}
               className="absolute top-3 right-3 text-2xl text-gray-600 hover:text-gray-900"
@@ -182,10 +185,13 @@ const Checkout = () => {
         {cartData.items.length > 0 ? (
           cartData.items.map((item, index) => {
 
+
             const { productId, quantity, productName, images } = item;
             {/* const { name, images, variants } = productId; */ }
             const { weight, price } = item?.variant
             {/* const firstVariant = variants?.[0] || {}; */ }
+
+
             return (
               <CardItem
                 key={index}
