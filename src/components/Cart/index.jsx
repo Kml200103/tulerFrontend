@@ -179,21 +179,21 @@ export default function Cart({ onClose }) {
               {/* Product Image */}
               <img
                 loading="lazy"
-                src={item.productId?.images?.[0] || ""}
-                alt={item.productId?.name || "Unknown Product"}
+                src={item?.images?.[0] || ""}
+                alt={item.productName || "Unknown Product"}
                 className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
               />
 
               {/* Product Details */}
               <div className="flex flex-col self-stretch my-auto text-sm">
-                <div className="text-neutral-900">{item.productId?.name}</div>
+                <div className="text-neutral-900">{item.productName}</div>
                 <div className="text-gray-600 mt-1">
-                  Price: ${item.price.toFixed(2)}
+                  Price: ${item.totalPrice.toFixed(2)}
                 </div>
                 <div className="text-gray-600 mt-1">
                   Quantity: {item.quantity}
                 </div>
-                <div className="text-gray-600 mt-1">Weight: {item.weight}</div>
+                <div className="text-gray-600 mt-1">Weight: {item.variant.weight}</div>
               </div>
             </div>
           ))

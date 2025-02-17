@@ -33,6 +33,7 @@ const ProfilePage = () => {
   localStorage.setItem("userRole", userRole);
 
   useEffect(() => {
+   
     if (isError) {
       dispatch(logout());
       navigate("/login");
@@ -41,6 +42,7 @@ const ProfilePage = () => {
     }
   }, [data, isError, dispatch]);
 
+  
   const handleRemove = async (id) => {
     try {
       const { receiveObj } = await del(`/address/${id}`);

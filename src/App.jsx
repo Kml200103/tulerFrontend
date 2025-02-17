@@ -73,14 +73,16 @@ export default function App() {
             <Route
               path="/my-orders"
               element={
-                Layout ? (
-                  <Layout.main>
+                <ProtectedRoute>
+                  {Layout ? (
+                    <Layout.main>
+                      <MyOrders />
+                    </Layout.main>
+                  ) : (
                     <MyOrders />
-                  </Layout.main>
-                ) : (
-                  <MyOrders />
-                )
-              }
+                  )
+                  }
+                </ProtectedRoute>}
             />
             <Route
               path="/forgot-password"

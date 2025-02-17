@@ -33,6 +33,7 @@ function ProductCard({ product }) {
           weight: selectedVariant.weight,
           quantity: 1,
           price: selectedVariant.price,
+          variantId:selectedVariant._id
         });
         if (response.receiveObj) {
           NotificationService.sendSuccessMessage(response.receiveObj.message);
@@ -46,6 +47,7 @@ function ProductCard({ product }) {
         //   alert("Failed to add product to cart.");
         // }
       }
+      console.log('selectedVariant',selectedVariant )
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");
