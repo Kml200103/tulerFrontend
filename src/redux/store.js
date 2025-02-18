@@ -3,8 +3,8 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/authSlice";
 import loaderReducer from "./loader/loaderSlice";
+import searchReducer from "./search/searchSlice";
 import { BaseService } from "./reduxQuery";
-
 
 import { loaderMiddleware } from "../services/middleware/loaderMiddleware";
 import { setStore } from "../services/loaderApi/loaderService";
@@ -20,6 +20,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   loader: loaderReducer,
+  search: searchReducer,
   [BaseService.reducerPath]: BaseService.reducer,
 });
 

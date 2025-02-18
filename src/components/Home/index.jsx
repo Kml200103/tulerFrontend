@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import NavigationLinks from "../Header/NavigationLinks";
 import SocialIcons from "../Header/SocialIcons";
 
@@ -13,10 +13,11 @@ import { HoneyCard } from "../HoneyTypes/HoneyCard";
 import { BenefitCard } from "../Benefit/BenefitCard";
 import TestimonialCard from "../Testimonial/TestimonialCard";
 import { Footer } from "../Footer";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AdminHeader from "../AdminHeader";
 import AdminNavigationLinks from "../AdminHeader/NavigationLinks";
 import AdminSocialIcons from "../AdminHeader/SocialIcons";
+import { setSearchTerm } from "../../redux/search/searchSlice";
 
 const honeyProducts = [
   {
@@ -180,13 +181,34 @@ const testimonials = [
 ];
 const Home = () => {
   const { user, isLoggedIn } = useSelector((state) => state.auth);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const searchInputRef = useRef(null); // Create a ref for the search input
+  const searchTerm = useSelector((state) => state.search.term);
   const isAdmin = isLoggedIn && user.role === "admin"; // Check if user is admin
   const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
 
   const toggleSearchInput = () => {
     setIsSearchInputOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
+        setIsSearchInputOpen(false);
+      }
+    };
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Clean up the event listener
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchInputRef]);
   return (
     <>
       {isAdmin ? (
@@ -230,11 +252,16 @@ const Home = () => {
       )}
 
       {isSearchInputOpen && (
-        <div className="absolute z-50 left-1/2 top-32 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-96">
+        <div
+          ref={searchInputRef}
+          className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-[400px]"
+        >
           <input
             type="text"
             placeholder="Search products..."
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400" // Standard border without rounded-full
+            value={searchTerm}
+            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+            className="w-full p-3  border-gray-300 rounded focus:outline-none  "
           />
         </div>
       )}
@@ -272,6 +299,7 @@ const Home = () => {
                     <button
                       className="px-9 py-5 mt-11 text-lg font-medium text-black bg-yellow-400 rounded-[30px] max-md:px-5 max-md:mt-10"
                       tabIndex="0"
+                      onClick={() => navigate("/products")}
                     >
                       Shop Honey
                     </button>

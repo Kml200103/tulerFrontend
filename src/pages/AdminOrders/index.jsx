@@ -1,58 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Dialog, DialogBackdrop } from "@headlessui/react";
 import ConfirmModal from "../../components/ConfirmModal";
 import { EyeIcon, Pencil } from "lucide-react";
 import Pagination from "../../components/Pagination";
+import { get, post } from "../../services/http/axiosApi";
 
-const staticOrders = [
-  {
-    orderId: "ORD123456",
-    items: [
-      { name: "Product 1", productQuantity: 2 },
-      { name: "Product 2", productQuantity: 1 },
-    ],
-    grandTotal: 50.0,
-    address: {
-      streetAddress: "123 Main St",
-      city: "Anytown",
-      state: "CA",
-      zipCode: "12345",
-    },
-    status: "pending",
-    paymentStatus: "paid",
-    createdAt: "2023-10-01T12:00:00Z",
-    updatedAt: "2023-10-01T12:00:00Z",
-  },
-  {
-    orderId: "ORD123457",
-    items: [
-      { name: "Product 3", productQuantity: 1 },
-      { name: "Product 4", productQuantity: 3 },
-    ],
-    grandTotal: 75.0,
-    address: {
-      streetAddress: "456 Elm St",
-      city: "Othertown",
-      state: "NY",
-      zipCode: "67890",
-    },
-    status: "dispatched",
-    paymentStatus: "unpaid",
-    createdAt: "2023-10-02T12:00:00Z",
-    updatedAt: "2023-10-02T12:00:00Z",
-  },
-  // Add more static orders as needed
-];
-
-function AdminOrders() {
+const AdminOrders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState(null);
-
-  const totalPages = Math.ceil(staticOrders.length / pageSize);
+  const [orders, setOrders] = useState([]);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [editableOrderId, setEditableOrderId] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
 
   const handleShow = (order) => {
     setSelectedOrder(order);
@@ -62,6 +25,7 @@ function AdminOrders() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedOrder(null);
+    setEditableOrderId(null); // Reset editable order when closing dialog
   };
 
   const openConfirmModal = (order) => {
@@ -69,8 +33,9 @@ function AdminOrders() {
     setIsConfirmModalOpen(true);
   };
 
-  const handleCancelOrder = () => {
+  const handleCancelOrder = async () => {
     // Logic to cancel the order
+    await cancelOrder(orderToCancel.orderId);
     setIsConfirmModalOpen(false);
     setOrderToCancel(null);
   };
@@ -79,6 +44,76 @@ function AdminOrders() {
     setIsConfirmModalOpen(false);
     setOrderToCancel(null);
   };
+
+  const chooseColor = (status) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-purple-200 text-purple-600";
+      case "CANCEL":
+        return "bg-red-200 text-red-600";
+      case "COMPLETED":
+        return "bg-green-200 text-green-600";
+      default:
+        return "bg-purple-200 text-purple-600";
+    }
+  };
+
+  const getAdminOrders = async () => {
+    try {
+      const response = await get(
+        `/order/all?page=${currentPage}&pageSize=${pageSize}`
+      );
+      const orders = response?.receiveObj?.orders || [];
+      const pagination = response?.receiveObj?.pagination || {};
+
+      // Set total orders for pagination
+      setTotalOrders(pagination.totalOrders);
+      setOrders(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  const cancelOrder = async (orderId) => {
+    const { receiveObj } = await post("/order/status", {
+      orderId: orderId,
+      status: "CANCEL",
+    });
+    if (receiveObj.status === true) {
+      // Optionally refresh orders after cancellation
+      getAdminOrders();
+    }
+  };
+
+  const updateOrderStatus = async (orderId, status) => {
+    const { receiveObj } = await post("/order/status", {
+      orderId: orderId,
+      status: status,
+    });
+    if (receiveObj.status === true) {
+      // Update local orders state
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.orderId === orderId ? { ...order, status: status } : order
+        )
+      );
+      setEditableOrderId(null); // Reset editable order
+    }
+  };
+
+  const handleStatusChange = (e, orderId) => {
+    const selectedStatus = e.target.value;
+    setNewStatus(selectedStatus);
+    updateOrderStatus(orderId, selectedStatus);
+  };
+
+  const truncateText = (text, length) => {
+    return text.length > length ? `${text.substring(0, length)}...` : text;
+  };
+
+  useEffect(() => {
+    getAdminOrders();
+  }, [currentPage, pageSize]);
 
   return (
     <div className="overflow-x-auto ">
@@ -89,7 +124,7 @@ function AdminOrders() {
               <h1 className="text-xl font-semibold">Admin Orders</h1>
             </div>
 
-            {staticOrders.length === 0 ? (
+            {orders.length === 0 ? (
               <div className="p-6 text-center text-gray-600">
                 No orders found.
               </div>
@@ -109,13 +144,12 @@ function AdminOrders() {
                       <th className="py-3 px-0 text-center">Order Status</th>
                       <th className="py-3 px-0 text-center">Payment Status</th>
                       <th className="py-3 px-0 text-left">Order Time</th>
-                      <th className="py-3 px-0 text-left">Last Updated</th>
                       <th className="py-3 px-0 text-center">Actions</th>
                       <th className="py-3 px-0 text-center">Cancel</th>
                     </tr>
                   </thead>
                   <tbody className="text-gray-600 text-sm font-light">
-                    {staticOrders
+                    {orders
                       .slice(
                         (currentPage - 1) * pageSize,
                         currentPage * pageSize
@@ -126,32 +160,48 @@ function AdminOrders() {
                           className="border-b border-gray-200 hover:bg-gray-100"
                         >
                           <td className="py-3 px-0 text-left whitespace-nowrap">
-                            <span className="font-medium">{order.orderId}</span>
+                            <span className="font-medium">
+                              {truncateText(order.orderId, 8)}
+                            </span>
                           </td>
                           <td className="py-3 px-0 text-left">
                             {order.items
                               .map(
                                 (item) =>
-                                  `${item.name} - ${item.productQuantity}`
+                                  `${item.productName} - ${item.quantity}`
                               )
                               .join(", ")}
                           </td>
                           <td className="py-3 px-0 text-center">
-                            ${order.grandTotal}
+                            ${order.totalPrice}
                           </td>
                           <td className="py-3 px-0 text-center">
-                            {`${order.address.streetAddress}, ${order.address.city}`}
+                            {truncateText(
+                              `${order.address.streetAddress}, ${order.address.city}, ${order.address.state}, ${order.address.country}, ${order.address.pincode}`,
+                              30
+                            )}
                           </td>
                           <td className="py-3 px-0 text-center">
-                            <span
-                              className={`py-1 px-3 rounded-full text-xs ${
-                                order.status === "pending"
-                                  ? "bg-purple-200 text-purple-600"
-                                  : "bg-green-200 text-green-600"
-                              }`}
-                            >
-                              {order.status}
-                            </span>
+                            {editableOrderId === order.orderId ? (
+                              <select
+                                value={newStatus}
+                                onChange={(e) =>
+                                  handleStatusChange(e, order.orderId)
+                                }
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                              </select>
+                            ) : (
+                              <span
+                                className={`${chooseColor(
+                                  order.status
+                                )} py-1 px-3 rounded-full text-xs`}
+                              >
+                                {order.status.toUpperCase()}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 px-0 text-center">
                             <span
@@ -167,28 +217,40 @@ function AdminOrders() {
                           <td className="py-3 px-0 text-left">
                             {new Date(order.createdAt).toLocaleString()}
                           </td>
-                          <td className="py-3 px-0 text-left">
-                            {new Date(order.updatedAt).toLocaleString()}
-                          </td>
-                          <td className="py-3 px-0 text-center space-x-2">
+
+                          <td className="py-3 px-0 text-center flex items-center justify-center space-x-2">
                             <EyeIcon
                               className="w-8 h-8 cursor-pointer hover:text-purple-500"
                               onClick={() => handleShow(order)}
                             />
-                            <Pencil className="w-8 h-8 cursor-pointer hover:text-purple-500" />
+                            <Pencil
+                              className={`w-8 h-8 cursor-pointer ${
+                                order.status === "CANCEL"
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "hover:text-purple-500"
+                              }`}
+                              onClick={() => {
+                                if (order.status !== "CANCEL") {
+                                  setEditableOrderId(order.orderId);
+                                  setNewStatus(order.status); // Set the current status for the dropdown
+                                }
+                              }}
+                            />
                           </td>
                           <td className="py-3 px-0 text-center">
-                            <button
-                              onClick={() => openConfirmModal(order)}
-                              className="ml-8"
-                            >
-                              <img
-                                src="/images/multiply.png"
-                                alt="cancel"
-                                width={20}
-                                height={20}
-                              />
-                            </button>
+                            <td className="py-3 px-0 text-center">
+                              <button
+                                className={`mt-4 text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
+                                  order.status === "CANCEL"
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
+                                disabled={order.status === "CANCEL"}
+                                onClick={() => openConfirmModal(order)}
+                              >
+                                Cancel Order
+                              </button>
+                            </td>
                           </td>
                         </tr>
                       ))}
@@ -197,7 +259,7 @@ function AdminOrders() {
 
                 {/* Pagination Component */}
                 <Pagination
-                  totalItems={staticOrders.length}
+                  totalItems={totalOrders}
                   itemsPerPage={pageSize}
                   onPageChange={setCurrentPage}
                   setPageSize={setPageSize}
@@ -256,16 +318,14 @@ function AdminOrders() {
                             {selectedOrder.paymentStatus.toUpperCase()}
                           </h3>
                           <h3
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              selectedOrder.status === "pending"
-                                ? "bg-purple-200 text-purple-600"
-                                : "bg-green-200 text-green-600"
-                            }`}
+                            className={`px-2 py-1 rounded-full text-xs ${chooseColor(
+                              selectedOrder.status.toUpperCase() // Remove the curly braces
+                            )}`}
                           >
                             {selectedOrder.status.toUpperCase()}
                           </h3>
                           <h3 className="text-green-600">
-                            ${selectedOrder.grandTotal.toFixed(2)}
+                            ${selectedOrder.totalPrice.toFixed(2)}
                           </h3>
                         </div>
                         <h4 className="text-gray-600 mt-2 text-xs">
@@ -278,14 +338,14 @@ function AdminOrders() {
                           <div className="flex gap-2 items-center" key={index}>
                             <img
                               className="h-10 w-10 rounded-lg"
-                              src="/images/product-placeholder.png"
+                              src={item.image[0]}
                               alt="Product Image"
                             />
                             <div>
-                              <h1>{item.name}</h1>
+                              <h1>{item.productName}</h1>
                               <h1 className="text-gray-500 text-xs">
                                 ${item.price} <span>X</span>{" "}
-                                <span>{item.productQuantity}</span>
+                                <span>{item.quantity}</span>
                               </h1>
                             </div>
                           </div>
@@ -299,31 +359,27 @@ function AdminOrders() {
                         <tbody>
                           <tr>
                             <td>Full Name</td>
-                            <td>{selectedOrder.user?.name || "N/A"}</td>
-                          </tr>
-                          <tr>
-                            <td>Mobile</td>
-                            <td>{selectedOrder.user?.phoneNumber || "N/A"}</td>
-                          </tr>
-                          <tr>
-                            <td>Email</td>
-                            <td>{selectedOrder.user?.email || "N/A"}</td>
+                            <td>{selectedOrder.address.name}</td>
                           </tr>
                           <tr>
                             <td>Street Address</td>
-                            <td>{selectedOrder.address?.streetAddress}</td>
+                            <td>{selectedOrder.address.streetAddress}</td>
                           </tr>
                           <tr>
                             <td>City</td>
-                            <td>{selectedOrder.address?.city}</td>
+                            <td>{selectedOrder.address.city}</td>
                           </tr>
                           <tr>
                             <td>State</td>
-                            <td>{selectedOrder.address?.state}</td>
+                            <td>{selectedOrder.address.state}</td>
+                          </tr>
+                          <tr>
+                            <td>Country</td>
+                            <td>{selectedOrder.address.country}</td>
                           </tr>
                           <tr>
                             <td>Pincode</td>
-                            <td>{selectedOrder.address?.zipCode}</td>
+                            <td>{selectedOrder.address.pincode}</td>
                           </tr>
                         </tbody>
                       </table>
@@ -345,6 +401,6 @@ function AdminOrders() {
       />
     </div>
   );
-}
+};
 
 export default AdminOrders;

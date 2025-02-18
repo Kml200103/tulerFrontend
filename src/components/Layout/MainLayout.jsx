@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../Header";
 import { Footer } from "../Footer";
+import { useDispatch, useSelector } from "react-redux";
+import { setSearchTerm } from "../../redux/search/searchSlice";
 
 const MainLayout = ({ children }) => {
   const isBrowser = () => typeof window !== "undefined"; // The approach recommended by Next.js
   const [isVisible, setIsVisible] = useState(false);
   const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
-
+  const dispatch = useDispatch();
+  const searchInputRef = useRef(null); // Create a ref for the search input
+  const searchTerm = useSelector((state) => state.search.term);
   function scrollToTop() {
     if (!isBrowser()) return;
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -34,7 +38,23 @@ const MainLayout = ({ children }) => {
   const toggleSearchInput = () => {
     setIsSearchInputOpen((prev) => !prev);
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
+        setIsSearchInputOpen(false);
+      }
+    };
 
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Clean up the event listener
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [searchInputRef]);
   return (
     <>
       <div className="">
@@ -43,12 +63,16 @@ const MainLayout = ({ children }) => {
         <div className="mt-10">{children}</div>
         {/* Search Input */}
         {isSearchInputOpen && (
-          <div className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-[400px]">
-            {/* Outer div with rounded border */}
+          <div
+            ref={searchInputRef}
+            className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-[400px]"
+          >
             <input
               type="text"
               placeholder="Search products..."
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400" // Standard border without rounded-full
+              value={searchTerm}
+              onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+              className="w-full p-3  border-gray-300 rounded focus:outline-none  "
             />
           </div>
         )}
