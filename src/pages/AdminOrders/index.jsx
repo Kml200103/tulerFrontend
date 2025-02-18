@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Dialog, DialogBackdrop } from "@headlessui/react";
+import { Button, Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import ConfirmModal from "../../components/ConfirmModal";
 import { EyeIcon, Pencil } from "lucide-react";
 import Pagination from "../../components/Pagination";
@@ -115,6 +115,7 @@ const AdminOrders = () => {
     getAdminOrders();
   }, [currentPage, pageSize]);
 
+  console.log('orders', orders)
   return (
     <div className="overflow-x-auto ">
       <div className="bg-white flex items-center justify-center font-sans overflow-hidden">
@@ -124,7 +125,7 @@ const AdminOrders = () => {
               <h1 className="text-xl font-semibold">Admin Orders</h1>
             </div>
 
-            {orders.length === 0 ? (
+            {orders?.length === 0 ? (
               <div className="p-6 text-center text-gray-600">
                 No orders found.
               </div>
@@ -149,12 +150,7 @@ const AdminOrders = () => {
                     </tr>
                   </thead>
                   <tbody className="text-gray-600 text-sm font-light">
-                    {orders
-                      .slice(
-                        (currentPage - 1) * pageSize,
-                        currentPage * pageSize
-                      )
-                      .map((order) => (
+                    {orders?.map((order) => (
                         <tr
                           key={order.orderId}
                           className="border-b border-gray-200 hover:bg-gray-100"
@@ -279,7 +275,7 @@ const AdminOrders = () => {
       >
         <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
         <div className="flex items-center justify-center fixed inset-0 z-50">
-          <Dialog.Panel className="relative transform overflow-y-auto rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[85vh]">
+          <DialogPanel className="relative transform overflow-y-auto rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[85vh]">
             <div className="bg-gray-50 px-6 py-8 sm:px-10">
               {selectedOrder && (
                 <>
@@ -388,7 +384,7 @@ const AdminOrders = () => {
                 </>
               )}
             </div>
-          </Dialog.Panel>
+          </DialogPanel>
         </div>
       </Dialog>
 
