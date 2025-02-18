@@ -78,9 +78,11 @@ const ProductPage = () => {
 
   const getCategory = async () => {
     const result = await get("/category/all");
-    console.log("API Response:", result); // Debugging
+    console.log(result);
+
     if (result.isSuccess) {
-      console.log("Categories received:", result.receiveObj.categories);
+      console.log("categoroes", categories);
+
       setCategories(result.receiveObj.categories);
     } else {
       console.error("Failed to get categories:", result.receiveObj);
@@ -88,10 +90,12 @@ const ProductPage = () => {
   };
 
   const onSubmit = async (data) => {
+    console.log("Form Data:", data); // Log the entire form data
+    console.log("Selected Category ID:", data.categoryId); // Log the category ID
     const formData = new FormData();
 
     formData.append("name", data.name);
-    formData.append("categoryId", data.categoryId);
+    formData.append("categoryId", data.categoryId); // This should now be the category ID
     formData.append("description", data.description);
 
     // Only append productId if it exists
@@ -200,7 +204,9 @@ const ProductPage = () => {
                 >
                   <option value="">Select Category</option>
                   {categories.map((category) => (
-                    <option key={category._id} value={category._id}>
+                    <option key={category.id} value={category.id}>
+                      {" "}
+                      {/* Use category.id here */}
                       {category.name}
                     </option>
                   ))}
@@ -255,6 +261,7 @@ const ProductPage = () => {
               <div className="mt-2">
                 <textarea
                   id="description"
+                  maxLength={50}
                   {...register("description", {
                     required: "Description is required",
                     validate: {
