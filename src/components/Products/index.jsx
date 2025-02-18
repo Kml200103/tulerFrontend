@@ -3,39 +3,49 @@ import ProductCard from "./ProductCard";
 import { get } from "../../services/http/axiosApi";
 import Pagination from "../Pagination";
 import { useNavigate } from "react-router";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 const circleButtons = [{ key: "start" }, { key: "end" }];
 
 const Products = () => {
   const navigate = useNavigate();
+  const searchTerm = useSelector((state) => state.search.term);
+
   const [products, setProducts] = useState([]); // Store API products
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalProducts, setTotalProducts] = useState(0); // Total products from API
+  const [totalPages, setTotalPages] = useState(0); // Total pages from API
+
+  // State for sorting
+  const [sortOption, setSortOption] = useState("default"); // default, lowToHigh, highToLow
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
 
   useEffect(() => {
-    // Check user role and navigate if admin
-    const userRole = localStorage.getItem("userRole"); // Assuming user role is stored in local storage
+    const userRole = localStorage.getItem("userRole");
     if (userRole === "admin") {
-      navigate("/all-products"); // Redirect to /all-products if admin
+      navigate("/all-products");
     } else {
-      fetchProducts(); // Fetch products if not admin
+      fetchProducts();
     }
-  }, [navigate]);
+  }, [navigate, currentPage, itemsPerPage]); // Add currentPage and itemsPerPage to dependencies
 
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await get("/products"); // Replace with actual API
-      // const data = await response.json();
-      console.log("response", response);
+      const response = await get(
+        `/product?page=${currentPage}&limit=${itemsPerPage}`
+      );
       if (response.isSuccess) {
-        setProducts(response?.receiveObj?.products);
+        setProducts(response.receiveObj.products);
+        setTotalProducts(response.receiveObj.totalProducts);
+        setTotalPages(response.receiveObj.totalPages);
       } else {
         throw new Error("Failed to fetch products");
       }
@@ -46,7 +56,45 @@ const Products = () => {
     }
   };
 
-  // Debounce function to avoid frequent filtering
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchesSearch = product.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+      const minVariantPrice = Math.min(...product.variants.map((v) => v.price));
+      const matchesPrice =
+        minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
+
+      if (searchTerm.trim()) {
+        return matchesSearch && matchesPrice;
+      }
+      if (maxPrice !== Infinity) {
+        return matchesPrice;
+      }
+      return true;
+    });
+  }, [products, minPrice, maxPrice, searchTerm]);
+
+  // Sort products based on selected option
+  const sortedProducts = useMemo(() => {
+    let sorted = [...filteredProducts];
+    if (sortOption === "lowToHigh") {
+      sorted.sort((a, b) => {
+        const aPrice = Math.min(...a.variants.map((v) => v.price));
+        const bPrice = Math.min(...b.variants.map((v) => v.price));
+        return aPrice - bPrice;
+      });
+    } else if (sortOption === "highToLow") {
+      sorted.sort((a, b) => {
+        const aPrice = Math.min(...a.variants.map((v) => v.price));
+        const bPrice = Math.min(...b.variants.map((v) => v.price));
+        return bPrice - aPrice;
+      });
+    }
+    return sorted;
+  }, [filteredProducts, sortOption]);
+
   const debounce = (func, delay) => {
     let timer;
     return (...args) => {
@@ -55,36 +103,62 @@ const Products = () => {
     };
   };
 
-  // Memoized filter function to avoid recalculating on every re-render
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const minVariantPrice = Math.min(...product.variants.map((v) => v.price));
-      return minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
-    });
-  }, [products, minPrice, maxPrice]);
-  const indexOfLastProduct = currentPage * itemsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  );
-
-  // Handle price input changes with debounce
   const handleChange = useCallback(
     debounce((event) => {
       const { name, value } = event.target;
-      const parsedValue = Math.max(0, Number(value)); // Prevent negative values
+      const parsedValue = Math.max(0, Number(value));
 
       if (name === "min") {
         setMinPrice(parsedValue > maxPrice ? maxPrice : parsedValue);
       } else {
         setMaxPrice(parsedValue < minPrice ? minPrice : parsedValue);
       }
-    }, 300), // 300ms debounce delay
+    }, 300),
     [minPrice, maxPrice]
   );
 
-  console.log("filtered", filteredProducts);
+  const getProductsByCategories = async () => {
+    const { receiveObj } = await get("/category/all");
+    if (receiveObj.success) {
+      setCategories(receiveObj.categories);
+    }
+  };
+
+  const fetchProductsByCategory = async (categoryId) => {
+    setError(null);
+    try {
+      const { receiveObj } = await get(
+        `/product?categoryId=${categoryId}&page=${currentPage}&limit=${itemsPerPage}`
+      );
+      setProducts(receiveObj.products);
+      setTotalProducts(receiveObj.totalProducts);
+      setTotalPages(receiveObj.totalPages);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getProductsByCategories();
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  const handleSortOptionChange = (option) => {
+    setSortOption(option);
+    setIsDropdownOpen(false); // Close dropdown after selection
+  };
+
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const setPageSize = (size) => {
+    setItemsPerPage(size);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   return (
     <div className="container flex overflow-hidden flex-col bg-white">
@@ -96,48 +170,63 @@ const Products = () => {
             </span>
           </div>
           <div className="flex gap-5 mt-2 text-center text-stone-500">
-            <div className="flex-auto my-auto text-xs">
-              Showing {indexOfFirstProduct + 1} -{" "}
-              {Math.min(indexOfLastProduct, filteredProducts.length)} of{" "}
-              {filteredProducts.length} item(s)
-            </div>
-            <div className="flex gap-2 px-2 py-2 text-sm font-semibold bg-neutral-200">
-              <div>SORT BY</div>
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/c2ae2d0d1344eee9754786ab04249477cc25d0d914353e3c63323d54ea86a8d1?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                alt="Sort Icon"
-                className="object-contain shrink-0 my-auto w-4 aspect-[1.6]"
-              />
+            <div className="relative">
+              <button
+                onClick={toggleDropdown}
+                className="flex gap-2 px-2 py-2 text-sm font-semibold bg-neutral-200"
+              >
+                <div>SORT BY</div>
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/c2ae2d0d1344eee9754786ab04249477cc25d0d914353e3c63323d54ea86a8d1?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Sort Icon"
+                  className="object-contain shrink-0 my-auto w-4 aspect-[1.6]"
+                />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute right-0 z-10 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                  <div
+                    onClick={() => handleSortOptionChange("lowToHigh")}
+                    className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                  >
+                    Price: Low to High
+                  </div>
+                  <div
+                    onClick={() => handleSortOptionChange("highToLow")}
+                    className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                  >
+                    Price: High to Low
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       <div className="flex w-full max-w-[1385px] max-md:flex-col">
-        {/* Sidebar Section */}
-
-        <div className="flex flex-col w-1/4 p-4 mt-5 bg-sky-50 border border-sky-50 border-solid rounded-[20px] max-md:w-full  ">
+        <div className="flex flex-col w-1/4 p-4 mt-5 bg-sky-50 border border-sky-50 border-solid rounded-[20px] max-md:w-full">
           <div className="flex flex-col px-4 w-full max-md:px-2">
             <div className="text-2xl font-semibold leading-[32px] text-neutral-700">
               Product categories
             </div>
             <div className="mt-2 text-lg font-medium leading-[32px] text-neutral-700 max-md:mr-2.5 max-md:ml-1">
-              Healing Ointments (10)
-              <br />
-              Health & Nutrition (6)
-              <br />
-              Honey (6)
-              <br />
-              Specials (9)
-              <br />
-              Uncategorized (0)
+              {categories?.map((category) => (
+                <div
+                  key={category.id}
+                  onClick={() => fetchProductsByCategory(category.id)}
+                  className="cursor-pointer"
+                >
+                  <h2>
+                    {category.name} ({category.productCount})
+                  </h2>
+                </div>
+              ))}
             </div>
             <div className="p-4">
               <div className="self-start mt-4 mb-4 text-2xl font-semibold leading-[32px] text-neutral-700">
                 Filter by price
               </div>
-
               <div className="flex justify-start mr-10">
                 {circleButtons.map((button, index) => (
                   <React.Fragment key={button.key}>
@@ -153,87 +242,42 @@ const Products = () => {
             </div>
           </div>
           <div className="flex flex-col items-start px-4 w-full text-sm font-medium text-neutral-700 max-md:px-2">
-            {/* <div className="max-md:ml-1.5">Price: $60 — $540</div> */}
             <div className="mt-4 text-2xl font-semibold leading-[32px] max-md:mt-5">
               Top Sellers
             </div>
-            <div className="flex gap-2 mt-1 ml-1">
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/2cebb2e00d5a66e0057449add526ddbdcaff8159acc4dd1d46cf9fc344b548d3?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                alt="Top Seller 1"
-                className="object-contain shrink-0 max-w-full aspect-square w-[80px]"
-              />
-              <div className="mt-3">
-                <span className="text-sm font-semibold leading-5 text-black">
-                  Multi Flower Honey
-                </span>
-              </div>
-            </div>
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/97b51f76976f99691933407049080049f96ab06a2ff355a992be3a855cfe22d8?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-              alt=""
-              className="object-contain self-stretch mt-2 w-full aspect-[333.33] max-md:ml-0.5"
-            />
-            <div className="flex gap-2 mt-2 ml-1">
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/3b53c6bccb5f91ef4bfcba4e6008565dfbe36468ae0216637828f69eaf582f05?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                alt="Top Seller 2"
-                className="object-contain shrink-0 max-w-full aspect-square w-[80px]"
-              />
-              <div className="mt-3">
-                <span className="text-sm font-semibold leading-5 text-black">
-                  Acacia Honey
-                </span>
-              </div>
-            </div>
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/97b51f76976f99691933407049080049f96ab06a2ff355a992be3a855cfe22d8?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-              alt=""
-              className="object-contain self-stretch mt-2 w-full aspect-[333.33] max-md:ml-0.5"
-            />
-            <div className="flex gap-2 mt-2 ml-1 max-md:ml-2.5">
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/bf69b3a45408eb1744c2c02549383cbc7f91aada9d424d98cc6df836ba3c9d6b?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                alt="Top Seller 3"
-                className="object-contain shrink-0 max-w-full aspect-square w-[80px]"
-              />
-              <div className="mt-3">
-                <span className="text-sm font-semibold leading-5 text-black">
-                  Black Forest Honey
-                </span>
-              </div>
-            </div>
+            {/* Top Sellers Content */}
           </div>
         </div>
 
-        {/* Product List Section */}
-        {/* <div className="flex flex-col w-3/4 p-4 max-md:w-full"> */}
-        {/* Price Filter Inputs */}
         <div className="container bg-white">
           <div className="text-3xl font-bold mb-4">PRODUCTS</div>
 
           {isLoading && <p>Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          {sortedProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedProducts?.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-lg text-gray-500">
+              {searchTerm
+                ? `No results found for "${searchTerm}"`
+                : "No products available."}
+            </p>
+          )}
         </div>
       </div>
       <div className="mt-6">
         <Pagination
-          totalItems={filteredProducts.length}
+          totalItems={totalProducts} // Use totalProducts from API
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          setPageSize={setItemsPerPage}
+          onPageChange={onPageChange}
+          setPageSize={setPageSize}
+          totalPages={totalPages} // Pass totalPages if needed
         />
       </div>
     </div>

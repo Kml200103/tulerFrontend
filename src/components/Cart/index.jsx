@@ -33,9 +33,10 @@ export default function Cart({ onClose }) {
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
+      console.log("productId :>> ", productId);
       // Get current quantity from cartData instead of local state
       const currentItem = cartData?.items?.find(
-        (item) => item.productId._id === productId && item.weight === weight
+        (item) => item.productId === productId && item.variant.weight === weight
       );
 
       if (!currentItem) {
@@ -99,6 +100,7 @@ export default function Cart({ onClose }) {
       setUpdating(false);
     }
   }, [id]);
+  console.log(cartData);
 
   return (
     <div
@@ -138,67 +140,68 @@ export default function Cart({ onClose }) {
 
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
-          cartData.items.map((item) => (
-            <div
-              key={item._id}
-              className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
-            >
-              {/ Remove Button /}
-              <button
-                onClick={() => removeItem(item.productId._id, item.weight)}
-                className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
+          cartData.items.map((item) => {
+            console.log("item :>> ", item);
+            return (
+              <div
+                key={item._id}
+                className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
               >
-                Remove
-              </button>
-
-              {/ Quantity Control /}
-              <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                 <button
                   onClick={() =>
-                    updateQuantity(item.productId._id, item.weight, 1)
+                    removeItem(item.productId, item.variant.weight)
                   }
-                  className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
-                  disabled={updating}
+                  className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
                 >
-                  +
+                  Remove
                 </button>
-                <span className="py-2 text-lg font-semibold">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() =>
-                    updateQuantity(item.productId._id, item.weight, -1)
-                  }
-                  className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
-                  disabled={updating}
-                >
-                  -
-                </button>
-              </div>
 
-              {/ Product Image /}
-              <img
-                loading="lazy"
-                src={item?.images?.[0] || ""}
-                alt={item.productName || "Unknown Product"}
-                className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
-              />
-
-              {/ Product Details /}
-              <div className="flex flex-col self-stretch my-auto text-sm">
-                <div className="text-neutral-900">{item.productName}</div>
-                <div className="text-gray-600 mt-1">
-                  Price: ${item.totalPrice.toFixed(2)}
-                </div>
-                <div className="text-gray-600 mt-1">
-                  Quantity: {item.quantity}
+                <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
+                  <button
+                    onClick={() =>
+                      updateQuantity(item.productId, item.variant.weight, 1)
+                    }
+                    className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
+                    disabled={updating}
+                  >
+                    +
+                  </button>
+                  <span className="py-2 text-lg font-semibold">
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() =>
+                      updateQuantity(item.productId, item.variant.weight, -1)
+                    }
+                    className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
+                    disabled={updating}
+                  >
+                    -
+                  </button>
                 </div>
 
-                <div className="text-gray-600 mt-1">Weight: {item.variant.weight}</div>
+                <img
+                  loading="lazy"
+                  src={item?.images?.[0] || ""}
+                  alt={item.productName || "Unknown Product"}
+                  className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
+                />
 
+                <div className="flex flex-col self-stretch my-auto text-sm">
+                  <div className="text-neutral-900">{item.productName}</div>
+                  <div className="text-gray-600 mt-1">
+                    Price: ${item.totalPrice.toFixed(2)}
+                  </div>
+                  <div className="text-gray-600 mt-1">
+                    Quantity: {item.quantity}
+                  </div>
+                  <div className="text-gray-600 mt-1">
+                    Weight: {item.variant.weight}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-center text-gray-500 mt-4">Your Cart is Empty</p>
         )}

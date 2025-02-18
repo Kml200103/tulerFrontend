@@ -107,7 +107,7 @@ const Pagination = ({
       <select
         value={itemsPerPage}
         onChange={(e) => setPageSize(Number(e.target.value))}
-        className="ml-4 px-2 py-1 border border-gray-300 rounded"
+        className="ml-4 px-2 py-1 text-sm border border-gray-300 rounded"
       >
         <option value={5}>5</option>
         <option value={10}>10</option>

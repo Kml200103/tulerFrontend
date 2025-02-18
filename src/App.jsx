@@ -22,6 +22,7 @@ import ProductPage from "./pages/AddProduct";
 import AllProducts from "./pages/AllProducts";
 import AdminProfile from "./components/AdminProfile";
 import AdminOrders from "./pages/AdminOrders";
+import SuccessOrderPage from "./pages/SuccessOrderPage";
 
 export default function App() {
   return (
@@ -80,9 +81,9 @@ export default function App() {
                     </Layout.main>
                   ) : (
                     <MyOrders />
-                  )
-                  }
-                </ProtectedRoute>}
+                  )}
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/forgot-password"
@@ -192,6 +193,18 @@ export default function App() {
                     <AdminProfile />
                   )}
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/success-page"
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <SuccessOrderPage />
+                  </Layout.main>
+                ) : (
+                  <SuccessOrderPage />
+                )
               }
             />
           </Routes>
