@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
+import { post } from "../../services/http/axiosApi";
+import { NotificationService } from "../../services/Notifcation";
 
 const menuItems = [
   { name: "Home", path: "/" },
@@ -23,115 +25,24 @@ const socialIcons = [
 ];
 
 export const Footer = () => {
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+
+    try {
+      const { receiveObj } = await post("/subscribe", {
+        email,
+      });
+      if (receiveObj.status == true) {
+        NotificationService.sendSuccessMessage(receiveObj.message);
+        setEmail("");
+      }
+    } catch (error) {
+      NotificationService.sendErrorMessage("Error Subscribing");
+    }
+  };
   return (
-    // <div className="flex flex-col rounded-none mt-10">
-    //   <div className="flex flex-col items-center px-20 pt-10 pb-6 w-full bg-sky-50 max-md:px-5 max-md:max-w-full">
-    //     <div className="flex ml-8 w-full max-w-[1498px] max-md:max-w-full">
-    //       {/* Menu Section */}
-    //       <div className="flex flex-col my-auto text-black flex-1">
-    //         <div className="self-start text-3xl font-semibold">Menu</div>
-    //         <div className="mt-7 text-xl font-medium">
-    //           {menuItems.map((item, index) => (
-    //             <React.Fragment key={item}>
-    //               {item}
-    //               {index !== menuItems.length - 1 && (
-    //                 <>
-    //                   <br />
-    //                   <br />
-    //                 </>
-    //               )}
-    //             </React.Fragment>
-    //           ))}
-    //         </div>
-    //       </div>
-
-    //       {/* Contact Us Section */}
-    //       <div className="flex flex-col items-start my-auto flex-1">
-    //         <div className="text-3xl font-semibold text-neutral-900">
-    //           Contact us
-    //         </div>
-    //         <div className="self-stretch mt-7 text-base font-medium leading-7 text-neutral-700">
-    //           4821 Ridge Top Cir, Anchorage Street,
-    //           <br />
-    //           Alaska 99508, USA.
-    //         </div>
-    //         <div className="mt-1 text-base font-medium leading-loose text-neutral-700">
-    //           <span className="text-neutral-700">Call Us: </span>
-    //           <span className="font-bold text-neutral-700">800.275.8777</span>
-    //         </div>
-    //         <div className="mt-10 text-3xl font-semibold text-neutral-700">
-    //           Social Links
-    //         </div>
-    //         <div className="flex gap-3 mt-5">
-    //           {socialIcons.map((icon, index) => (
-    //             <div
-    //               className="flex flex-col justify-center items-center px-2 bg-yellow-400 rounded-full h-[39px] w-[39px]"
-    //               key={index}
-    //             >
-    //               <img
-    //                 loading="lazy"
-    //                 src={icon.src}
-    //                 alt={icon.alt}
-    //                 className="object-contain w-5 aspect-square"
-    //               />
-    //             </div>
-    //           ))}
-    //         </div>
-    //       </div>
-
-    //       {/* Subscribe to Newsletter Section */}
-    //       <div className="flex flex-col items-start mt-14 max-md:mt-10 max-md:max-w-full flex-1">
-    //         <div className="ml-7 text-3xl font-semibold text-neutral-900 max-md:ml-2.5">
-    //           Subscribe to Newsletter
-    //         </div>
-    //         <form className="flex gap-10 pl-8 mt-5 text-center bg-white rounded-[30px] max-md:pl-5">
-    //           <label htmlFor="emailInput" className="sr-only">
-    //             Your e-mail address
-    //           </label>
-    //           <input
-    //             type="email"
-    //             id="emailInput"
-    //             className="my-auto text-base font-semibold basis-auto text-zinc-500"
-    //             placeholder="Your e-mail address"
-    //             aria-label="Your e-mail address"
-    //           />
-    //           <button
-    //             type="submit"
-    //             className="z-10 px-9 py-3.5 mr-0 text-xl bg-yellow-400 font-medium text-black whitespace-nowrap rounded-[30px] max-md:px-5"
-    //           >
-    //             Subscribe
-    //           </button>
-    //         </form>
-    //         <div className="flex flex-col self-stretch pl-8 mt-4 text-base font-medium leading-7 text-neutral-700 max-md:pl-5 max-md:max-w-full">
-    //           <div className="self-start">
-    //             Sign up with your email address to receive <br />
-    //             news and updates
-    //           </div>
-    //           <div className="relative mt-4">
-    //             <img
-    //               loading="lazy"
-    //               src="https://cdn.builder.io/api/v1/image/assets/TEMP/21d8913f5c9f45590a2651b620ce11816f44bdb57c2ea1f56a4f35bbca97c0c3?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-    //               alt="Featured content"
-    //               className="object-contain w-[100px] aspect-[1.34] absolute top-0 right-0"
-    //             />
-    //             <img
-    //               loading="lazy"
-    //               src="https://cdn.builder.io/api/v1/image/assets/TEMP/a4f40c7ad209242c431087eb46f67908cbe969c2332847a2dee8ab347c95efbb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-    //               alt=""
-    //               className="object-contain w-[120px] aspect-[1.43] absolute top-0 right-0 z-10"
-    //             />
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //     <div className="flex shrink-0 mt-3 mr-11 max-w-full h-px bg-neutral-200 w-full max-md:mr-2.5" />
-    //     <div className="self-start mt-4 ml-10 text-3xl font-semibold text-black max-md:ml-2.5">
-    //       <span className="text-base font-medium">
-    //         Copyright ©2025 Tuler. All rights reserved.
-    //       </span>
-    //     </div>
-    //   </div>
-    // </div>
     <footer className="flex flex-col items-center px-20 pt-20 pb-6 mt-3 w-full bg-sky-50 max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col w-full max-w-[1498px] max-md:max-w-full">
         {/* Footer Content */}
@@ -222,16 +133,22 @@ export const Footer = () => {
             <div className="ml-7 text-3xl font-semibold text-neutral-900 max-md:ml-2.5">
               Subscribe to Newsletter
             </div>
-            <form className="flex gap-10 pl-8 mt-5 text-center bg-white rounded-[30px] max-md:pl-5">
+            <form
+              onSubmit={handleSubscribe}
+              className="flex gap-10 pl-8 mt-5 text-center bg-white rounded-[30px] max-md:pl-5"
+            >
               <label htmlFor="emailInput" className="sr-only">
                 Your e-mail address
               </label>
               <input
                 type="email"
                 id="emailInput"
-                className="my-auto text-base font-semibold basis-auto text-zinc-500"
+                className="my-auto text-base font-semibold basis-auto text-zinc-500 focus:outline-none focus:border-none"
                 placeholder="Your e-mail address"
                 aria-label="Your e-mail address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // Update email state on input change
+                required
               />
               <button
                 type="submit"
@@ -240,6 +157,7 @@ export const Footer = () => {
                 Subscribe
               </button>
             </form>
+
             <div className="flex flex-col self-stretch pl-8 mt-4 text-base font-medium leading-7 text-neutral-700 max-md:pl-5 max-md:max-w-full">
               <div className="self-start">
                 Sign up with your email address to receive <br />

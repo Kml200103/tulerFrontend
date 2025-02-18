@@ -17,7 +17,7 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(true); // Handle loading state
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
-
+  const [topProducts, setTopProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalProducts, setTotalProducts] = useState(0); // Total products from API
@@ -45,6 +45,7 @@ const Products = () => {
       if (response.isSuccess) {
         setProducts(response.receiveObj.products);
         setTotalProducts(response.receiveObj.totalProducts);
+        setTopProducts(response.receiveObj.topProducts);
         setTotalPages(response.receiveObj.totalPages);
       } else {
         throw new Error("Failed to fetch products");
@@ -245,7 +246,37 @@ const Products = () => {
             <div className="mt-4 text-2xl font-semibold leading-[32px] max-md:mt-5">
               Top Sellers
             </div>
-            {/* Top Sellers Content */}
+            {isLoading && <div>Loading...</div>}
+            {error && <div className="text-red-500">{error}</div>}
+            {topProducts.length > 0 ? (
+              topProducts.map((product) => (
+                <div key={product._id} className="mb-4">
+                  {" "}
+                  {/* Add margin-bottom for spacing */}
+                  <div className="flex gap-2 mt-3 ml-1">
+                    <img
+                      loading="lazy"
+                      src={product.images[0]} // Display the first image
+                      alt={product.name}
+                      className="object-contain shrink-0 max-w-full aspect-square w-[80px]"
+                    />
+                    <div className="mt-3">
+                      <span className="text-sm font-semibold leading-5 text-black">
+                        {product.name}
+                      </span>
+                    </div>
+                  </div>
+                  <img
+                    loading="lazy"
+                    src={product.images[0]} // You can replace this with another image if needed
+                    alt={product.name}
+                    className="object-contain self-stretch mt-2 w-full aspect-[333.33] max-md:ml-0.5"
+                  />
+                </div>
+              ))
+            ) : (
+              <div>No top sellers available.</div>
+            )}
           </div>
         </div>
 
