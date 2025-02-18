@@ -59,6 +59,7 @@ const AdminOrders = () => {
   };
 
   const getAdminOrders = async () => {
+  
     try {
       const response = await get(
         `/order/all?page=${currentPage}&pageSize=${pageSize}`
@@ -73,7 +74,6 @@ const AdminOrders = () => {
       console.error("Error fetching orders:", error);
     }
   };
-
   const cancelOrder = async (orderId) => {
     const { receiveObj } = await post("/order/status", {
       orderId: orderId,
@@ -161,28 +161,28 @@ const AdminOrders = () => {
                         >
                           <td className="py-3 px-0 text-left whitespace-nowrap">
                             <span className="font-medium">
-                              {truncateText(order.orderId, 8)}
+                              {truncateText(order?.orderId, 8)}
                             </span>
                           </td>
                           <td className="py-3 px-0 text-left">
                             {order.items
                               .map(
                                 (item) =>
-                                  `${item.productName} - ${item.quantity}`
+                                  `${item?.productName} - ${item?.quantity}`
                               )
                               .join(", ")}
                           </td>
                           <td className="py-3 px-0 text-center">
-                            ${order.totalPrice}
+                            ${order?.totalPrice}
                           </td>
                           <td className="py-3 px-0 text-center">
                             {truncateText(
-                              `${order.address.streetAddress}, ${order.address.city}, ${order.address.state}, ${order.address.country}, ${order.address.pincode}`,
+                              `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
                               30
                             )}
                           </td>
                           <td className="py-3 px-0 text-center">
-                            {editableOrderId === order.orderId ? (
+                            {editableOrderId === order?.orderId ? (
                               <select
                                 value={newStatus}
                                 onChange={(e) =>
@@ -199,23 +199,23 @@ const AdminOrders = () => {
                                   order.status
                                 )} py-1 px-3 rounded-full text-xs`}
                               >
-                                {order.status.toUpperCase()}
+                                {order?.status.toUpperCase()}
                               </span>
                             )}
                           </td>
                           <td className="py-3 px-0 text-center">
                             <span
                               className={`py-1 px-3 rounded-full text-xs ${
-                                order.paymentStatus === "paid"
+                                order?.paymentStatus === "paid"
                                   ? "bg-green-200 text-green-600"
                                   : "bg-red-200 text-red-600"
                               }`}
                             >
-                              {order.paymentStatus}
+                              {order?.paymentStatus}
                             </span>
                           </td>
                           <td className="py-3 px-0 text-left">
-                            {new Date(order.createdAt).toLocaleString()}
+                            {new Date(order?.createdAt).toLocaleString()}
                           </td>
 
                           <td className="py-3 px-0 text-center flex items-center justify-center space-x-2">
@@ -230,7 +230,7 @@ const AdminOrders = () => {
                                   : "hover:text-purple-500"
                               }`}
                               onClick={() => {
-                                if (order.status !== "CANCEL") {
+                                if (order?.status !== "CANCEL") {
                                   setEditableOrderId(order.orderId);
                                   setNewStatus(order.status); // Set the current status for the dropdown
                                 }
@@ -245,7 +245,7 @@ const AdminOrders = () => {
                                     ? "opacity-50 cursor-not-allowed"
                                     : ""
                                 }`}
-                                disabled={order.status === "CANCEL"}
+                                disabled={order?.status === "CANCEL"}
                                 onClick={() => openConfirmModal(order)}
                               >
                                 Cancel Order
