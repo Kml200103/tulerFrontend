@@ -344,7 +344,8 @@ const Home = () => {
                   Category
                 </div>
                 <button
-                  className="px-14 py-3 mt-14 max-w-full text-lg bg-yellow-400  font-medium text-center text-black rounded-[90px] w-[200px] max-md:px-5 max-md:mt-10"
+                  onClick={() => navigate("/products")}
+                  className="px-14 py-3 mt-14 max-w-full text-lg bg-yellow-400  font-medium text-center text-black rounded-[90px] w-[200px]  max-md:px-5 max-md:mt-10"
                   aria-label="View all categories"
                 >
                   View All
