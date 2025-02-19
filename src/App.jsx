@@ -23,6 +23,7 @@ import AllProducts from "./pages/AllProducts";
 import AdminProfile from "./components/AdminProfile";
 import AdminOrders from "./pages/AdminOrders";
 import SuccessOrderPage from "./pages/SuccessOrderPage";
+import Spin from "./pages/Spinwheel";
 
 export default function App() {
   return (
@@ -31,7 +32,15 @@ export default function App() {
         <BrowserRouter>
           <Loader />
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={
+            Layout ? (
+                  <Layout.main>
+                    <Home />
+                  </Layout.main>
+                ) : (
+                  <Home />
+                )
+              } />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
@@ -207,6 +216,16 @@ export default function App() {
                 )
               }
             />
+
+            <Route path="/spin" element={
+              Layout ? (
+                <Layout.main>
+
+                  <Spin />
+                </Layout.main>) : (
+                <Spin />
+              )
+            }></Route>
           </Routes>
         </BrowserRouter>
       </PersistGate>
