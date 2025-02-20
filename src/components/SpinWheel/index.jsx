@@ -4,109 +4,85 @@ import { Wheel } from "react-custom-roulette";
 import { useGetWheelDataQuery } from "../../services/http/spinService";
 
 const SpinWheel = () => {
-    // const wheelData = [
-    //     { option: "10% OFF" },
-    //     { option: "₹50 OFF" },
-    //     { option: "20% OFF" },
-    //     { option: "₹100 OFF" },
-    //     { option: "15% OFF" },
-    //     { option: "₹25 OFF" },
-    //     { option: "5% OFF" },
-    //     { option: "₹75 OFF" },
-    // ];
-
-    const[wheelData,setWheelData]=useState([])
+    const [spinData, setSpinData] = useState([]);
     const [mustSpin, setMustSpin] = useState(false);
     const [prizeNumber, setPrizeNumber] = useState(0);
-    const [savedOffers, setSavedOffers] = useState([]);
+    const [savedOffer, setSavedOffer] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const { data, isError, isLoading,isSuccess } = useGetWheelDataQuery()
     const sidebarRef = useRef(null);
 
-    
+    const { data, isLoading } = useGetWheelDataQuery();
+
     useEffect(() => {
-        if(data){
-            setWheelData(data?.offers)
+        if (data?.offers?.length) {
+            setSpinData(data.offers);
         }
-        const storedOffers = JSON.parse(localStorage.getItem("savedOffers")) || [];
-        setSavedOffers(storedOffers);
-    }, []);
 
-    useEffect(() => {
-        localStorage.setItem("savedOffers", JSON.stringify(savedOffers));
-    }, [savedOffers]);
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-                setIsSidebarOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+        // Check if an offer is already saved in localStorage
+        const storedOffer = JSON.parse(localStorage.getItem("savedOffer"));
+        if (storedOffer) {
+            setSavedOffer(storedOffer);
+        }
+    }, [data]);
 
     const handleSpinClick = () => {
-        if (!mustSpin) {
-            const randomIndex = Math.floor(Math.random() * wheelData.length);
+        if (!mustSpin && spinData.length > 0 && !savedOffer) {
+            const randomIndex = Math.floor(Math.random() * spinData.length);
             setPrizeNumber(randomIndex);
             setMustSpin(true);
         }
     };
 
     const handleStopSpinning = () => {
-        const wonOffer = wheelData[prizeNumber].option;
-        setSavedOffers((prev) => [...prev, wonOffer]);
-        alert(`You won: ${wonOffer}!`);
+        if (spinData.length > 0) {
+            const wonOffer = spinData[prizeNumber];
+
+        
+            // Save the offer with ID to localStorage
+            const offerToSave = { id: wonOffer._id, option: wonOffer.option };
+            localStorage.setItem("savedOffer", JSON.stringify(offerToSave));
+            setSavedOffer(offerToSave);
+
+            // Send offerToSave to backend if required
+            // sendOfferToBackend(offerToSave);
+
+            alert(`You won: ${wonOffer.option}!`);
+        }
         setMustSpin(false);
     };
 
+    const wheelData = spinData?.length
+        ? spinData.map((offer) => ({ option: offer.option }))
+        : [];
+
     return (
         <div className="spin-wheel-page">
-            {/* Header */}
-
-
             <div className="spin-wheel-container">
                 <div className="wheel-container">
-                    <Wheel
-                        mustStartSpinning={mustSpin}
-                        prizeNumber={prizeNumber}
-                        data={wheelData}
-                        backgroundColors={["#ff5733", "#ffbe0b", "#ff8c42", "#ffb142"]}
-                        textColors={["#ffffff"]}
-                        onStopSpinning={handleStopSpinning}
-                        outerBorderColor={"#ffffff"}
-                        outerBorderWidth={6}
-                        radiusLineColor={"#ffffff"}
-                        radiusLineWidth={2}
-                        textDistance={75}
-                    />
+                    {isLoading ? (
+                        <p>Loading Spin Data...</p>
+                    ) : wheelData.length > 0 ? (
+                        <Wheel
+                            mustStartSpinning={mustSpin}
+                            prizeNumber={prizeNumber}
+                            data={wheelData}
+                            backgroundColors={["#ff5733", "#ffbe0b", "#ff8c42", "#ffb142"]}
+                            textColors={["#ffffff"]}
+                            onStopSpinning={handleStopSpinning}
+                            outerBorderColor={"#ffffff"}
+                            outerBorderWidth={6}
+                            radiusLineColor={"#ffffff"}
+                            radiusLineWidth={2}
+                            textDistance={75}
+                        />
+                    ) : (
+                        <p>No Offers Available</p>
+                    )}
                 </div>
-                <button className="spin-button" onClick={handleSpinClick} disabled={mustSpin}>
-                    {mustSpin ? "Spinning..." : "Spin"}
+                <button className="spin-button" onClick={handleSpinClick} disabled={mustSpin || !!savedOffer}>
+                    {savedOffer ? `Offer: ${savedOffer?.option}` : mustSpin ? "Spinning..." : "Spin"}
                 </button>
             </div>
-
-            {/* Sidebar
-            {isSidebarOpen && (
-                <div className="sidebar-overlay">
-                    <div className="sidebar" ref={sidebarRef}>
-                        <button className="close-btn" onClick={() => setIsSidebarOpen(false)}>
-                            &times;
-                        </button>
-                        <h2>Saved Offers</h2>
-                        <ul>
-                            {savedOffers.length > 0 ? (
-                                savedOffers.map((offer, index) => <li key={index}>{offer}</li>)
-                            ) : (
-                                <p>No offers saved yet.</p>
-                            )}
-                        </ul>
-                    </div>
-                </div>
-            )} */}
         </div>
     );
 };
