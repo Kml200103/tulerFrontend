@@ -400,7 +400,7 @@ const Checkout = () => {
         navigate("/success-page", {
           state: { orderId: response.receiveObj.orderId },
         });
-        localStorage.removeItem('"savedOffer"');
+        localStorage.removeItem("savedOffer");
       } else {
         NotificationService.sendErrorMessage("Failed to place order");
       }
