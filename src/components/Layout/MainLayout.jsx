@@ -40,7 +40,10 @@ const MainLayout = ({ children }) => {
   // Close search input when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target)
+      ) {
         setIsSearchInputOpen(false);
       }
     };
@@ -51,19 +54,24 @@ const MainLayout = ({ children }) => {
   // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutsideSidebar = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target) && !event.target.classList.contains("sidebar-toggle")) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.classList.contains("sidebar-toggle")
+      ) {
         setIsSidebarOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutsideSidebar);
-    return () => document.removeEventListener("mousedown", handleClickOutsideSidebar);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutsideSidebar);
   }, []);
 
   return (
     <>
       <div>
         <Header toggleSearchInput={toggleSearchInput} />
-        <div className="mt-10">{children}</div>
+        <div>{children}</div>
 
         {/* Sidebar Toggle Button */}
         <button
@@ -76,14 +84,18 @@ const MainLayout = ({ children }) => {
         {/* Sidebar for SpinWheel */}
         <div
           ref={sidebarRef}
-          className={`fixed left-0 top-0 h-full bg-white w-1/2 shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
+          className={`fixed left-0 top-0 h-full bg-white w-1/2 shadow-lg transition-transform transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
           style={{ backgroundColor: "#fff", zIndex: 50 }} // Ensures solid background
         >
-
           <div className="p-5 border-b flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Spin to Get Offers</h2>
-            <button onClick={toggleSidebar} className="text-xl">✖</button>
+            <h2 className="text-lg font-semibold text-[#ff7300]">
+              Spin to Get Offers
+            </h2>
+            <button onClick={toggleSidebar} className="text-xl">
+              ✖
+            </button>
           </div>
           <div className="p-5">
             <SpinWheel />

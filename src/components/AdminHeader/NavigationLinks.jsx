@@ -5,6 +5,7 @@ const navItems = [
   { text: "Products", path: "/all-products" },
   { text: "Add Product", path: "/add-product" },
   { text: "All Orders", path: "/all-orders" },
+  { text: "Offers", path: "/offers" },
 ];
 
 export default function AdminNavigationLinks() {

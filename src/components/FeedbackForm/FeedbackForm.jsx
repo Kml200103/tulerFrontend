@@ -2,8 +2,10 @@ import axios from "axios";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { NotificationService } from "../../services/Notifcation";
+import { classNames } from "../../utils/classNames";
+import { post } from "../../services/http/axiosApi";
 
-export function FormInput({ label, type, id, register, errors }) {
+export function FormInput({ label, type, id, register, errors, className }) {
   return (
     <div className="flex flex-col flex-1 grow shrink-0 basis-0 w-fit">
       <label htmlFor={id} className="self-start">
@@ -14,11 +16,21 @@ export function FormInput({ label, type, id, register, errors }) {
         id={id}
         {...register(id, {
           required: `${label} is required`,
-          pattern: id === "email" ? { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email format" } : undefined,
+          pattern:
+            id === "email"
+              ? {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email format",
+                }
+              : undefined,
         })}
-        className="flex shrink-0 mt-6 h-12 w-full bg-white rounded-xl border border-gray-300 border-solid"
+        className={classNames(
+          `${className} flex shrink-0 mt-6 h-12 w-full bg-white rounded-xl border border-gray-300 border-solid`
+        )}
       />
-      {errors[id] && <p className="text-red-500 text-sm mt-1">*{errors[id]?.message}</p>}
+      {errors[id] && (
+        <p className="text-red-500 text-sm mt-1">*{errors[id]?.message}</p>
+      )}
     </div>
   );
 }
@@ -28,26 +40,22 @@ function FeedbackForm() {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm();
 
   const onSubmit = async (data) => {
-
     try {
-      const response = await axios.post('http://localhost:3001/api/feedback',
-        data
-      )
-
-      if (response?.data?.status) {
-        NotificationService.sendInfoMessage(`${response?.data?.message}`)
-        reset()
+      const { receiveObj } = await post("/feedback", data);
+      if (receiveObj.status == true) {
+        NotificationService.sendSuccessMessage(receiveObj.message);
+        reset();
       }
-    }
-    catch (error) {
-      NotificationService.sendErrorMessage("Failed to submit feedback. Please try again.");
+    } catch (error) {
+      NotificationService.sendErrorMessage(
+        "Failed to submit feedback. Please try again."
+      );
       console.error("Error submitting feedback:", error);
     }
-
   };
 
   return (
@@ -61,8 +69,22 @@ function FeedbackForm() {
         </h1>
 
         <div className="flex text-xl flex-wrap gap-6 self-stretch mt-8 max-md:mt-8 max-md:max-w-full">
-          <FormInput label="Name" type="text" id="name" register={register} errors={errors} />
-          <FormInput label="Email" type="email" id="email" register={register} errors={errors} />
+          <FormInput
+            label="Name"
+            type="text"
+            id="name"
+            register={register}
+            errors={errors}
+            className={"p-2"}
+          />
+          <FormInput
+            label="Email"
+            type="email"
+            id="email"
+            register={register}
+            errors={errors}
+            className={"p-2"}
+          />
         </div>
 
         <div className="w-full">
@@ -72,10 +94,20 @@ function FeedbackForm() {
           <input
             type="text"
             id="subject"
-            {...register("subject", { required: "Subject is required" })}
-            className="flex shrink-0 self-stretch mt-4 h-10 w-full bg-white rounded-xl border border-gray-300 border-solid max-md:max-w-full"
+            {...register("subject", {
+              required: "Subject is required",
+              minLength: {
+                value: 10,
+                message: "Subject must be at least 5 characters",
+              },
+            })}
+            className="p-2 flex shrink-0 self-stretch mt-4 h-10 w-full bg-white rounded-xl border border-gray-300 border-solid max-md:max-w-full"
           />
-          {errors.subject && <p className="text-red-500 text-sm mt-1">*{errors.subject.message}</p>}
+          {errors.subject && (
+            <p className="text-red-500 text-sm mt-1">
+              *{errors.subject.message}
+            </p>
+          )}
         </div>
 
         <div className="w-full">
@@ -86,11 +118,18 @@ function FeedbackForm() {
             id="description"
             {...register("description", {
               required: "Description is required",
-              minLength: { value: 10, message: "Description must be at least 10 characters" },
+              minLength: {
+                value: 10,
+                message: "Description must be at least 10 characters",
+              },
             })}
-            className="flex shrink-0 self-stretch mt-4 w-full bg-white rounded-xl border border-gray-300 border-solid h-[100px] max-md:max-w-full"
+            className=" p-2 flex shrink-0 self-stretch mt-4 w-full bg-white rounded-xl border border-gray-300 border-solid h-[100px] max-md:max-w-full"
           />
-          {errors.description && <p className="text-red-500 text-sm mt-1">*{errors.description.message}</p>}
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              *{errors.description.message}
+            </p>
+          )}
         </div>
 
         <button

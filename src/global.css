@@ -15,7 +15,6 @@
   height: 350px;
 }
 
-
 .spin-button {
   padding: 12px 25px;
   font-size: 1.2rem;
@@ -38,10 +37,6 @@
   background: linear-gradient(135deg, #ff9500, #ff7300);
 }
 
-h2 {
-  color: #ff7300;
-}
-
 ul {
   list-style-type: none;
   padding: 0;
@@ -51,7 +46,6 @@ li {
   font-size: 1.2rem;
   color: #333;
 }
-
 
 .spin-wheel-page {
   display: flex;
@@ -122,12 +116,9 @@ li {
   overflow-y: auto;
   z-index: 100;
   overflow: auto; /* Prevents scrolling from affecting the whole page */
-
 }
-.sidebar:hover{
-
-    overflow: auto; /* Allows scrolling only when hovering */
-
+.sidebar:hover {
+  overflow: auto; /* Allows scrolling only when hovering */
 }
 .close-btn {
   position: absolute;
@@ -155,4 +146,21 @@ li {
   margin-bottom: 5px;
   border-radius: 5px;
   text-align: center;
+}
+
+.win-message {
+  margin-top: 20px; /* Space above the message */
+  padding: 10px 20px; /* Padding around the message */
+  background-color: #4caf50; /* Green background for success */
+  color: white; /* White text color */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 1.2em; /* Slightly larger font size */
+  text-align: center; /* Center the text */
+  transition: opacity 0.5s ease; /* Smooth transition for visibility */
+  opacity: 1; /* Fully visible */
+}
+
+/* Optional: Add a fade-out effect */
+.win-message.fade-out {
+  opacity: 0; /* Make it invisible */
 }
