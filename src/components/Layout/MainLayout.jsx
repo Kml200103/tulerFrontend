@@ -3,41 +3,41 @@ import Header from "../Header";
 import { Footer } from "../Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchTerm } from "../../redux/search/searchSlice";
+import SpinWheel from "../SpinWheel";
 
 const MainLayout = ({ children }) => {
-  const isBrowser = () => typeof window !== "undefined"; // The approach recommended by Next.js
+  const isBrowser = () => typeof window !== "undefined";
   const [isVisible, setIsVisible] = useState(false);
-  const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
+  const [isSearchInputOpen, setIsSearchInputOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar state
   const dispatch = useDispatch();
-  const searchInputRef = useRef(null); // Create a ref for the search input
+  const searchInputRef = useRef(null);
+  const sidebarRef = useRef(null); // Ref for sidebar
   const searchTerm = useSelector((state) => state.search.term);
+
   function scrollToTop() {
     if (!isBrowser()) return;
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const handleScroll = () => {
-    // Show the button when the user scrolls down
-    if (window.scrollY > 100) {
-      setIsVisible(true);
-    } else {
-      setIsVisible(false);
-    }
+    setIsVisible(window.scrollY > 100);
   };
 
   useEffect(() => {
-    // Add scroll event listener when the component mounts
     window.addEventListener("scroll", handleScroll);
-
-    // Remove the event listener when the component unmounts
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const toggleSearchInput = () => {
     setIsSearchInputOpen((prev) => !prev);
   };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
+  // Close search input when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -47,20 +47,61 @@ const MainLayout = ({ children }) => {
         setIsSearchInputOpen(false);
       }
     };
-
-    // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      // Clean up the event listener
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [searchInputRef]);
+
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    const handleClickOutsideSidebar = (event) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.classList.contains("sidebar-toggle")
+      ) {
+        setIsSidebarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutsideSidebar);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutsideSidebar);
+  }, []);
+
   return (
     <>
-      <div className="">
-        <Header toggleSearchInput={toggleSearchInput} />{" "}
-        {/* Pass the toggle function to Header if needed */}
-        <div className="mt-10">{children}</div>
+      <div>
+        <Header toggleSearchInput={toggleSearchInput} />
+        <div>{children}</div>
+
+        {/* Sidebar Toggle Button */}
+        <button
+          className="sidebar-toggle fixed bottom-10 left-5 bg-[#006d77] text-white px-4 py-2 rounded-md"
+          onClick={toggleSidebar}
+        >
+          🎡 Spin & Win
+        </button>
+
+        {/* Sidebar for SpinWheel */}
+        <div
+          ref={sidebarRef}
+          className={`fixed left-0 top-0 h-full bg-white w-1/2 shadow-lg transition-transform transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+          style={{ backgroundColor: "#fff", zIndex: 50 }} // Ensures solid background
+        >
+          <div className="p-5 border-b flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-[#ff7300]">
+              Spin to Get Offers
+            </h2>
+            <button onClick={toggleSidebar} className="text-xl">
+              ✖
+            </button>
+          </div>
+          <div className="p-5">
+            <SpinWheel />
+          </div>
+        </div>
+
         {/* Search Input */}
         {isSearchInputOpen && (
           <div
@@ -72,13 +113,15 @@ const MainLayout = ({ children }) => {
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-              className="w-full p-3  border-gray-300 rounded focus:outline-none  "
+              className="w-full p-3 border-gray-300 rounded focus:outline-none"
             />
           </div>
         )}
+
+        {/* Scroll to Top Button */}
         <div className={`scrollToTopButton ${isVisible ? "visible" : ""}`}>
           <button
-            className={`fixed bottom-0 hover:mb-[80px] hover:duration-300 right-0 rounded-s-full px-2 py-4 mr-5 mb-[71px] z-50 items-center flex gap-2`}
+            className="fixed bottom-0 hover:mb-[80px] hover:duration-300 right-0 rounded-s-full px-2 py-4 mr-5 mb-[71px] z-50 items-center flex gap-2"
             onClick={scrollToTop}
           >
             <svg
@@ -91,6 +134,7 @@ const MainLayout = ({ children }) => {
             </svg>
           </button>
         </div>
+
         <Footer />
       </div>
     </>

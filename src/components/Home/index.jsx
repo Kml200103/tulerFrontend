@@ -185,7 +185,7 @@ const Home = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null); // Create a ref for the search input
   const searchTerm = useSelector((state) => state.search.term);
-  const isAdmin = isLoggedIn && user.role === "admin"; // Check if user is admin
+
   const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
 
   const toggleSearchInput = () => {
@@ -211,61 +211,6 @@ const Home = () => {
   }, [searchInputRef]);
   return (
     <>
-      {isAdmin ? (
-        <nav
-          className="absolute top-0 left-0 w-full flex items-center justify-around px-6 py-4 z-20"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          <Link to="/" className="flex items-center">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/815194ebd73b1770653e9eeff880f6142915e483ce7502d72dbe90db2da05af4?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-              className="object-contain w-32 h-auto max-md:w-24"
-              alt="Company logo"
-            />
-          </Link>
-          <div className="flex flex-col md:flex-row gap-6 items-center w-full md:w-auto">
-            <AdminNavigationLinks />
-            <AdminSocialIcons />
-          </div>
-        </nav>
-      ) : (
-        <nav
-          className="absolute top-0 left-0 w-full flex items-center justify-around px-6 py-4 z-20"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          <Link to="/">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/815194ebd73b1770653e9eeff880f6142915e483ce7502d72dbe90db2da05af4?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-              className="object-contain w-32 h-auto max-md:w-24"
-              alt="Company logo"
-            />
-          </Link>
-          <div className="flex gap-6 items-center">
-            <NavigationLinks />
-            <SocialIcons toggleSearchInput={toggleSearchInput} />{" "}
-          </div>
-        </nav>
-      )}
-
-      {isSearchInputOpen && (
-        <div
-          ref={searchInputRef}
-          className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-[400px]"
-        >
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-            className="w-full p-3  border-gray-300 rounded focus:outline-none  "
-          />
-        </div>
-      )}
-
       <section>
         <div className="flex relative flex-col items-center px-16 pt-56 pb-6 w-full rounded-none min-h-[774px] max-md:px-5 max-md:pt-24 max-md:max-w-full">
           <img
@@ -344,7 +289,6 @@ const Home = () => {
                   Category
                 </div>
                 <button
-                  onClick={() => navigate("/products")}
                   className="px-14 py-3 mt-14 max-w-full text-lg bg-yellow-400  font-medium text-center text-black rounded-[90px] w-[200px]  max-md:px-5 max-md:mt-10"
                   aria-label="View all categories"
                 >
@@ -570,8 +514,6 @@ const Home = () => {
           </Swiper>
         </div>
       </div>
-
-      <Footer />
     </>
   );
 };
