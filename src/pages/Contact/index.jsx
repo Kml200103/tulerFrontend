@@ -16,71 +16,70 @@ const socialIcons = [
   },
 ];
 
+
 const ContactPage = () => {
   return (
-    <div className="container  justify-center flex w-full  max-md:flex-col">
-      <div className="flex flex-col rounded-none max-w-[400px]">
-        {" "}
-        {/* Reduced width */}
-        <div className="flex flex-col items-start px-10 pt-7  max-w-[530px] pb-20 w-full bg-sky-50 border border-sky-50 border-solid rounded-[30px] max-md:px-5 max-md:max-w-full mb-96">
+    <div className=" m-10 container flex flex-col md:flex-row w-full justify-center items-start md:items-center px-4 md:px-0"> {/* Container with responsive flex direction and padding */}
+      <div className="md:w-1/3 w-full rounded-none"> {/* Responsive width for contact info */}
+        <div className="flex flex-col items-start p-6 bg-sky-50 border border-sky-50 border-solid rounded-[30px] w-full mb-6 md:mb-0"> {/* Responsive padding and margin */}
           <img
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/3cfa34d20795278a334d84d850e3fc32f7ad0a4af83f42e875decc451145b2d9?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
             alt="Contact"
-            className="object-contain self-stretch w-3/4 md:w-1/2 mx-auto"
+            className="object-contain w-1/2 mx-auto mb-4 md:mb-0" // Responsive image width and margin
           />
 
-          <div className="mt-3.5 text-xl font-semibold leading-3 text-neutral-700">
+          <div className="mt-4 text-xl font-semibold leading-3 text-neutral-700 w-full"> {/* Added w-full */}
             Address
           </div>
-          <div className="mt-6 text-lg font-medium leading-4 text-stone-500">
+          <div className="mt-2 text-lg font-medium leading-4 text-stone-500 w-full"> {/* Added w-full */}
             NY State Thruway, New York, USA
           </div>
-          <div className="mt-10 text-xl font-semibold leading-3 text-neutral-700 max-md:mt-10">
+          <div className="mt-6 text-xl font-semibold leading-3 text-neutral-700 w-full"> {/* Added w-full */}
             Phone
           </div>
-          <div className="mt-2.5 text-lg font-medium leading-[64px] text-stone-500">
+          <div className="mt-2 text-lg font-medium leading-4 text-stone-500 w-full"> {/* Added w-full */}
             +129290122122
           </div>
-          <div className="mt-10 text-xl font-semibold leading-3 text-neutral-700 max-md:mt-10">
+          <div className="mt-6 text-xl font-semibold leading-3 text-neutral-700 w-full"> {/* Added w-full */}
             Email Address
           </div>
-          <div className="mt-6 text-lg font-medium leading-4 text-stone-500">
+          <div className="mt-2 text-lg font-medium leading-4 text-stone-500 w-full"> {/* Added w-full */}
             demo@demo.com
           </div>
-          <div className="mt-8 text-xl font-semibold leading-[64px] text-neutral-700 max-md:mt-10">
+          <div className="mt-6 text-xl font-semibold leading-3 text-neutral-700 w-full"> {/* Added w-full */}
             Website
           </div>
-          <div className="mt-2.5 text-lg font-medium leading-4 text-stone-500">
+          <div className="mt-2 text-lg font-medium leading-4 text-stone-500 w-full"> {/* Added w-full */}
             https://redq.io
           </div>
-          <div className="mt-10 text-xl font-semibold leading-[64px] text-neutral-700 max-md:mt-10">
+          <div className="mt-6 text-xl font-semibold leading-3 text-neutral-700 w-full"> {/* Added w-full */}
             Follow Us
           </div>
-          <div className="flex gap-3.5 mt-3.5 max-md:mt-10">
+          <div className="flex gap-3.5 mt-2 w-full"> {/* Added w-full and reduced margin-top */}
             <img
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/dc3aaf0e2da052fe1190fc676bac126d3313350a79e984babc91d661d6901fba?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
               alt="Social Media 1"
-              className="object-contain shrink-0 aspect-[1.17] w-[21px]"
+              className="object-contain shrink-0 w-6" // Adjusted width
             />
             <img
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/4f2e8ffd91a09464f45b56aaf701353a9616e7946c70b2fb45f74f852f06fd9c?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
               alt="Social Media 2"
-              className="object-contain shrink-0 aspect-[1.17] w-[21px]"
+              className="object-contain shrink-0 w-6" // Adjusted width
             />
             <img
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/bdfe4337061578f5470529822231bcbef630e64e81ccd1d3d76b6b98fe45dfa9?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
               alt="Social Media 3"
-              className="object-contain shrink-0 w-5 aspect-[1.11]"
+              className="object-contain shrink-0 w-6" // Adjusted width
             />
           </div>
         </div>
       </div>
 
-      <div className="ml-5  flex-1 ">
+      <div className="md:w-1/2 w-full md:pl-8 mt-6 md:mt-0"> {/* Responsive width and padding for the form */}
         <FeedbackForm />
       </div>
     </div>
@@ -88,3 +87,4 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+

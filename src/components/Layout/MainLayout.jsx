@@ -67,6 +67,23 @@ const MainLayout = ({ children }) => {
       document.removeEventListener("mousedown", handleClickOutsideSidebar);
   }, []);
 
+  useEffect(() => {
+    // ... (Existing useEffect code)
+
+    // Hide sidebar on smaller screens if not open
+    const handleResize = () => {
+      if (window.innerWidth < 840 && !isSidebarOpen) {
+        setIsSidebarOpen(false); // Force close the sidebar
+      }
+    };
+
+    window.addEventListener("resize", handleResize); // Add resize listener
+    handleResize(); // Call it initially to set initial state
+
+    return () => window.removeEventListener("resize", handleResize); // Clean up
+  }, [isSidebarOpen]); // Add isSidebarOpen to dependency array
+
+
   return (
     <>
       <div>
@@ -82,24 +99,36 @@ const MainLayout = ({ children }) => {
         </button>
 
         {/* Sidebar for SpinWheel */}
-        <div
+        {/* <div
           ref={sidebarRef}
           className={`fixed left-0 top-0 h-full bg-white w-1/2 shadow-lg transition-transform transform ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{ backgroundColor: "#fff", zIndex: 50 }} // Ensures solid background
+        > */}
+        <div
+          ref={sidebarRef}
+          className={`fixed left-0 top-0 h-full bg-white w-full md:w-1/2 shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            }`} 
+          style={{ backgroundColor: "#fff", zIndex: 50 }}
         >
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-[#ff7300]">
               Spin to Get Offers
             </h2>
-            <button onClick={toggleSidebar} className="text-xl">
+            <button onClick={toggleSidebar} className="text-xl md:hidden"> {/* Hide close button on larger screens */}
               ✖
             </button>
           </div>
           <div className="p-5">
             <SpinWheel />
           </div>
+          <button
+            onClick={toggleSidebar}
+            className="fixed bottom-10 right-10 bg-[#ff7300] text-white p-3 rounded-full z-50 md:hidden"
+          >
+            Spin
+          </button>
         </div>
 
         {/* Search Input */}

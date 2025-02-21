@@ -44,53 +44,6 @@ const honeyProducts = [
   },
 ];
 
-// const products = [
-//   {
-//     imgSrc:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/c000a97bc014e7856faeb2a21d008e47996125e3d3e2d379a2a9cb768f4d1b88?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     altText: "Acacia Honey",
-//     name: "Acacia Honey",
-//     price: "$13.25",
-//     discount: 20,
-//     ratings: [
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/381d98a1e7f295b3bec7f4ea84e6687add44348be10288ed758a689336b014b9?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/7b3b366a614c3d7e43d0ecb2b4de6d6fd14cf8e3b339cdc0fc672c1674bf37b5?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/82bb6e6bbd16cbfcf7c81874e67d60d525b69b100e91e832758a0d53da0110eb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/d0e700d508590133b1c8d38554740d78bc7c9c841fd58ec71f19ad0c9240b07e?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/cd1db83f6ff6f45050ce5cbfd8148656e569dffda926fdbcf345db39a35c5442?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     ],
-//   },
-//   {
-//     imgSrc:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/01a0fd7286148713d5f172805aada435495b7390f1db004e0f1e8693fa84d226?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     altText: "Multi Flower Honey",
-//     name: "Multi Flower Honey",
-//     price: "$19.55 - $46.99",
-//     discount: 10,
-//     ratings: [
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/1fba96ff68655a17dcf15a9b4286b3c7b238842bd63174c17b5292560ec0d75e?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/4e5e718a936cb52238e08cf0b2e76c0f53c43e24e72a40f0358898a745781712?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/d1201a48c90c56a46e0aa9284686a775bf48dffe94fa4937acb2e2615bc8ffdc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/7a03c14574123938ccc1440b93ed0dd2b350c9f544d6472d6ac450d1a9100000?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/16d9e69d96cba5d1fd2be85f9a4e6f716abe1b3165f6eb81a403ad511c6011c4?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     ],
-//   },
-//   {
-//     imgSrc:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/faaa0b7cbbb405ee439040529d4a17a727e430a8f58669a7ccb1afa820fec4d9?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     altText: "Kashmir Black Forest Honey",
-//     name: "Kashmir Black Forest Honey",
-//     price: "$17.25",
-//     discount: null,
-//     ratings: [
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/381d98a1e7f295b3bec7f4ea84e6687add44348be10288ed758a689336b014b9?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/7b3b366a614c3d7e43d0ecb2b4de6d6fd14cf8e3b339cdc0fc672c1674bf37b5?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/82bb6e6bbd16cbfcf7c81874e67d60d525b69b100e91e832758a0d53da0110eb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/d0e700d508590133b1c8d38554740d78bc7c9c841fd58ec71f19ad0c9240b07e?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/cd1db83f6ff6f45050ce5cbfd8148656e569dffda926fdbcf345db39a35c5442?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     ],
-//   },
-// ];
 
 const images = [
   {
