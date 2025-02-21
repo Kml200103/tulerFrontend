@@ -83,7 +83,7 @@ const ProductDescription = () => {
   }
 
   return (
-    <main className="flex overflow-hidden flex-col bg-white">
+    <main className="flex overflow-hidden flex-col bg-white pt-[72px] md:pt-[96px] mt-8">
       <section className="self-center  mx-3 w-full max-w-[1398px]">
         <div className="max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">

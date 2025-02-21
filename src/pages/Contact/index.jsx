@@ -19,7 +19,7 @@ const socialIcons = [
 
 const ContactPage = () => {
   return (
-    <div className=" m-10 container flex flex-col md:flex-row w-full justify-center items-start md:items-center px-4 md:px-0"> {/* Container with responsive flex direction and padding */}
+    <div className=" m-10 container flex flex-col md:flex-row w-full justify-center items-start md:items-center px-4 md:px-0 pt-[72px] md:pt-[96px]">
       <div className="md:w-1/3 w-full rounded-none"> {/* Responsive width for contact info */}
         <div className="flex flex-col items-start p-6 bg-sky-50 border border-sky-50 border-solid rounded-[30px] w-full mb-6 md:mb-0"> {/* Responsive padding and margin */}
           <img

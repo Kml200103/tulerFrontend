@@ -162,7 +162,7 @@ const Checkout = () => {
   };
 
   return (
-    <div className="container flex flex-col py-4 mx-auto w-full bg-white min-h-screen">
+    <div className="container flex flex-col pt-[72px] md:pt-[96px] mt-10 py-4 mx-auto w-full bg-white min-h-screen">
       <div className="flex gap-5 justify-between items-center w-full text-sm">
         <div className="flex flex-col w-full text-black">
           <div className="text-neutral-700">

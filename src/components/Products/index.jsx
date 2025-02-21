@@ -130,7 +130,7 @@ const Products = () => {
   };
 
   return (
-    <div className="container flex overflow-hidden flex-col bg-white">
+    <div className="container flex overflow-hidden flex-col bg-white ">
       <div className="container flex flex-col self-center mb-4 ml-2.5 w-full max-w-[1385px] max-md:mt-5 max-md:max-w-full">
         <div className="flex flex-wrap gap-5 justify-between items-start w-full max-md:mr-2.5 max-md:max-w-full">
           <div className="text-3xl font-medium text-neutral-900 tracking-[2px] max-md:text-3xl">
@@ -138,7 +138,7 @@ const Products = () => {
               PRODUCTS
             </span>
           </div>
-          <div className="flex gap-5 mt-2 text-center text-stone-500">
+          <div className="flex gap-5  text-center text-stone-500 pt-[72px] md:pt-[96px] mt-8">
             <div className="relative">
               <button
                 onClick={toggleDropdown}

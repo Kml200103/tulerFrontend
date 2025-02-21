@@ -180,7 +180,7 @@ const AllProducts = () => {
           />
         </div>
 
-        <div className="relative overflow-x-auto">
+        <div className="relative overflow-x-auto pt-[72px] md:pt-[96px]">
           {currentProducts.length > 0 ? (
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
               <thead>

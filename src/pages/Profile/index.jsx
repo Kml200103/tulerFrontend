@@ -147,7 +147,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="container flex flex-col max-w-[954px] min-h-screen flex-grow overflow-auto pb-20">
+    <div className="container flex flex-col pt-[72px] md:pt-[96px] mt-4 max-w-[954px] min-h-screen flex-grow overflow-auto pb-20">
       <div className="flex flex-col items-start px-11 pt-7 pb-4 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-5 max-md:pb-4 max-md:max-w-full flex-grow">
         <div className="flex gap-2">
           <h1 className="text-3xl font-semibold leading-loose text-neutral-700">

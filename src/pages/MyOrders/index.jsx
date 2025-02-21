@@ -59,7 +59,7 @@ const MyOrders = () => {
   };
 
   return (
-    <div className="flex flex-col text-3xl font-semibold leading-[64px] max-w-full rounded-[30px] text-neutral-700">
+    <div className="flex flex-col text-3xl font-semibold leading-[64px] max-w-full rounded-[30px] pt-[72px] md:pt-[96px] text-neutral-700">
       <h1 className="text-2xl font-bold mb-4 px-11 pt-7">All Orders</h1>
       <div className="px-11 pt-7 w-full bg-white pb-10 rounded-[30px] shadow-md max-md:px-5 max-md:pb-28">
         <div>

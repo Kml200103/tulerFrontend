@@ -19,7 +19,7 @@ export default function Header({ toggleSearchInput, isLoggedIn, user }) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-white transition-all duration-300"> {/* Header is fixed */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white transition-all duration-300"> 
         <nav
           className={`relative w-full flex items-center justify-between px-6 py-4 transition-all duration-300 ${
             location.pathname !== "/" ? "md:flex-row md:items-center md:max-h-[308px]" : ""
@@ -42,7 +42,7 @@ export default function Header({ toggleSearchInput, isLoggedIn, user }) {
 
           <div className="flex items-center">
             <button
-              className="md:hidden block text-gray-600 mr-4 z-50"
+              className={`md:hidden  block text-gray-600 mr-4 z-50 ${menuOpen?"hidden":""} `}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -59,7 +59,7 @@ export default function Header({ toggleSearchInput, isLoggedIn, user }) {
           } md:hidden flex flex-col p-6`}
         >
           <button
-            className={`absolute top-9 right-[-2] text-gray-600 z-50 ${menuOpen ? "hidden":""}`}
+            className={`absolute top-9 right-4 text-gray-600 z-50 `}
             onClick={() => setMenuOpen(false)}
           >
             <X size={28} />
