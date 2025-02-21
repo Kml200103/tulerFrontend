@@ -1,5 +1,5 @@
 import * as React from "react";
-import { NavLink } from "react-router";
+import { NavLink } from "react-router"; // Correct import
 
 const navItems = [
   { text: "Home", path: "/" },
@@ -10,7 +10,7 @@ const navItems = [
 
 export default function NavigationLinks() {
   return (
-    <div className="flex gap-6 text-lg text-black">
+    <div className="flex flex-col md:flex-row gap-4 md:gap-6 text-lg text-black"> {/* Added flex-col md:flex-row */}
       {navItems.map((item, index) => (
         <NavLink
           key={index}

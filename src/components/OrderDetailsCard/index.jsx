@@ -17,7 +17,7 @@ export const OrderDetailsCard = ({ group }) => {
   return (
     <div className="mb-10 border p-5 rounded-md">
       {/* Orders */}
-      {group.orders.map((order) => (
+      {group?.orders.map((order) => (
         <div key={order.orderId} className="mt-5 border-t pt-5">
           {/* Shipping Address */}
           <h2 className="text-lg font-bold">Shipping Address:</h2>
@@ -41,7 +41,7 @@ export const OrderDetailsCard = ({ group }) => {
           {order.items.map((item) => (
             <OrderItem
               key={item.variantId}
-              imageSrc={item.image[0]}
+              imageSrc={item.image}
               name={item.productName}
               description={`Weight: ${item.variantDetails?.weight}`}
               price={item.price}

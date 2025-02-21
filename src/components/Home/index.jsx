@@ -136,24 +136,31 @@ const Home = () => {
   }, [searchInputRef]);
   return (
     <>
-   <section className="relative w-full min-h-screen bg-cover bg-center" style={{ backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47')` }}>
-            <div className="absolute inset-0 "></div> {/* Optional overlay for better text contrast */}
+ <section
+            className="relative w-full min-h-screen bg-cover bg-center pt-20 md:pt-32"
+            style={{
+                backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47')`,
+            }}
+        >
+            <div className="absolute inset-0"></div>
             <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 py-16 md:px-16 md:py-56">
                 <div className="max-w-7xl mx-auto w-full">
                     <div className="flex flex-col md:flex-row gap-8 md:gap-5">
                         <div className="w-full md:w-1/2 text-center md:text-left">
-                            <div className="text-xl md:text-2xl lg:text-3xl font-medium tracking-[3px] text-black"> {/* Responsive font sizes */}
+                            <div className="text-xl md:text-2xl lg:text-3xl font-medium tracking-[3px] text-black">
                                 FRESH & SWEET AS HONEY
                             </div>
-                            <div className="mt-2 text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-wider text-black leading-tight"> {/* Responsive font sizes */}
+                            <div className="mt-2 text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-wider text-black leading-tight">
                                 HONEYBEE
                             </div>
-                            <div className="mt-6 md:mt-14 text-base md:text-lg lg:text-xl font-extrabold tracking-wide text-gray-700"> {/* Responsive font sizes */}
-                                At Tuler, we are passionate about delivering pure, organic, and high-quality honey. Our honey is harvested from the finest floral sources, ensuring a rich taste, smooth texture, and countless health benefits.
+                            <div className="mt-6 md:mt-14 text-base md:text-lg lg:text-xl font-extrabold tracking-wide text-gray-700">
+                                At Tuler, we are passionate about delivering pure, organic, and high-quality
+                                honey. Our honey is harvested from the finest floral sources, ensuring a
+                                rich taste, smooth texture, and countless health benefits.
                             </div>
                             <button
                                 className="mt-8 md:mt-11 px-6 py-4 md:px-9 md:py-5 text-base md:text-lg font-medium text-black bg-yellow-400 rounded-[30px] transition-colors duration-300 hover:bg-yellow-500"
-                                onClick={() => navigate("/products")}
+                                onClick={() => navigate("/products")} // Use navigate here
                             >
                                 Shop Honey
                             </button>
