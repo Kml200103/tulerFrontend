@@ -120,7 +120,7 @@ const OfferManagement = () => {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded mt-3"
+          className="text-blue-500 hover:underline px-4 py-2 rounded mt-3"
         >
           {isEdit ? "Update Offer" : "Add Offer"}
         </button>
@@ -151,11 +151,11 @@ const OfferManagement = () => {
                       handleEditClick(offer);
                     }
                   }}
-                  className={`px-2 py-1 rounded mr-2 ${
+                  className={`px-2 py-1 rounded mr-2 text-white ${
                     isEdit && selectedOffer?._id === offer._id
-                      ? "bg-red-500"
-                      : "bg-yellow-500"
-                  } text-white`}
+                      ? "text-red-500 hover:underline"
+                      : "text-yellow-500 hover:underline"
+                  }`}
                 >
                   {isEdit && selectedOffer?._id === offer._id
                     ? "Close"
@@ -164,7 +164,7 @@ const OfferManagement = () => {
 
                 <button
                   onClick={() => handleDeleteOffer(offer._id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded"
+                  className="text-red-500 hover:underline px-2 py-1 rounded"
                 >
                   Delete
                 </button>

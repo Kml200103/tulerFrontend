@@ -25,6 +25,7 @@ import AdminOrders from "./pages/AdminOrders";
 import SuccessOrderPage from "./pages/SuccessOrderPage";
 import Spin from "./pages/Spinwheel";
 import OfferManagement from "./pages/Offers";
+import ProductDescription from "./pages/ProductDescription";
 
 export default function App() {
   return (
@@ -81,6 +82,18 @@ export default function App() {
                   </Layout.main>
                 ) : (
                   <ContactPage />
+                )
+              }
+            />
+            <Route
+              path="/product/description/:productName/:productId"
+              element={
+                Layout ? (
+                  <Layout.main>
+                    <ProductDescription />
+                  </Layout.main>
+                ) : (
+                  <ProductDescription />
                 )
               }
             />

@@ -18,6 +18,7 @@ import AdminHeader from "../AdminHeader";
 import AdminNavigationLinks from "../AdminHeader/NavigationLinks";
 import AdminSocialIcons from "../AdminHeader/SocialIcons";
 import { setSearchTerm } from "../../redux/search/searchSlice";
+import StickyVideo from "../StickyVideo";
 
 const honeyProducts = [
   {
@@ -514,6 +515,7 @@ const Home = () => {
           </Swiper>
         </div>
       </div>
+      <StickyVideo />
     </>
   );
 };
