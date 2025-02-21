@@ -28,24 +28,32 @@ function ProductCard({ product }) {
       return;
     }
 
-    try {
-      if (userId) {
-        const response = await post("/cart/add", {
-          userId,
-          productId: product._id,
-          weight: selectedVariant.weight,
-          quantity: 1,
-          price: selectedVariant.price,
-          variantId: selectedVariant._id,
-        });
-        if (response.receiveObj) {
-          NotificationService.sendSuccessMessage(response.receiveObj.message);
-        } else {
-          NotificationService.sendErrorMessage(response.receiveObj.message);
-        }
-      }
+    console.log("Adding product to cart:", {
+      userId,
+      productId: product._id,
+      variantId: selectedVariant._id,
+      weight: selectedVariant.weight,
+      price: selectedVariant.price,
+      quantity: 1,
+    });
 
-      console.log("selectedVariant", selectedVariant);
+    try {
+      const response = await post("/cart/add", {
+        userId,
+        productId: product._id, // Ensure this is defined
+        variantId: selectedVariant._id,
+        weight: selectedVariant.weight,
+        quantity: 1,
+        price: selectedVariant.price,
+      });
+
+      console.log("Cart API Response:", response);
+
+      if (response.receiveObj) {
+        NotificationService.sendSuccessMessage(response.receiveObj.message);
+      } else {
+        NotificationService.sendErrorMessage(response.receiveObj.message);
+      }
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");
@@ -61,17 +69,16 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div
-      className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md cursor-pointer"
-      onClick={handleCardClick}
-    >
+    <div className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md cursor-pointer">
       <img
-        src={product.images[0]}
+        src={product.images}
         alt={product.name}
         className="w-full h-48 object-cover rounded-xl"
       />
 
-      <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
+      <h2 className="mt-4 text-xl font-semibold" onClick={handleCardClick}>
+        {product.name}
+      </h2>
 
       <div className="mt-4">
         <label className="block text-sm font-semibold">Choose Weight:</label>

@@ -82,7 +82,6 @@ const ProductPage = () => {
     setBenefits(benefits.filter((_, i) => i !== index));
   };
 
-
   const handleImagePreview = (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -177,7 +176,7 @@ const ProductPage = () => {
     benefits.forEach((benefit, index) => {
       formData.append(`benefits[${index}]`, benefit);
     });
-    console.log('formData', formData)
+    console.log("formData", formData);
     try {
       const result = await post("/product", formData, {
         "Content-Type": "multipart/form-data",
@@ -187,7 +186,7 @@ const ProductPage = () => {
         console.log("Product saved successfully:", result.receiveObj);
         NotificationService.sendSuccessMessage("Product saved successfully!");
         reset();
-        setBenefits([])
+        setBenefits([]);
       } else {
         console.error("Failed to save product:", result.receiveObj);
         NotificationService.sendErrorMessage(
@@ -282,7 +281,6 @@ const ProductPage = () => {
               </div>
             </div>
 
-
             <div>
               <label
                 htmlFor="description"
@@ -293,7 +291,7 @@ const ProductPage = () => {
               <div className="mt-2">
                 <textarea
                   id="description"
-                  maxLength={50}
+                  maxLength={150}
                   {...register("description", {
                     required: "Description is required",
                     validate: {
@@ -338,7 +336,10 @@ const ProductPage = () => {
 
               <ul className="mt-4 space-y-2">
                 {benefits.map((benefit, index) => (
-                  <li key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
+                  <li
+                    key={index}
+                    className="flex justify-between items-center bg-gray-100 p-2 rounded-md"
+                  >
                     <span>{benefit}</span>
                     <button
                       type="button"
@@ -353,7 +354,10 @@ const ProductPage = () => {
             </div>
 
             <div>
-              <label htmlFor="coverImage" className="block text-md font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="coverImage"
+                className="block text-md font-medium leading-6 text-gray-900"
+              >
                 Cover Image <span className="text-red-600">*</span>
               </label>
               <div className="mt-2">
@@ -363,8 +367,13 @@ const ProductPage = () => {
                   {...register("coverImage", {
                     required: "Cover image is required",
                     validate: (file) => {
-                      if (!file || file.length === 0) return "Cover image is required";
-                      const validTypes = ["image/jpeg", "image/png", "image/gif"];
+                      if (!file || file.length === 0)
+                        return "Cover image is required";
+                      const validTypes = [
+                        "image/jpeg",
+                        "image/png",
+                        "image/gif",
+                      ];
                       if (!validTypes.includes(file[0]?.type)) {
                         return "Only JPEG, PNG, and GIF are allowed";
                       }
@@ -375,11 +384,17 @@ const ProductPage = () => {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                 />
                 {errors.coverImage && (
-                  <p className="text-red-600 text-sm mt-2">{errors.coverImage.message}</p>
+                  <p className="text-red-600 text-sm mt-2">
+                    {errors.coverImage.message}
+                  </p>
                 )}
                 {coverImagePreview && (
                   <div className="mt-2">
-                    <img src={coverImagePreview} alt="Cover Preview" className="w-20 h-20 object-cover rounded" />
+                    <img
+                      src={coverImagePreview}
+                      alt="Cover Preview"
+                      className="w-20 h-20 object-cover rounded"
+                    />
                   </div>
                 )}
               </div>
@@ -402,7 +417,11 @@ const ProductPage = () => {
                       validateFiles: (files) => {
                         if (files.length === 0)
                           return "At least one image is required";
-                        const validTypes = ["image/jpeg", "image/png", "image/gif"];
+                        const validTypes = [
+                          "image/jpeg",
+                          "image/png",
+                          "image/gif",
+                        ];
                         for (let i = 0; i < files.length; i++) {
                           if (!validTypes.includes(files[i].type)) {
                             return "Only JPEG, PNG, and GIF are allowed";
@@ -416,7 +435,9 @@ const ProductPage = () => {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                 />
                 {errors.images && (
-                  <p className="text-red-600 text-sm mt-2">{errors.images.message}</p>
+                  <p className="text-red-600 text-sm mt-2">
+                    {errors.images.message}
+                  </p>
                 )}
                 {previewImages.length > 0 && (
                   <div className="mt-2 flex space-x-2">

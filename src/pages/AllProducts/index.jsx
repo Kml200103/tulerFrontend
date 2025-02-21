@@ -11,8 +11,10 @@ const AllProducts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+  const [totalProducts, setTotalProducts] = useState(0); // To store total products
 
   const {
     register,
@@ -35,9 +37,12 @@ const AllProducts = () => {
   });
 
   const getProducts = async () => {
-    const { receiveObj } = await get("/products");
+    const { receiveObj } = await get(
+      `/products?page=${currentPage}&pageSize=${pageSize}`
+    );
     if (receiveObj.success) {
       setProducts(receiveObj.products);
+      setTotalProducts(receiveObj.totalProducts); // Set total products from response
     } else {
       console.error("Failed to fetch products");
     }
@@ -101,33 +106,43 @@ const AllProducts = () => {
 
     // Append the updated product data to the FormData object
     formData.append("name", data.name);
-    formData.append("categoryId", selectedProduct.categoryId); // Use the categoryId from the selected product
+    formData.append("categoryId", selectedProduct.categoryId);
     formData.append("description", data.description);
-    formData.append("productId", selectedProduct._id); // Use the ID of the selected product
+    formData.append("productId", selectedProduct._id);
 
-    // Append new images if any
-    if (data.images && data.images.length > 0) {
-      Array.from(data.images).forEach((file) => {
-        formData.append("images", file);
+    // Append new main image if uploaded
+    if (data.mainImage && data.mainImage.length > 0) {
+      formData.append("images", data.mainImage[0]); // Main image
+    }
+
+    // Append new other images if uploaded
+    if (data.otherImages && data.otherImages.length > 0) {
+      Array.from(data.otherImages).forEach((file) => {
+        formData.append("otherImages", file);
       });
     }
 
-    // Append each variant separately
+    // Append variants
     data.variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight);
       formData.append(`variants[${index}][price]`, variant.price);
       formData.append(`variants[${index}][quantity]`, variant.quantity);
     });
 
-    // Call your update API here
+    // Append benefits
+    data.benefits.forEach((benefit, index) => {
+      formData.append(`benefits[${index}]`, benefit); // Append each benefit
+    });
+
+    // Call your update API
     const result = await post("/product", formData, {
       "Content-Type": "multipart/form-data",
     });
 
     if (result.isSuccess) {
       console.log("Product updated successfully:", result.receiveObj);
-      await getProducts(); // Fetch updated products
-      handleCloseModal(); // Close the modal
+      await getProducts();
+      handleCloseModal();
     } else {
       console.error("Failed to update product:", result.receiveObj);
     }
@@ -146,102 +161,110 @@ const AllProducts = () => {
       console.error("Error deleting product:", error);
     }
   };
+  const trimDescription = (description, maxLength = 100) => {
+    if (description.length > maxLength) {
+      return description.substring(0, maxLength) + "...";
+    }
+    return description;
+  };
 
   return (
-    <div className="container mx-auto p-6 min-h-screen">
-      <div className="flex justify-center mb-4">
-        <input
-          type="text"
-          className="w-1/2 p-2 pl-3 py-4 text-md text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-          placeholder="Search Products here...."
-          onChange={(e) => setSearchQuery(e.target.value)}
+    <>
+      <div className="container mx-auto p-6 min-h-screen">
+        <div className="flex justify-center mb-4">
+          <input
+            type="text"
+            className="w-1/2 p-2 pl-3 py-4 text-md text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            placeholder="Search Products here...."
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="relative overflow-x-auto">
+          {currentProducts.length > 0 ? (
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th scope="col" className="px-6 py-3 border-b">
+                    Image
+                  </th>
+                  <th scope="col" className="px-6 py-3 border-b w-1/4">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 border-b">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3 border-b">
+                    Variants
+                  </th>
+                  <th scope="col" className="px-6 py-3 border-b">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentProducts.map((product) => (
+                  <tr
+                    key={product._id}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                  >
+                    <td className="px-6 py-4 border-b">
+                      <img
+                        src={product.images} // Display the first image
+                        height={50}
+                        width={50}
+                        alt="Product Image"
+                        className="rounded-lg"
+                      />
+                    </td>
+                    <td className="px-6 py-4 border-b">{product.name}</td>
+                    <td className="px-6 py-4 text-center border-b">
+                      {trimDescription(product.description, 50)}{" "}
+                      {/* Trimmed description */}
+                    </td>
+                    <td className="px-6 py-4 text-center border-b">
+                      {product.variants.map((variant) => (
+                        <div key={variant._id}>
+                          {variant.weight} - ${variant.price} (Qty:{" "}
+                          {variant.quantity})
+                        </div>
+                      ))}
+                    </td>
+                    <td className="px-6 py-4 flex items-center">
+                      <button
+                        type="button"
+                        className="text-white p-2 rounded-lg flex items-center justify-center"
+                        onClick={() => handleOpenModal(product)}
+                      >
+                        <PencilIcon className="h-6 w-6 text-gray-500" />
+                      </button>
+                      <button
+                        className="bg-white font-bold rounded-full p-2 flex items-center justify-center mr-2"
+                        onClick={() => handleDeleteProduct(product)} // Call the delete function
+                      >
+                        <TrashIcon className="h-6 w-6 text-gray-500" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-center text-gray-500 mt-8">
+              <h1 className="text-xl">No products found</h1>
+            </div>
+          )}
+        </div>
+
+        {/* Pagination Component */}
+        <Pagination
+          totalItems={filteredProducts.length}
+          itemsPerPage={pageSize}
+          onPageChange={setCurrentPage}
+          setPageSize={setPageSize}
+          currentPage={currentPage}
         />
       </div>
-
-      <div className="relative overflow-x-auto">
-        {currentProducts.length > 0 ? (
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead>
-              <tr className="bg-gray-100">
-                <th scope="col" className="px-6 py-3 border-b">
-                  Image
-                </th>
-                <th scope="col" className="px-6 py-3 border-b w-1/4">
-                  Name
-                </th>
-                <th scope="col" className="px-6 py-3 border-b">
-                  Description
-                </th>
-                <th scope="col" className="px-6 py-3 border-b">
-                  Variants
-                </th>
-                <th scope="col" className="px-6 py-3 border-b">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentProducts.map((product) => (
-                <tr
-                  key={product._id}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                >
-                  <td className="px-6 py-4 border-b">
-                    <img
-                      src={product.images[0]} // Display the first image
-                      height={50}
-                      width={50}
-                      alt="Product Image"
-                      className="rounded-lg"
-                    />
-                  </td>
-                  <td className="px-6 py-4 border-b">{product.name}</td>
-                  <td className="px-6 py-4 text-center border-b">
-                    {product.description}
-                  </td>
-                  <td className="px-6 py-4 text-center border-b">
-                    {product.variants.map((variant) => (
-                      <div key={variant._id}>
-                        {variant.weight} - ${variant.price} (Qty:{" "}
-                        {variant.quantity})
-                      </div>
-                    ))}
-                  </td>
-                  <td className="px-6 py-4 flex items-center">
-                    <button
-                      type="button"
-                      className="text-white p-2 rounded-lg flex items-center justify-center"
-                      onClick={() => handleOpenModal(product)}
-                    >
-                      <PencilIcon className="h-6 w-6 text-gray-500" />
-                    </button>
-                    <button
-                      className="bg-white font-bold rounded-full p-2 flex items-center justify-center mr-2"
-                      onClick={() => handleDeleteProduct(product)} // Call the delete function
-                    >
-                      <TrashIcon className="h-6 w-6 text-gray-500" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="text-center text-gray-500 mt-8">
-            <h1 className="text-xl">No products found</h1>
-          </div>
-        )}
-      </div>
-
-      {/* Pagination Component */}
-      <Pagination
-        totalItems={filteredProducts.length}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-        setPageSize={setItemsPerPage}
-      />
-
       {isModalOpen && (
         <Dialog
           open={isModalOpen}
@@ -327,47 +350,101 @@ const AllProducts = () => {
                     </div>
 
                     {/* Images */}
-                    <input
-                      type="file"
-                      multiple
-                      {...register("images", {
-                        required: "At least one image is required",
-                        validate: {
-                          validateFiles: (files) => {
-                            if (files.length === 0)
-                              return "At least one image is required";
-                            const validTypes = [
-                              "image/jpeg",
-                              "image/png",
-                              "image/gif",
-                            ];
-                            for (let i = 0; i < files.length; i++) {
-                              if (!validTypes.includes(files[i].type)) {
-                                return "Only image files are allowed (JPEG, PNG, GIF)";
+                    <div>
+                      <label
+                        htmlFor="images"
+                        className="block text-md font-medium leading-6 text-gray-900"
+                      >
+                        Images
+                      </label>
+                      <input
+                        type="file"
+                        multiple
+                        {...register("images", {
+                          validate: {
+                            validateFiles: (files) => {
+                              const validTypes = [
+                                "image/jpeg",
+                                "image/png",
+                                "image/gif",
+                              ];
+                              for (let i = 0; i < files.length; i++) {
+                                if (!validTypes.includes(files[i].type)) {
+                                  return "Only image files are allowed (JPEG, PNG, GIF)";
+                                }
                               }
-                            }
-                            return true; // All files are valid
+                              return true; // All files are valid
+                            },
                           },
-                        },
-                      })}
-                      onChange={handleImagePreview}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
-                    />
+                        })}
+                        onChange={handleImagePreview}
+                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                      />
 
-                    {previewImages.length > 0 && (
+                      {previewImages.length > 0 && (
+                        <div className="mt-2 flex space-x-2">
+                          {previewImages.map((src, index) => (
+                            <img
+                              key={index}
+                              src={src}
+                              alt={`Preview ${index + 1}`}
+                              className={`w-16 h-16 object-cover rounded ${
+                                index === 0 ? "border-2 border-blue-500" : ""
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Other Images */}
+                    <div>
+                      <label
+                        htmlFor="otherImages"
+                        className="block text-md font-medium leading-6 text-gray-900"
+                      >
+                        Other Images
+                      </label>
                       <div className="mt-2 flex space-x-2">
-                        {previewImages.map((src, index) => (
+                        {selectedProduct?.otherImages.map((image, index) => (
                           <img
                             key={index}
-                            src={src} // Directly using the URL from the array
-                            alt={`Preview ${index + 1}`}
-                            className={`w-16 h-16 object-cover rounded ${
-                              index === 0 ? "border-2 border-blue-500" : ""
-                            }`} // Highlight the first image
+                            src={image}
+                            alt={`Other Image ${index + 1}`}
+                            className="w-16 h-16 object-cover rounded"
                           />
                         ))}
                       </div>
-                    )}
+                    </div>
+
+                    {/* Benefits */}
+                    <div>
+                      <label
+                        htmlFor="benefits"
+                        className="block text-md font-medium leading-6 text-gray-900"
+                      >
+                        Benefits
+                      </label>
+                      <div className="mt-2">
+                        {selectedProduct?.benefits.map((benefit, index) => (
+                          <div key={index} className="flex items-center">
+                            <input
+                              type="text"
+                              defaultValue={benefit}
+                              {...register(`benefits.${index}`, {
+                                required: "Benefit is required",
+                              })}
+                              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                            />
+                            {errors.benefits?.[index] && (
+                              <p className="text-red-600 text-sm mt-2">
+                                {errors.benefits[index].message}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
 
                     {/* Variants */}
                     <div>
@@ -481,7 +558,7 @@ const AllProducts = () => {
           </div>
         </Dialog>
       )}
-    </div>
+    </>
   );
 };
 
