@@ -60,36 +60,7 @@ const images = [
   },
 ];
 
-// const benefitsData = [
-//   {
-//     image:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/e330948d463d832f7408f67b12aaaed494b0c359f56e8b63af980662d8b90aeb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     text: "Promotes burn and<br/>wound healing",
-//     variant: "light",
-//   },
-//   {
-//     image:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/e5c9a65e65eccbfd559a6ade45829a6d180a57ca242cf4d6e4b43f3b27682258?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     text: "Better for blood<br/>sugar levels",
-//     variant: "centered spaced",
-//   },
-//   {
-//     image:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/042472d9d822b990a3f43b172ffc1be2e4358b6a1617a423fa643907c69c8064?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/3614b1c4de446ef3c9c7e64c596ec50337cafc2826391996dc141e01a7c73805?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     text: "Improve health and<br/>immune support",
-//     variant: "light",
-//   },
-//   {
-//     image:
-//       "https://cdn.builder.io/api/v1/image/assets/TEMP/042472d9d822b990a3f43b172ffc1be2e4358b6a1617a423fa643907c69c8064?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/81103e8ac05c90dcc9673a718695a05cd178db37719ae966daf5ab8e8609f6d5?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
-//     text: "Contains a variety<br/>of nutrients",
-//     variant: "centered narrow spaced",
-//   },
-// ];
+
 
 const testimonials = [
   {
@@ -165,58 +136,40 @@ const Home = () => {
   }, [searchInputRef]);
   return (
     <>
-      <section>
-        <div className="flex relative flex-col items-center px-16 pt-56 pb-6 w-full rounded-none min-h-[774px] max-md:px-5 max-md:pt-24 max-md:max-w-full">
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-            alt=""
-            className="object-cover absolute inset-0 size-full"
-          />
-          <div className="relative ml-8 w-full max-w-[1422px] max-md:max-w-full">
-            <div className="flex gap-5 max-md:flex-col">
-              <div className="flex flex-col w-[43%] max-md:ml-0 max-md:w-full">
-                <div className="flex relative flex-col mt-40 max-md:mt-10 max-md:max-w-full">
-                  <div className="self-start text-xl text-neutral-900 tracking-[3px]">
-                    <span className="font-medium text-neutral-900">
-                      FRESH & SWEET AS HONEY
-                    </span>
-                  </div>
-                  <div className="mt-2 text-base font-medium text-neutral-900 tracking-[2.4px] max-md:max-w-full">
-                    <span className="text-8xl font-extrabold tracking-wider text-neutral-900">
-                      HONEYBEE
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-start pr-20 pl-1.5 mt-14 max-md:pr-5 max-md:mt-10 max-md:max-w-full">
-                    <div className="text-xl font-extrabold tracking-wide text-neutral-700 max-md:max-w-full">
-                      <span className="leading-7 text-neutral-700">
-                        Lorem ipsum dolor sit amet, sint nostrum mea ut, vel
-                        semper vidisse eu usu temporibus disputationi
-                        voluptatibus in ei est possit salutandi abhorrea acusa
-                      </span>
+   <section className="relative w-full min-h-screen bg-cover bg-center" style={{ backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47')` }}>
+            <div className="absolute inset-0 "></div> {/* Optional overlay for better text contrast */}
+            <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 py-16 md:px-16 md:py-56">
+                <div className="max-w-7xl mx-auto w-full">
+                    <div className="flex flex-col md:flex-row gap-8 md:gap-5">
+                        <div className="w-full md:w-1/2 text-center md:text-left">
+                            <div className="text-xl md:text-2xl lg:text-3xl font-medium tracking-[3px] text-black"> {/* Responsive font sizes */}
+                                FRESH & SWEET AS HONEY
+                            </div>
+                            <div className="mt-2 text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-wider text-black leading-tight"> {/* Responsive font sizes */}
+                                HONEYBEE
+                            </div>
+                            <div className="mt-6 md:mt-14 text-base md:text-lg lg:text-xl font-extrabold tracking-wide text-gray-700"> {/* Responsive font sizes */}
+                                At Tuler, we are passionate about delivering pure, organic, and high-quality honey. Our honey is harvested from the finest floral sources, ensuring a rich taste, smooth texture, and countless health benefits.
+                            </div>
+                            <button
+                                className="mt-8 md:mt-11 px-6 py-4 md:px-9 md:py-5 text-base md:text-lg font-medium text-black bg-yellow-400 rounded-[30px] transition-colors duration-300 hover:bg-yellow-500"
+                                onClick={() => navigate("/products")}
+                            >
+                                Shop Honey
+                            </button>
+                        </div>
+                        <div className="w-full md:w-1/2">
+                            <img
+                                loading="lazy"
+                                src="https://cdn.builder.io/api/v1/image/assets/TEMP/9f4153f0473c59ba62497d0b2c178a37869743aa7dbb9d1e43206ae2d4e47c43?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                                alt="Honey product showcase"
+                                className="object-contain w-full h-auto"
+                            />
+                        </div>
                     </div>
-                    <button
-                      className="px-9 py-5 mt-11 text-lg font-medium text-black bg-yellow-400 rounded-[30px] max-md:px-5 max-md:mt-10"
-                      tabIndex="0"
-                      onClick={() => navigate("/products")}
-                    >
-                      Shop Honey
-                    </button>
-                  </div>
                 </div>
-              </div>
-              <div className="flex flex-col ml-5 w-[57%] max-md:ml-0 max-md:w-full">
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/9f4153f0473c59ba62497d0b2c178a37869743aa7dbb9d1e43206ae2d4e47c43?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                  alt="Honey product showcase"
-                  className="object-contain grow w-full aspect-[1.41] max-md:mt-10 max-md:max-w-full"
-                />
-              </div>
             </div>
-          </div>
-        </div>
-      </section>
+        </section>
 
       <div className=" container rounded-xl pt-5 ">
         <div className="flex gap-5 max-md:flex-col">
