@@ -43,16 +43,174 @@ export const Footer = () => {
     }
   };
   return (
-    <footer className="flex flex-col items-center px-20 pt-20 pb-6 mt-3 w-full bg-sky-50 max-md:px-5 max-md:max-w-full">
-      <div className="flex flex-col w-full max-w-[1498px] max-md:max-w-full">
-        {/* Footer Content */}
-        <div className="flex justify-between items-start w-full max-w-[1461px] max-md:flex-col max-md:items-center max-md:text-center">
-          {/* Menu Section */}
-          <div className="flex flex-col text-black">
-            <div className="text-3xl font-semibold">Menu</div>
-            <div className="mt-7 text-xl font-medium">
+    // <footer className="flex flex-col items-center px-20 pt-20 pb-6 mt-3 w-full bg-sky-50 max-md:px-5 max-md:max-w-full">
+    //   <div className="flex flex-col w-full max-w-[1498px] max-md:max-w-full">
+    //     {/* Footer Content */}
+    //     <div className="flex justify-between items-start w-full max-w-[1461px] max-md:flex-col max-md:items-center max-md:text-center">
+    //       {/* Menu Section */}
+    //       <div className="flex flex-col text-black">
+    //         <div className="text-3xl font-semibold">Menu</div>
+    //         <div className="mt-7 text-xl font-medium">
+    //           {menuItems.map((item) => (
+    //             <div key={item.name} className="mb-3">
+    //               <Link to={item.path} className="hover:text-blue-600">
+    //                 {item.name}
+    //               </Link>
+    //             </div>
+    //           ))}
+    //         </div>
+    //       </div>
+
+    //       {/* Vertical Separator */}
+    //       <div className="w-px bg-neutral-200 h-full hidden max-md:block"></div>
+
+    //       {/* Contact Info Section */}
+    //       <div className="flex flex-col ml-10 items-start ">
+    //         <div className="text-3xl font-semibold text-neutral-900">
+    //           Contact Us
+    //         </div>
+    //         <div className="mt-7 text-base font-medium leading-7 text-neutral-700">
+    //           4821 Ridge Top Cir, Anchorage Street, <br />
+    //           Alaska 99508, USA.
+    //         </div>
+    //         <div className="mt-1 text-base font-medium leading-loose text-neutral-700">
+    //           <span className="text-neutral-700">Call Us: </span>
+    //           <span className="font-bold text-neutral-700">800.275.8777</span>
+    //         </div>
+
+    //         {/* Social Links */}
+    //         <div className="mt-10 text-3xl font-semibold text-neutral-700">
+    //           Social Links
+    //         </div>
+    //         <div className="flex gap-3 mt-5">
+    //           {socialIcons.map((icon, index) => (
+    //             <div
+    //               className="flex flex-col justify-center items-center px-2 bg-yellow-400 rounded-full h-[39px] w-[39px]"
+    //               key={index}
+    //             >
+    //               <img
+    //                 loading="lazy"
+    //                 src={icon.src}
+    //                 alt={icon.alt}
+    //                 className="object-contain w-5 aspect-square"
+    //               />
+    //             </div>
+    //           ))}
+    //         </div>
+    //       </div>
+
+    //       {/* Vertical Separator */}
+    //       <div className="w-px bg-neutral-200 h-full hidden max-md:block"></div>
+
+    //       {/* Newsletter Subscription Section */}
+
+    //       {/* <div className="flex flex-col items-start self-end max-md:self-center max-md:text-center">
+    //         <label htmlFor="emailInput" className="text-3xl font-semibold text-neutral-900">
+    //           Subscribe to Newsletter
+    //         </label>
+    //         <div className="flex gap-4 items-center mt-5 bg-white rounded-[30px] p-3 shadow-md">
+    //           <input
+    //             className="text-base font-semibold text-zinc-500 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+    //             type="email"
+    //             id="emailInput"
+    //             placeholder="Your email address"
+    //             aria-label="Your email address"
+    //           />
+    //           <button
+    //             className="px-6 py-2 text-white bg-black text-xl font-medium rounded-[30px] hover:bg-gray-800"
+    //             type="submit">
+    //             Subscribe
+    //           </button>
+    //         </div>
+    //         <div className="mt-4 text-base font-medium leading-7 text-neutral-700">
+    //           Sign up with your email address to receive <br />
+    //           news and updates.
+    //         </div>
+    //       </div> */}
+    //       {/* Newsletter Subscription Section */}
+
+    //       <div className="flex flex-col items-start  max-md:mt-10 max-md:max-w-full ">
+    //         <div className="ml-7 text-3xl font-semibold text-neutral-900 max-md:ml-2.5">
+    //           Subscribe to Newsletter
+    //         </div>
+    //         <form
+    //           onSubmit={handleSubscribe}
+    //           className="flex gap-10 pl-8 mt-5 text-center bg-white rounded-[30px] max-md:pl-5"
+    //         >
+    //           <label htmlFor="emailInput" className="sr-only">
+    //             Your e-mail address
+    //           </label>
+    //           <input
+    //             type="email"
+    //             id="emailInput"
+    //             className="my-auto text-base font-semibold basis-auto text-zinc-500 focus:outline-none focus:border-none"
+    //             placeholder="Your e-mail address"
+    //             aria-label="Your e-mail address"
+    //             value={email}
+    //             onChange={(e) => setEmail(e.target.value)} // Update email state on input change
+    //             required
+    //           />
+    //           <button
+    //             type="submit"
+    //             className="z-10 px-9 py-3.5 mr-0 text-xl bg-yellow-400 font-medium text-black whitespace-nowrap rounded-[30px] max-md:px-5"
+    //           >
+    //             Subscribe
+    //           </button>
+    //         </form>
+
+    //         <div className="flex flex-col self-stretch pl-8 mt-4 text-base font-medium leading-7 text-neutral-700 max-md:pl-5 max-md:max-w-full">
+    //           <div className="self-start">
+    //             Sign up with your email address to receive <br />
+    //             news and updates
+    //           </div>
+    //           <div className="relative mt-4">
+    //             {/* bottle image */}
+    //             <img
+    //               loading="lazy"
+    //               src="https://cdn.builder.io/api/v1/image/assets/TEMP/21d8913f5c9f45590a2651b620ce11816f44bdb57c2ea1f56a4f35bbca97c0c3?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+    //               alt="Featured content"
+    //               className="object-contain w-[238px] h-[177px] aspect-[1.34] absolute -top-10 right-1"
+    //             />
+    //             <img
+    //               loading="lazy"
+    //               src="https://cdn.builder.io/api/v1/image/assets/TEMP/a4f40c7ad209242c431087eb46f67908cbe969c2332847a2dee8ab347c95efbb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+    //               alt=""
+    //               className="object-contain w-[159px] h-[111px] aspect-[1.43] absolute top-5 -right-5 z-10"
+    //             />
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+
+    //     {/* Separator */}
+    //     <div className="flex mt-12 w-full h-px bg-neutral-200"></div>
+
+    //     {/* Copyright */}
+    //     <div className="text-center mt-4 text-base font-medium text-black">
+    //       Copyright © 2025 Tuler. All rights reserved.
+    //     </div>
+    //   </div>
+    // </footer>
+
+    <footer className="flex flex-col items-center px-4 py-16 w-full bg-sky-50 md:px-20 md:pt-20 md:pb-6">
+      {" "}
+      {/* Adjusted padding */}
+      <div className="w-full max-w-[1498px]">
+        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-8 md:gap-0">
+          {" "}
+          {/* Flex direction and gap */}
+          <div className="w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
+            {" "}
+            {/* Menu section width and alignment */}
+            <div className="text-2xl md:text-3xl font-semibold">Menu</div>{" "}
+            {/* Responsive font size */}
+            <div className="mt-4 md:mt-7 text-base md:text-xl font-medium">
+              {" "}
+              {/* Responsive font size and margin */}
               {menuItems.map((item) => (
-                <div key={item.name} className="mb-3">
+                <div key={item.name} className="mb-2 md:mb-3">
+                  {" "}
+                  {/* Responsive margin */}
                   <Link to={item.path} className="hover:text-blue-600">
                     {item.name}
                   </Link>
@@ -60,16 +218,17 @@ export const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Vertical Separator */}
-          <div className="w-px bg-neutral-200 h-full hidden max-md:block"></div>
-
-          {/* Contact Info Section */}
-          <div className="flex flex-col ml-10 items-start ">
-            <div className="text-3xl font-semibold text-neutral-900">
+          <div className="w-full md:w-auto hidden md:block w-px bg-neutral-200 h-full"></div>{" "}
+          {/* Vertical separator (hide on mobile) */}
+          <div className="w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
+            {" "}
+            {/* Contact info section width and alignment */}
+            <div className="text-2xl md:text-3xl font-semibold text-neutral-900">
+              {" "}
+              {/* Responsive font size */}
               Contact Us
             </div>
-            <div className="mt-7 text-base font-medium leading-7 text-neutral-700">
+            <div className="mt-4 md:mt-7 text-base font-medium leading-7 text-neutral-700">
               4821 Ridge Top Cir, Anchorage Street, <br />
               Alaska 99508, USA.
             </div>
@@ -77,12 +236,14 @@ export const Footer = () => {
               <span className="text-neutral-700">Call Us: </span>
               <span className="font-bold text-neutral-700">800.275.8777</span>
             </div>
-
-            {/* Social Links */}
-            <div className="mt-10 text-3xl font-semibold text-neutral-700">
+            <div className="mt-6 md:mt-10 text-xl md:text-2xl font-semibold text-neutral-700">
+              {" "}
+              {/* Responsive font size and margin */}
               Social Links
             </div>
-            <div className="flex gap-3 mt-5">
+            <div className="flex justify-center md:justify-start gap-3 mt-4 md:mt-5">
+              {" "}
+              {/* Responsive margin and justify content */}
               {socialIcons.map((icon, index) => (
                 <div
                   className="flex flex-col justify-center items-center px-2 bg-yellow-400 rounded-full h-[39px] w-[39px]"
@@ -98,95 +259,51 @@ export const Footer = () => {
               ))}
             </div>
           </div>
-
-          {/* Vertical Separator */}
-          <div className="w-px bg-neutral-200 h-full hidden max-md:block"></div>
-
-          {/* Newsletter Subscription Section */}
-
-          {/* <div className="flex flex-col items-start self-end max-md:self-center max-md:text-center">
-            <label htmlFor="emailInput" className="text-3xl font-semibold text-neutral-900">
-              Subscribe to Newsletter
-            </label>
-            <div className="flex gap-4 items-center mt-5 bg-white rounded-[30px] p-3 shadow-md">
-              <input
-                className="text-base font-semibold text-zinc-500 px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-                type="email"
-                id="emailInput"
-                placeholder="Your email address"
-                aria-label="Your email address"
-              />
-              <button
-                className="px-6 py-2 text-white bg-black text-xl font-medium rounded-[30px] hover:bg-gray-800"
-                type="submit">
-                Subscribe
-              </button>
-            </div>
-            <div className="mt-4 text-base font-medium leading-7 text-neutral-700">
-              Sign up with your email address to receive <br />
-              news and updates.
-            </div>
-          </div> */}
-          {/* Newsletter Subscription Section */}
-
-          <div className="flex flex-col items-start  max-md:mt-10 max-md:max-w-full ">
-            <div className="ml-7 text-3xl font-semibold text-neutral-900 max-md:ml-2.5">
+          <div className="w-full md:w-auto hidden md:block w-px bg-neutral-200 h-full"></div>{" "}
+          {/* Vertical separator (hide on mobile) */}
+          <div className="w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
+            {" "}
+            {/* Newsletter section width and alignment */}
+            <div className="text-2xl md:text-3xl font-semibold text-neutral-900">
+              {" "}
+              {/* Responsive font size */}
               Subscribe to Newsletter
             </div>
             <form
               onSubmit={handleSubscribe}
-              className="flex gap-10 pl-8 mt-5 text-center bg-white rounded-[30px] max-md:pl-5"
+              className="flex flex-col md:flex-row gap-4 mt-4 md:mt-5 bg-white rounded-[30px] p-3 shadow-md w-full md:w-auto"
             >
-              <label htmlFor="emailInput" className="sr-only">
-                Your e-mail address
-              </label>
+              {" "}
+              {/* Responsive flex direction, margin, and width */}
               <input
                 type="email"
                 id="emailInput"
-                className="my-auto text-base font-semibold basis-auto text-zinc-500 focus:outline-none focus:border-none"
+                className="w-full md:w-auto text-base font-semibold text-zinc-500 px-3 py-2  rounded-md focus:outline-none" // Responsive width
                 placeholder="Your e-mail address"
                 aria-label="Your e-mail address"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)} // Update email state on input change
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <button
                 type="submit"
-                className="z-10 px-9 py-3.5 mr-0 text-xl bg-yellow-400 font-medium text-black whitespace-nowrap rounded-[30px] max-md:px-5"
+                className="w-full md:w-auto px-6 py-2 text-white  bg-yellow-400 text-base md:text-xl font-medium rounded-[30px] hover:bg-yellow-500" // Responsive width and font size
               >
                 Subscribe
               </button>
             </form>
-
-            <div className="flex flex-col self-stretch pl-8 mt-4 text-base font-medium leading-7 text-neutral-700 max-md:pl-5 max-md:max-w-full">
-              <div className="self-start">
-                Sign up with your email address to receive <br />
-                news and updates
-              </div>
-              <div className="relative mt-4">
-                {/* bottle image */}
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/21d8913f5c9f45590a2651b620ce11816f44bdb57c2ea1f56a4f35bbca97c0c3?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                  alt="Featured content"
-                  className="object-contain w-[238px] h-[177px] aspect-[1.34] absolute -top-10 right-1"
-                />
-                <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/a4f40c7ad209242c431087eb46f67908cbe969c2332847a2dee8ab347c95efbb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                  alt=""
-                  className="object-contain w-[159px] h-[111px] aspect-[1.43] absolute top-5 -right-5 z-10"
-                />
-              </div>
+            <div className="mt-3 text-base font-medium leading-7 text-neutral-700">
+              Sign up with your email address to receive <br />
+              news and updates.
             </div>
+            {/* ... (bottle images - these can be made more responsive if needed) */}
           </div>
         </div>
-
-        {/* Separator */}
-        <div className="flex mt-12 w-full h-px bg-neutral-200"></div>
-
-        {/* Copyright */}
-        <div className="text-center mt-4 text-base font-medium text-black">
+        <div className="mt-8 md:mt-12 w-full h-px bg-neutral-200"></div>{" "}
+        {/* Responsive margin */}
+        <div className="text-center mt-3 md:mt-4 text-base font-medium text-black">
+          {" "}
+          {/* Responsive margin */}
           Copyright © 2025 Tuler. All rights reserved.
         </div>
       </div>

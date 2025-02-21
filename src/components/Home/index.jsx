@@ -184,58 +184,53 @@ const Home = () => {
         </div>
       </div>
 
-      <div className=" fle x flex-col items-center px-16 pt-32 pb-20 w-full bg-stone-50 max-md:px-5 max-md:pt-24 max-md:max-w-full">
-        <div className="  ml-5 w-full max-w-[1455px] max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
-            <div className="flex flex-col w-[28%] max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col items-start self-stretch my-auto max-md:mt-10">
-                <div className="text-2xl font-semibold text-yellow-400">
-                  Shop By
+
+      <div className="flex flex-col items-center px-4 py-16 w-full bg-stone-50 md:px-16 md:pt-32 md:pb-20">
+            <div className="w-full max-w-[1455px]">
+                <div className="flex flex-col md:flex-row gap-5">
+                    <div className="w-full md:w-2/6">
+                        <div className="flex flex-col items-start"> {/* Removed self-stretch */}
+                            <div className="text-xl md:text-2xl font-semibold text-yellow-400 leading-tight"> {/* Added leading-tight */}
+                                Shop By
+                            </div>
+                            <div className="xl:text-6xl sm:text-2xl  md:text-5xl font-extrabold text-neutral-900 leading-tight"> {/* Added leading-tight */}
+                                Category
+                            </div>
+                            <button
+                                className="px-8 py-3 mt-8 md:mt-14 w-full md:w-auto text-base md:text-lg bg-yellow-400 font-medium text-center text-black rounded-[90px] transition duration-300 hover:bg-yellow-500"
+                                aria-label="View all categories"
+                            >
+                                View All
+                            </button>
+                        </div>
+                    </div>
+                    <div className="w-full md:w-3/6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8 md:mt-0">
+                            {images.slice(0, 2).map((image, index) => (
+                                <div key={index} className="w-full">
+                                    <img
+                                        loading="lazy"
+                                        src={image.src}
+                                        alt={image.alt}
+                                        className="object-contain w-full h-auto rounded-none aspect-[0.92]"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="w-full md:w-1/6">
+                        {images.length > 2 && (
+                            <img
+                                loading="lazy"
+                                src={images[2].src}
+                                alt={images[2].alt}
+                                className="object-contain w-full h-auto rounded-none aspect-[0.92] mt-8 md:mt-0"
+                            />
+                        )}
+                    </div>
                 </div>
-                <div className="self-stretch text-6xl font-extrabold text-neutral-900 max-md:text-4xl">
-                  Category
-                </div>
-                <button
-                  className="px-14 py-3 mt-14 max-w-full text-lg bg-yellow-400  font-medium text-center text-black rounded-[90px] w-[200px]  max-md:px-5 max-md:mt-10"
-                  aria-label="View all categories"
-                >
-                  View All
-                </button>
-              </div>
             </div>
-            <div className="flex flex-col ml-5 w-[40%] max-md:ml-0 max-md:w-full">
-              <div className="grow max-md:mt-8 max-md:max-w-full">
-                <div className="flex gap-5 max-md:flex-col">
-                  <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                    <img
-                      loading="lazy"
-                      src={images[0].src}
-                      alt={images[0].alt}
-                      className="object-contain w-full rounded-none aspect-[0.92] max-md:mt-3"
-                    />
-                  </div>
-                  <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-                    <img
-                      loading="lazy"
-                      src={images[1].src}
-                      alt={images[1].alt}
-                      className="object-contain grow w-full rounded-none aspect-[0.9] max-md:mt-3"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col ml-5 w-[19%] max-md:ml-0 max-md:w-full">
-              <img
-                loading="lazy"
-                src={images[2].src}
-                alt={images[2].alt}
-                className="object-contain shrink-0 max-w-full rounded-none aspect-[0.92] w-[315px] max-md:mt-3"
-              />
-            </div>
-          </div>
         </div>
-      </div>
 
       {/* benefits section */}
       <div
