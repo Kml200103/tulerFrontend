@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { post } from "../../services/http/axiosApi";
 import { useSelector } from "react-redux";
 import { NotificationService } from "../../services/Notifcation";
+import { useNavigate } from "react-router"; // Import useNavigate
 
 function ProductCard({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]); // Default to first variant
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
+  const navigate = useNavigate(); // Call useNavigate to get the navigate function
+
   const handleVariantChange = (event) => {
     const selectedId = event.target.value;
     const variant = product.variants.find((v) => v._id === selectedId);
@@ -33,33 +36,35 @@ function ProductCard({ product }) {
           weight: selectedVariant.weight,
           quantity: 1,
           price: selectedVariant.price,
-
-          variantId:selectedVariant._id
-
+          variantId: selectedVariant._id,
         });
         if (response.receiveObj) {
           NotificationService.sendSuccessMessage(response.receiveObj.message);
         } else {
           NotificationService.sendErrorMessage(response.receiveObj.message);
         }
-
-        // if (response.status === 200 || response.data?.success) {
-        //   alert("Product added to cart successfully!");
-        // } else {
-        //   alert("Failed to add product to cart.");
-        // }
       }
 
-     console.log('selectedVariant',selectedVariant )
-
+      console.log("selectedVariant", selectedVariant);
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");
     }
   };
 
+  const handleCardClick = () => {
+    // Get the product name and format it for the URL
+    const productName = product.name.trim().replace(/\s+/g, "-"); // Replace spaces with hyphens
+    const productId = product._id;
+    console.log(productName);
+    navigate(`/product/description/${productName}/${productId}`); // Navigate to the product description page
+  };
+
   return (
-    <div className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md">
+    <div
+      className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md cursor-pointer"
+      onClick={handleCardClick}
+    >
       <img
         src={product.images[0]}
         alt={product.name}
@@ -67,7 +72,6 @@ function ProductCard({ product }) {
       />
 
       <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
-      {/* {/ <p className="mt-2 text-sm text-gray-600">{product.description}</p> /} */}
 
       <div className="mt-4">
         <label className="block text-sm font-semibold">Choose Weight:</label>

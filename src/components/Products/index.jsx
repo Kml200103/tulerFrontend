@@ -4,28 +4,25 @@ import { get } from "../../services/http/axiosApi";
 import Pagination from "../Pagination";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-
-const circleButtons = [{ key: "start" }, { key: "end" }];
+import Slider from "@mui/material/Slider";
 
 const Products = () => {
   const navigate = useNavigate();
   const searchTerm = useSelector((state) => state.search.term);
 
-  const [products, setProducts] = useState([]); // Store API products
+  const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000); // Adjust based on product range
-  const [isLoading, setIsLoading] = useState(true); // Handle loading state
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [totalProducts, setTotalProducts] = useState(0); // Total products from API
-  const [totalPages, setTotalPages] = useState(0); // Total pages from API
-
-  // State for sorting
-  const [sortOption, setSortOption] = useState("default"); // default, lowToHigh, highToLow
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [sortOption, setSortOption] = useState("default");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const userRole = localStorage.getItem("userRole");
@@ -34,7 +31,7 @@ const Products = () => {
     } else {
       fetchProducts();
     }
-  }, [navigate, currentPage, itemsPerPage]); // Add currentPage and itemsPerPage to dependencies
+  }, [navigate, currentPage, itemsPerPage]);
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -67,17 +64,10 @@ const Products = () => {
       const matchesPrice =
         minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
 
-      if (searchTerm.trim()) {
-        return matchesSearch && matchesPrice;
-      }
-      if (maxPrice !== Infinity) {
-        return matchesPrice;
-      }
-      return true;
+      return matchesSearch && matchesPrice;
     });
   }, [products, minPrice, maxPrice, searchTerm]);
 
-  // Sort products based on selected option
   const sortedProducts = useMemo(() => {
     let sorted = [...filteredProducts];
     if (sortOption === "lowToHigh") {
@@ -95,28 +85,6 @@ const Products = () => {
     }
     return sorted;
   }, [filteredProducts, sortOption]);
-
-  const debounce = (func, delay) => {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  const handleChange = useCallback(
-    debounce((event) => {
-      const { name, value } = event.target;
-      const parsedValue = Math.max(0, Number(value));
-
-      if (name === "min") {
-        setMinPrice(parsedValue > maxPrice ? maxPrice : parsedValue);
-      } else {
-        setMaxPrice(parsedValue < minPrice ? minPrice : parsedValue);
-      }
-    }, 300),
-    [minPrice, maxPrice]
-  );
 
   const getProductsByCategories = async () => {
     const { receiveObj } = await get("/category/all");
@@ -149,7 +117,7 @@ const Products = () => {
 
   const handleSortOptionChange = (option) => {
     setSortOption(option);
-    setIsDropdownOpen(false); // Close dropdown after selection
+    setIsDropdownOpen(false);
   };
 
   const onPageChange = (page) => {
@@ -158,7 +126,7 @@ const Products = () => {
 
   const setPageSize = (size) => {
     setItemsPerPage(size);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
   };
 
   return (
@@ -178,14 +146,17 @@ const Products = () => {
               >
                 <div>SORT BY</div>
                 <img
-                  loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/c2ae2d0d1344eee9754786ab04249477cc25d0d914353e3c63323d54ea86a8d1?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/c2ae2d0d1344eee9754786ab04249477cc25d0d914353e3c63323d54ea86a8d1"
                   alt="Sort Icon"
                   className="object-contain shrink-0 my-auto w-4 aspect-[1.6]"
                 />
               </button>
+
               {isDropdownOpen && (
-                <div className="absolute right-0 z-10 w-48 bg-white border border-gray-300 rounded shadow-lg">
+                <div
+                  className="absolute z-10 min-w-[160px] bg-white border border-gray-300 rounded shadow-lg 
+      right-0 xs:right-0 xs:ml-auto sm:right-auto"
+                >
                   <div
                     onClick={() => handleSortOptionChange("lowToHigh")}
                     className="cursor-pointer px-4 py-2 hover:bg-gray-100"
@@ -206,7 +177,8 @@ const Products = () => {
       </div>
 
       <div className="flex w-full max-w-[1385px] max-md:flex-col">
-        <div className="flex flex-col w-1/4 p-4 mt-5 bg-sky-50 border border-sky-50 border-solid rounded-[20px] max-md:w-full">
+        {/* Sidebar: Categories & Filters */}
+        <div className="w-1/4 md:w-[35%] lg:w-1/4 p-4 bg-sky-50 border border-sky-50 rounded-[20px] max-md:w-full sm:mb-11">
           <div className="flex flex-col px-4 w-full max-md:px-2">
             <div className="text-2xl font-semibold leading-[32px] text-neutral-700">
               Product categories
@@ -224,21 +196,68 @@ const Products = () => {
                 </div>
               ))}
             </div>
-            <div className="p-4">
+            <div className="p-4 w-full">
               <div className="self-start mt-4 mb-4 text-2xl font-semibold leading-[32px] text-neutral-700">
                 Filter by price
               </div>
-              <div className="flex justify-start mr-10">
-                {circleButtons.map((button, index) => (
-                  <React.Fragment key={button.key}>
-                    <div className="flex flex-col justify-center items-center px-1.5 bg-yellow-400 rounded-full h-[25px] w-[25px]">
-                      <div className="flex shrink-0 bg-white rounded-full h-[15px] w-[15px]" />
-                    </div>
-                    {index === 0 && (
-                      <div className="flex shrink-0 self-start mt-1.5 max-w-full h-3.5 bg-yellow-400 w-[280px]" />
-                    )}
-                  </React.Fragment>
-                ))}
+
+              {/* Price Range Slider */}
+              <Slider
+                value={[minPrice, maxPrice]}
+                onChange={(event, newValue) => {
+                  setMinPrice(newValue[0]);
+                  setMaxPrice(newValue[1]);
+                }}
+                valueLabelDisplay="auto"
+                min={0}
+                max={1000}
+                step={10}
+                sx={{
+                  color: "#3815e8",
+                  height: 5,
+                  "& .MuiSlider-thumb": {
+                    height: 18,
+                    width: 18,
+                    backgroundColor: "#fff",
+                    border: "2px solid currentColor",
+                    "&:hover, &.Mui-focusVisible": {
+                      boxShadow: "inherit",
+                    },
+                  },
+                  "& .MuiSlider-track": {
+                    height: 5,
+                    borderRadius: 5,
+                  },
+                  "& .MuiSlider-rail": {
+                    height: 5,
+                    borderRadius: 5,
+                    backgroundColor: "#e0e0e0",
+                  },
+                }}
+                className="w-full sm:w-[90%] mx-auto"
+              />
+
+              {/* Min and Max Price Inputs */}
+              <div className="flex flex-wrap sm:flex-nowrap md:justify-center mt-2 gap-2">
+                <input
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) =>
+                    setMinPrice(Math.max(0, Number(e.target.value)))
+                  }
+                  className="w-full sm:w-24 p-2 border border-gray-300 rounded-md text-sm text-center"
+                  placeholder="Min"
+                />
+                <span className="mx-2 text-center sm:mx-2 sm:w-auto">-</span>
+                <input
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) =>
+                    setMaxPrice(Math.max(0, Number(e.target.value)))
+                  }
+                  className="w-full sm:w-24 p-2 border border-gray-300 rounded-md text-sm text-center"
+                  placeholder="Max"
+                />
               </div>
             </div>
           </div>
@@ -281,7 +300,7 @@ const Products = () => {
         </div>
 
         <div className="container bg-white">
-          <div className="text-3xl font-bold mb-4">PRODUCTS</div>
+          <div className="text-3xl font-bold mb-4 mt-10">PRODUCTS</div>
 
           {isLoading && <p>Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}
