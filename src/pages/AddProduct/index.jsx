@@ -17,6 +17,7 @@ const ProductPage = () => {
       categoryId: "",
       description: "",
       images: null,
+      benefits: [],
       variants: [{ weight: "", price: null, quantity: null }],
     },
   });
@@ -30,6 +31,57 @@ const ProductPage = () => {
   const [categories, setCategories] = useState([]);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+  // const [previewImages, setPreviewImages] = useState([]);
+  const [benefits, setBenefits] = useState([]);
+  const [benefitText, setBenefitText] = useState("");
+  // Handle single image preview
+  const handleCoverImagePreview = (event) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setCoverImagePreview(reader.result);
+      };
+
+      reader.readAsDataURL(file);
+    } else {
+      setCoverImagePreview(null);
+    }
+  };
+
+  // Handle multiple images preview
+  // const handleImagePreview = (event) => {
+  //   const files = event.target.files;
+  //   if (files.length > 0) {
+  //     const imageUrls = Array.from(files).map((file) =>
+  //       URL.createObjectURL(file)
+  //     );
+  //     setPreviewImages(imageUrls);
+  //   }
+  // };
+
+  const addBenefit = () => {
+    if (benefits.length >= 5) {
+      alert("You can add a maximum of 5 benefits.");
+      return;
+    }
+
+    if (benefitText.trim().split(/\s+/).length > 70) {
+      alert("Each benefit must be within 70 words.");
+      return;
+    }
+
+    setBenefits([...benefits, benefitText.trim()]);
+    setBenefitText("");
+  };
+
+  const removeBenefit = (index) => {
+    setBenefits(benefits.filter((_, i) => i !== index));
+  };
+
 
   const handleImagePreview = (e) => {
     const files = e.target.files;
@@ -109,6 +161,12 @@ const ProductPage = () => {
       });
     }
 
+    if (data.coverImage && data.coverImage.length > 0) {
+      formData.append("coverImage", data.coverImage[0]);
+    } else {
+      console.warn("No cover image selected or file is empty");
+    }
+
     // Append each variant separately
     data.variants.forEach((variant, index) => {
       formData.append(`variants[${index}][weight]`, variant.weight);
@@ -116,6 +174,10 @@ const ProductPage = () => {
       formData.append(`variants[${index}][quantity]`, variant.quantity);
     });
 
+    benefits.forEach((benefit, index) => {
+      formData.append(`benefits[${index}]`, benefit);
+    });
+    console.log('formData', formData)
     try {
       const result = await post("/product", formData, {
         "Content-Type": "multipart/form-data",
@@ -125,6 +187,7 @@ const ProductPage = () => {
         console.log("Product saved successfully:", result.receiveObj);
         NotificationService.sendSuccessMessage("Product saved successfully!");
         reset();
+        setBenefits([])
       } else {
         console.error("Failed to save product:", result.receiveObj);
         NotificationService.sendErrorMessage(
@@ -219,37 +282,6 @@ const ProductPage = () => {
               </div>
             </div>
 
-            {/* Dialog for Adding New Category */}
-            {/* {isCategoryDialogOpen && (
-              <div className="fixed inset-0 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded shadow-lg w-96">
-                  <h3 className="text-lg font-semibold mb-4">
-                    Add New Category
-                  </h3>
-                  <input
-                    type="text"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full border p-2 rounded mb-4"
-                    placeholder="Enter category name"
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={() => setIsCategoryDialogOpen(false)}
-                      className="px-4 py-2 bg-gray-300 rounded"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={addCategory}
-                      className="px-4 py-2 bg-blue-600 text-white rounded"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )} */}
 
             <div>
               <label
@@ -284,35 +316,99 @@ const ProductPage = () => {
                 )}
               </div>
             </div>
+            <div>
+              <label className="block text-md font-medium text-gray-900">
+                Benefits <span className="text-red-600">*</span> (Max 5)
+              </label>
+              <input
+                type="text"
+                value={benefitText}
+                onChange={(e) => setBenefitText(e.target.value)}
+                placeholder="Enter a benefit point (Max 70 words)"
+                className="block w-full border p-2 rounded-md"
+              />
+              <button
+                type="button"
+                onClick={addBenefit}
+                disabled={benefits.length >= 5}
+                className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
+              >
+                Add Benefit
+              </button>
+
+              <ul className="mt-4 space-y-2">
+                {benefits.map((benefit, index) => (
+                  <li key={index} className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
+                    <span>{benefit}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeBenefit(index)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             <div>
+              <label htmlFor="coverImage" className="block text-md font-medium leading-6 text-gray-900">
+                Cover Image <span className="text-red-600">*</span>
+              </label>
+              <div className="mt-2">
+                <input
+                  type="file"
+                  accept="image/jpeg, image/png, image/gif"
+                  {...register("coverImage", {
+                    required: "Cover image is required",
+                    validate: (file) => {
+                      if (!file || file.length === 0) return "Cover image is required";
+                      const validTypes = ["image/jpeg", "image/png", "image/gif"];
+                      if (!validTypes.includes(file[0]?.type)) {
+                        return "Only JPEG, PNG, and GIF are allowed";
+                      }
+                      return true;
+                    },
+                  })}
+                  onChange={handleCoverImagePreview} // Keep the onChange handler
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                />
+                {errors.coverImage && (
+                  <p className="text-red-600 text-sm mt-2">{errors.coverImage.message}</p>
+                )}
+                {coverImagePreview && (
+                  <div className="mt-2">
+                    <img src={coverImagePreview} alt="Cover Preview" className="w-20 h-20 object-cover rounded" />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="mt-4">
               <label
                 htmlFor="images"
                 className="block text-md font-medium leading-6 text-gray-900"
               >
-                Images <span className="text-red-600">*</span>
+                Other Images <span className="text-red-600">*</span>
               </label>
               <div className="mt-2">
                 <input
                   type="file"
                   multiple
+                  accept="image/jpeg, image/png, image/gif"
                   {...register("images", {
                     required: "At least one image is required",
                     validate: {
                       validateFiles: (files) => {
                         if (files.length === 0)
                           return "At least one image is required";
-                        const validTypes = [
-                          "image/jpeg",
-                          "image/png",
-                          "image/gif",
-                        ];
+                        const validTypes = ["image/jpeg", "image/png", "image/gif"];
                         for (let i = 0; i < files.length; i++) {
                           if (!validTypes.includes(files[i].type)) {
-                            return "Only image files are allowed (JPEG, PNG, GIF)";
+                            return "Only JPEG, PNG, and GIF are allowed";
                           }
                         }
-                        return true; // All files are valid
+                        return true;
                       },
                     },
                   })}
@@ -320,9 +416,7 @@ const ProductPage = () => {
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                 />
                 {errors.images && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.images.message}
-                  </p>
+                  <p className="text-red-600 text-sm mt-2">{errors.images.message}</p>
                 )}
                 {previewImages.length > 0 && (
                   <div className="mt-2 flex space-x-2">

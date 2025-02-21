@@ -204,7 +204,7 @@ const Login = () => {
         </button>
       </form>
 
-      <div className="flex gap-4 items-center mt-8 text-sm text-black whitespace-nowrap">
+      {/* <div className="flex gap-4 items-center mt-8 text-sm text-black whitespace-nowrap">
         <div className="flex shrink-0 self-stretch my-auto h-px bg-gray-300 w-[182px]" />
         <div className="self-stretch">Or</div>
         <div className="flex shrink-0 self-stretch my-auto h-px bg-gray-300 w-[182px]" />
@@ -236,7 +236,7 @@ const Login = () => {
           />
           <div className="grow shrink w-28">Login with Mobile </div>
         </div>
-      </button>
+      </button> */}
       <div className="flex shrink-0 mt-10 w-full h-px bg-gray-300" />
 
       <div className="flex self-center mt-4 max-w-full text-sm w-[221px]">

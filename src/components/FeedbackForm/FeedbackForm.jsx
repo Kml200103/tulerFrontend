@@ -7,7 +7,7 @@ import { post } from "../../services/http/axiosApi";
 
 export function FormInput({ label, type, id, register, errors, className }) {
   return (
-    <div className="flex flex-col flex-1 grow shrink-0 basis-0 w-fit">
+    <div className="flex flex-col w-full"> {/* Make input container full width */}
       <label htmlFor={id} className="self-start">
         {label}
       </label>
@@ -25,7 +25,7 @@ export function FormInput({ label, type, id, register, errors, className }) {
               : undefined,
         })}
         className={classNames(
-          `${className} flex shrink-0 mt-6 h-12 w-full bg-white rounded-xl border border-gray-300 border-solid`
+          `${className} flex mt-2 h-12 w-full bg-white rounded-xl border border-gray-300 border-solid p-2` // Added p-2 for padding
         )}
       />
       {errors[id] && (
@@ -59,23 +59,23 @@ function FeedbackForm() {
   };
 
   return (
-    <div className="flex flex-col text-xl font-medium rounded-none max-w-[845px] text-neutral-700">
+    <div className="flex flex-col text-xl font-medium rounded-none text-neutral-700 w-full px-4 md:px-0"> {/* Added w-full and responsive padding */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-start px-8 pt-5 pb-20 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-4 max-md:pb-16 max-md:max-w-full"
+        className="flex flex-col items-start w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] p-6 md:p-8" // Responsive padding
       >
-        <h1 className="text-2xl font-semibold leading-loose text-neutral-700 max-md:max-w-full">
+        <h1 className="text-2xl font-semibold leading-loose text-neutral-700 w-full mb-4"> {/* Added w-full and margin-bottom */}
           How can we improve your experience?
         </h1>
 
-        <div className="flex text-xl flex-wrap gap-6 self-stretch mt-8 max-md:mt-8 max-md:max-w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full"> {/* Use grid for responsiveness */}
           <FormInput
             label="Name"
             type="text"
             id="name"
             register={register}
             errors={errors}
-            className={"p-2"}
+            className={""} // Removed unnecessary className
           />
           <FormInput
             label="Email"
@@ -83,12 +83,12 @@ function FeedbackForm() {
             id="email"
             register={register}
             errors={errors}
-            className={"p-2"}
+            className={""} // Removed unnecessary className
           />
         </div>
 
-        <div className="w-full">
-          <label htmlFor="subject" className="block mt-7">
+        <div className="w-full mt-4"> {/* Added margin-top */}
+          <label htmlFor="subject" className="block">
             Subject
           </label>
           <input
@@ -98,10 +98,10 @@ function FeedbackForm() {
               required: "Subject is required",
               minLength: {
                 value: 10,
-                message: "Subject must be at least 5 characters",
+                message: "Subject must be at least 10 characters",
               },
             })}
-            className="p-2 flex shrink-0 self-stretch mt-4 h-10 w-full bg-white rounded-xl border border-gray-300 border-solid max-md:max-w-full"
+            className="p-2 flex w-full mt-2 h-10 bg-white rounded-xl border border-gray-300 border-solid"
           />
           {errors.subject && (
             <p className="text-red-500 text-sm mt-1">
@@ -110,8 +110,8 @@ function FeedbackForm() {
           )}
         </div>
 
-        <div className="w-full">
-          <label htmlFor="description" className="block mt-7">
+        <div className="w-full mt-4"> {/* Added margin-top */}
+          <label htmlFor="description" className="block">
             Description
           </label>
           <textarea
@@ -123,7 +123,7 @@ function FeedbackForm() {
                 message: "Description must be at least 10 characters",
               },
             })}
-            className=" p-2 flex shrink-0 self-stretch mt-4 w-full bg-white rounded-xl border border-gray-300 border-solid h-[100px] max-md:max-w-full"
+            className="p-2 flex w-full mt-2 bg-white rounded-xl border border-gray-300 border-solid h-[100px]"
           />
           {errors.description && (
             <p className="text-red-500 text-sm mt-1">
@@ -134,7 +134,7 @@ function FeedbackForm() {
 
         <button
           type="submit"
-          className="px-10 py-3 mt-8 mb-0 text-lg text-black whitespace-nowrap bg-yellow-400 rounded-[30px] max-md:px-4 max-md:mt-8 max-md:mb-2.5"
+          className="px-10 py-3 mt-6 w-full text-lg text-black whitespace-nowrap bg-yellow-400 rounded-[30px]" // Added w-full and margin-top
         >
           Submit
         </button>
