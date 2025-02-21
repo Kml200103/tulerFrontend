@@ -17,6 +17,9 @@ export default function Cart({ onClose }) {
     if (!id) return;
     try {
       const { receiveObj } = await get(`/cart/${id}`);
+
+      console.log("Cart API Response Data:", receiveObj);
+
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
     } catch (error) {
       console.error("Error fetching cart data:", error);
@@ -25,7 +28,7 @@ export default function Cart({ onClose }) {
 
   useEffect(() => {
     fetchCartData();
-  }, [fetchCartData]);
+  }, []);
 
   // Update quantity and refresh cart
   const updateQuantity = useCallback(
@@ -100,7 +103,6 @@ export default function Cart({ onClose }) {
       setUpdating(false);
     }
   }, [id]);
-  console.log(cartData);
 
   return (
     <div
@@ -140,7 +142,7 @@ export default function Cart({ onClose }) {
 
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
-          cartData.items.map((item) => {
+          cartData?.items?.map((item) => {
             console.log("item :>> ", item);
             return (
               <div
@@ -182,7 +184,7 @@ export default function Cart({ onClose }) {
 
                 <img
                   loading="lazy"
-                  src={item?.images?.[0] || ""}
+                  src={item?.images || ""}
                   alt={item.productName || "Unknown Product"}
                   className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
                 />
@@ -214,7 +216,7 @@ export default function Cart({ onClose }) {
         >
           <span className="text-sm font-semibold">Checkout</span>
           <span className="px-5 py-2.5 text-base font-bold bg-yellow-400 text-black rounded-xl">
-            ${cartData?.totalPrice?.toFixed(2) || "0.00"}
+            ${cartData?.totalPrice ? cartData.totalPrice.toFixed(2) : "0.00"}
           </span>
         </Link>
       ) : (
