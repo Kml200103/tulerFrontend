@@ -28,6 +28,7 @@ const ProtectedRoute = ({ children }) => {
     "/add-product",
     "/adminProfile",
     "/all-orders",
+    "/offers",
   ];
   const adminRestrictedRoutes = ["/", "/products", "/profile", "/checkout"];
 

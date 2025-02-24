@@ -6,23 +6,34 @@ import AdminNavigationLinks from "../AdminHeader/NavigationLinks";
 import AdminSocialIcons from "../AdminHeader/SocialIcons";
 import NavigationLinks from "./NavigationLinks";
 import SocialIcons from "./SocialIcons";
+import { useSelector } from "react-redux";
 
-export default function Header({ toggleSearchInput, isLoggedIn, user }) {
+export default function Header({ toggleSearchInput }) {
   const location = useLocation();
   const navigate = useNavigate(); // Access navigate function
-  const isAdmin = isLoggedIn && user.role === "admin";
+  const { isLoggedIn, user } = useSelector((state) => state.auth);
+  const isAdmin = isLoggedIn && user?.role === "admin"; // Added optional chaining
+  console.log(isAdmin);
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const renderNavContent = () => {
     return isAdmin ? <AdminNavigationLinks /> : <NavigationLinks />;
   };
 
+  // Determine if the current path is the home page
+  const isHomePage = location.pathname === "/";
+
   return (
     <>
-      <header className="fixed top-0 left-0 w-full z-50 bg-white transition-all duration-300"> 
+      <header
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          isHomePage ? "bg-transparent" : "bg-white"
+        }`}
+      >
         <nav
           className={`relative w-full flex items-center justify-between px-6 py-4 transition-all duration-300 ${
-            location.pathname !== "/" ? "md:flex-row md:items-center md:max-h-[308px]" : ""
+            isHomePage ? "md:flex-row md:items-center md:max-h-[308px]" : ""
           }`}
           role="navigation"
           aria-label="Main navigation"
@@ -42,7 +53,9 @@ export default function Header({ toggleSearchInput, isLoggedIn, user }) {
 
           <div className="flex items-center">
             <button
-              className={`md:hidden  block text-gray-600 mr-4 z-50 ${menuOpen?"hidden":""} `}
+              className={`md:hidden block text-gray-600 mr-4 z-50 ${
+                menuOpen ? "hidden" : ""
+              } `}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -75,7 +88,6 @@ export default function Header({ toggleSearchInput, isLoggedIn, user }) {
           ></div>
         )}
       </header>
-
     </>
   );
 }
