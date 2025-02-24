@@ -10,12 +10,15 @@ const ProductDescription = () => {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [error, setError] = useState(null);
 
+  const [selectedImage, setSelectedImage] = useState();
+
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
   const getProduct = async () => {
     try {
       const { receiveObj } = await get(`/product/${productId}`);
       setProduct(receiveObj.product);
+      setSelectedImage(receiveObj.product.images);
     } catch (err) {
       setError("An error occurred while fetching the product.");
     }
@@ -26,10 +29,6 @@ const ProductDescription = () => {
       setSelectedVariant(product.variants[0]);
     }
   }, [product]); // Runs only when product data changes
-
-  useEffect(() => {
-    console.log(selectedVariant);
-  }, [selectedVariant]); // Logs the selected variant after it is updated
 
   useEffect(() => {
     getProduct();
@@ -46,7 +45,7 @@ const ProductDescription = () => {
       );
       return;
     }
-    
+
     try {
       if (userId) {
         const response = await post("/cart/add", {
@@ -83,7 +82,7 @@ const ProductDescription = () => {
   }
 
   return (
-    <main className="flex overflow-hidden flex-col bg-white pt-[72px] md:pt-[96px] mt-8">
+    <main className="flex overflow-hidden flex-col bg-white my-40">
       <section className="self-center  mx-3 w-full max-w-[1398px]">
         <div className="max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col">
@@ -92,7 +91,7 @@ const ProductDescription = () => {
               <div className="flex flex-col items-center">
                 {/* Main Image */}
                 <img
-                  src={product.images}
+                  src={selectedImage}
                   alt={product.name}
                   className="object-contain w-3/4 max-w-[400px] aspect-[1.01] max-md:w-[250px] max-md:mt-10"
                 />
@@ -106,7 +105,12 @@ const ProductDescription = () => {
                           <img
                             src={src}
                             alt={`Product thumbnail ${index + 1}`}
-                            className="object-contain grow shrink-0 mt-1.5 max-w-full rounded-none aspect-[0.99] w-full max-md:mt-8"
+                            className={`object-contain grow shrink-0 mt-1.5 max-w-full rounded-none aspect-[0.99] w-full max-md:mt-8 cursor-pointer ${
+                              selectedImage === src
+                                ? "border-2 border-blue-500"
+                                : ""
+                            }`}
+                            onClick={() => setSelectedImage(src)}
                           />
                         </div>
                       )

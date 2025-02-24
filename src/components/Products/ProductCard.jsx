@@ -70,16 +70,15 @@ function ProductCard({ product }) {
 
   return (
     <div className="flex flex-col p-5 w-full bg-white text-black rounded-xl shadow-md cursor-pointer">
-      <img
-        src={product.images}
-        alt={product.name}
-        className="w-full h-48 object-cover rounded-xl"
-      />
+      <div onClick={handleCardClick}>
+        <img
+          src={product.images}
+          alt={product.name}
+          className="w-full h-48 object-cover rounded-xl"
+        />
 
-      <h2 className="mt-4 text-xl font-semibold" onClick={handleCardClick}>
-        {product.name}
-      </h2>
-
+        <h2 className="mt-4 text-xl font-semibold">{product.name}</h2>
+      </div>
       <div className="mt-4">
         <label className="block text-sm font-semibold">Choose Weight:</label>
         <select
@@ -97,9 +96,14 @@ function ProductCard({ product }) {
 
       <button
         onClick={handleAddToCart}
-        className="mt-4 w-full py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
+        className="flex gap-3.5 px-6 py-2.5 mt-9 text-xl text-white bg-black rounded-3xl max-md:px-5"
       >
-        Add to Cart
+        <img
+                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
+                    alt="Cart icon"
+                    className="object-contain shrink-0 aspect-[1.04] w-[26px]"
+                  />
+                  Add to cart
       </button>
     </div>
   );

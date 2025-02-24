@@ -130,13 +130,13 @@ const Products = () => {
   };
 
   return (
-    <div className="container flex overflow-hidden flex-col bg-white ">
+    <div className="container flex  flex-col bg-white ">
       <div className="container flex flex-col self-center mb-4 ml-2.5 w-full max-w-[1385px] max-md:mt-5 max-md:max-w-full">
         <div className="flex flex-wrap gap-5 justify-between items-start w-full max-md:mr-2.5 max-md:max-w-full">
           <div className="text-3xl font-medium text-neutral-900 tracking-[2px] max-md:text-3xl">
-            <span className="font-extrabold tracking-wider text-neutral-900">
+            {/* <span className="font-extrabold tracking-wider text-neutral-900">
               PRODUCTS
-            </span>
+            </span> */}
           </div>
           <div className="flex gap-5  text-center text-stone-500 pt-[72px] md:pt-[96px] mt-8">
             <div className="relative">
@@ -155,7 +155,7 @@ const Products = () => {
               {isDropdownOpen && (
                 <div
                   className="absolute z-10 min-w-[160px] bg-white border border-gray-300 rounded shadow-lg 
-      right-0 xs:right-0 xs:ml-auto sm:right-auto"
+    xs:right-0 xs:ml-auto sm:right-auto"
                 >
                   <div
                     onClick={() => handleSortOptionChange("lowToHigh")}
@@ -213,7 +213,7 @@ const Products = () => {
                 max={1000}
                 step={10}
                 sx={{
-                  color: "#3815e8",
+                  color: "#F9C300",
                   height: 5,
                   "& .MuiSlider-thumb": {
                     height: 18,
@@ -295,7 +295,7 @@ const Products = () => {
         </div>
 
         <div className="container bg-white">
-          <div className="text-3xl font-bold mb-4 mt-10">PRODUCTS</div>
+          <div className="text-3xl font-bold mb-4 mt-2 ">PRODUCTS</div>
 
           {isLoading && <p>Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}

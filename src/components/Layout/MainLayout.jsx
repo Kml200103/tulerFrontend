@@ -83,7 +83,6 @@ const MainLayout = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize); // Clean up
   }, [isSidebarOpen]); // Add isSidebarOpen to dependency array
 
-
   return (
     <>
       <div>
@@ -92,7 +91,7 @@ const MainLayout = ({ children }) => {
 
         {/* Sidebar Toggle Button */}
         <button
-          className="sidebar-toggle fixed bottom-10 left-5 bg-[#006d77] text-white px-4 py-2 rounded-md"
+          className="sidebar-toggle fixed bottom-10 z-50 left-5 bg-[#006d77] text-white px-4 py-2 rounded-md"
           onClick={toggleSidebar}
         >
           🎡 Spin & Win
@@ -108,16 +107,18 @@ const MainLayout = ({ children }) => {
         > */}
         <div
           ref={sidebarRef}
-          className={`fixed left-0 top-0 h-full bg-white w-full md:w-1/2 shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-            }`} 
+          className={`fixed left-0 top-0 h-full bg-white w-full md:w-1/2 shadow-lg transition-transform transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
           style={{ backgroundColor: "#fff", zIndex: 50 }}
         >
           <div className="p-5 border-b flex justify-between items-center">
             <h2 className="text-lg font-semibold text-[#ff7300]">
               Spin to Get Offers
             </h2>
-            <button onClick={toggleSidebar} className="text-xl md:hidden"> {/* Hide close button on larger screens */}
-              ✖
+            <button onClick={toggleSidebar} className="text-xl md:hidden">
+              {" "}
+              {/* Hide close button on larger screens */}✖
             </button>
           </div>
           <div className="p-5">
