@@ -9,6 +9,8 @@ const CategoryModal = ({
   deleteCategory,
   updateCategory,
 }) => {
+  console.log('categories', categories)
+
   const [newCategory, setNewCategory] = useState("");
   const [editCategory, setEditCategory] = useState(null);
 
@@ -20,8 +22,9 @@ const CategoryModal = ({
   };
 
   const handleUpdate = async () => {
+    console.log('editcate', editCategory)
     if (!editCategory?.name.trim()) return;
-    await updateCategory(editCategory._id, editCategory.name);
+    await updateCategory(editCategory.id, editCategory.name);
     setEditCategory(null);
     getCategory(); // Fetch updated categories after updating
   };
@@ -35,8 +38,7 @@ const CategoryModal = ({
     isOpen && (
       <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
         <div className="bg-white p-6 rounded shadow-lg w-1/2">
-          {" "}
-          {/* Increased width */}
+
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Manage Categories</h3>
             <button
@@ -59,7 +61,7 @@ const CategoryModal = ({
               </svg>
             </button>
           </div>
-          {/* Add New Category */}
+
           <div className="mb-4">
             <input
               type="text"
@@ -75,17 +77,17 @@ const CategoryModal = ({
               Add Category
             </button>
           </div>
-          {/* List of Categories */}
+
           <ul className="max-h-40 overflow-auto">
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <li
-                key={category._id}
+                key={category.id}
                 className="flex justify-between items-center py-1"
               >
-                {editCategory?._id === category._id ? (
+                {editCategory?.id === category.id ? (
                   <input
                     type="text"
-                    value={editCategory.name}
+                    value={editCategory?.name}
                     onChange={(e) =>
                       setEditCategory({ ...editCategory, name: e.target.value })
                     }
@@ -96,7 +98,7 @@ const CategoryModal = ({
                 )}
 
                 <div className="flex space-x-2">
-                  {editCategory?._id === category._id ? (
+                  {editCategory?.id === category.id ? (
                     <button
                       onClick={handleUpdate}
                       className="text-green-500 hover:underline" // Removed background color
@@ -112,11 +114,26 @@ const CategoryModal = ({
                     </button>
                   )}
                   <button
-                    onClick={() => handleDelete(category._id)}
+                    onClick={() => handleDelete(category.id)}
                     className="text-red-500 hover:underline" // Removed background color
                   >
                     Delete
                   </button>
+
+                  {editCategory && editCategory.id == category.id && <button className="text-red-900" onClick={() => setEditCategory(null)}> <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg></button>}
                 </div>
               </li>
             ))}

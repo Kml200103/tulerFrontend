@@ -5,7 +5,7 @@ import authReducer from "./auth/authSlice";
 import loaderReducer from "./loader/loaderSlice";
 import searchReducer from "./search/searchSlice";
 import { BaseService } from "./reduxQuery";
-
+import cartReducer from "./cart/cartSlice"
 import { loaderMiddleware } from "../services/middleware/loaderMiddleware";
 import { setStore } from "../services/loaderApi/loaderService";
 
@@ -13,7 +13,7 @@ import { setStore } from "../services/loaderApi/loaderService";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"],
+  whitelist: ["auth","cart"],
 };
 
 // Combine reducers
@@ -21,6 +21,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   loader: loaderReducer,
   search: searchReducer,
+  cart:cartReducer,
   [BaseService.reducerPath]: BaseService.reducer,
 });
 

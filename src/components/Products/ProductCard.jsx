@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { post } from "../../services/http/axiosApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NotificationService } from "../../services/Notifcation";
 import { useNavigate } from "react-router"; // Import useNavigate
+import { addToCart } from "../../redux/cart/cartSlice";
 
 function ProductCard({ product }) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0]); // Default to first variant
+  const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
   const navigate = useNavigate(); // Call useNavigate to get the navigate function
-
+  const dispatch = useDispatch()
   const handleVariantChange = (event) => {
     const selectedId = event.target.value;
     const variant = product.variants.find((v) => v._id === selectedId);
@@ -18,7 +19,19 @@ function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
     if (!userId) {
-      NotificationService.sendErrorMessage("Please Login First");
+      console.log('product', product)
+      // NotificationService.sendErrorMessage("Please Login First");
+      const payload = {
+        variant: { weight: selectedVariant.weight },
+        productId: product._id,
+        variantId: selectedVariant._id,
+        weight: selectedVariant.weight,
+        totalPrice: selectedVariant.price,
+        images: product.images,
+        quantity: 1,
+        productName: product.name
+      }
+      dispatch(addToCart(payload))
       return;
     }
     if (!selectedVariant) {
@@ -28,14 +41,7 @@ function ProductCard({ product }) {
       return;
     }
 
-    console.log("Adding product to cart:", {
-      userId,
-      productId: product._id,
-      variantId: selectedVariant._id,
-      weight: selectedVariant.weight,
-      price: selectedVariant.price,
-      quantity: 1,
-    });
+
 
     try {
       const response = await post("/cart/add", {
@@ -87,7 +93,7 @@ function ProductCard({ product }) {
           onChange={handleVariantChange}
           value={selectedVariant._id}
         >
-          {product.variants.map((variant) => (
+          {product?.variants.map((variant) => (
             <option key={variant._id} value={variant._id}>
               {variant.weight} - ₹{variant.price}
             </option>
