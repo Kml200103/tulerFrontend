@@ -68,4 +68,4 @@ const ConfirmModal = ({ open, onClose, onConfirm, title, message }) => {
   );
 };
 
-export default ConfirmModal
+export default ConfirmModal;

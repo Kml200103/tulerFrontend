@@ -3,11 +3,14 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { del, get, post } from "../../services/http/axiosApi";
 import CategoryModal from "../../components/Modals/categoryModal";
 import { NotificationService } from "../../services/Notifcation";
+import { useNavigate } from "react-router";
 
 const ProductPage = () => {
+  const navigate = useNavigate();
   const {
     register,
     control,
+    watch,
     handleSubmit,
     reset,
     formState: { errors },
@@ -52,7 +55,6 @@ const ProductPage = () => {
     }
   };
 
-  // Handle multiple images preview
   // const handleImagePreview = (event) => {
   //   const files = event.target.files;
   //   if (files.length > 0) {
@@ -82,16 +84,34 @@ const ProductPage = () => {
     setBenefits(benefits.filter((_, i) => i !== index));
   };
 
+  // const handleImagePreview = (e) => {
+  //   const files = e.target.files;
+  //   if (files && files.length > 0) {
+  //     setValue("images", files); // Explicitly update form value
+  //     const imageUrls = Array.from(files).map((file) =>
+  //       URL.createObjectURL(file)
+  //     );
+  //     setPreviewImages(imageUrls);
+  //   }
+  // };
+
   const handleImagePreview = (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      setValue("images", files); // Explicitly update form value
-      const imageUrls = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
+      const fileArray = Array.from(files); // Convert FileList to array
+      setValue("images", fileArray); // Update form field value
+      const imageUrls = fileArray.map((file) => URL.createObjectURL(file));
       setPreviewImages(imageUrls);
     }
   };
+
+  // const handleCoverImagePreview = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setValue("coverImage", file); // Ensure form gets updated
+  //     setCoverImagePreview(URL.createObjectURL(file));
+  //   }
+  // };
 
   const addCategory = async (name) => {
     const result = await post("/category/createUpdate", { name });
@@ -185,7 +205,10 @@ const ProductPage = () => {
       if (result.isSuccess) {
         console.log("Product saved successfully:", result.receiveObj);
         NotificationService.sendSuccessMessage("Product saved successfully!");
+
         reset();
+        navigate("/all-products");
+
         setBenefits([]);
       } else {
         console.error("Failed to save product:", result.receiveObj);
