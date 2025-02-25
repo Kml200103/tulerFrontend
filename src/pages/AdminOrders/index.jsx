@@ -57,9 +57,20 @@ const AdminOrders = () => {
         return "bg-purple-200 text-purple-600";
     }
   };
+  const choosePaymentColor = (status) => {
+    switch (status.toUpperCase()) {
+      case "PAID":
+        return "bg-green-400 text-white"; // Bright green for paid
+      case "UNPAID":
+        return "bg-red-400 text-white"; // Red for unpaid
+      case "REFUNDED":
+        return "bg-yellow-400 text-black"; // Yellow for refunded
+      default:
+        return "bg-gray-200 text-gray-600"; // Default gray for unknown status
+    }
+  };
 
   const getAdminOrders = async () => {
-  
     try {
       const response = await get(
         `/order/all?page=${currentPage}&pageSize=${pageSize}`
@@ -115,7 +126,7 @@ const AdminOrders = () => {
     getAdminOrders();
   }, [currentPage, pageSize]);
 
-  console.log('orders', orders)
+  console.log("orders", orders);
   return (
     <div className="overflow-x-auto ">
       <div className="bg-white flex items-center justify-center font-sans overflow-hidden">
@@ -151,34 +162,37 @@ const AdminOrders = () => {
                   </thead>
                   <tbody className="text-gray-600 text-sm font-light">
                     {orders?.map((order) => (
-                        <tr
-                          key={order.orderId}
-                          className="border-b border-gray-200 hover:bg-gray-100"
-                        >
-                          <td className="py-3 px-0 text-left whitespace-nowrap">
-                            <span className="font-medium">
-                              {truncateText(order?.orderId, 8)}
-                            </span>
-                          </td>
-                          <td className="py-3 px-0 text-left">
-                            {order.items
-                              .map(
-                                (item) =>
-                                  `${item?.productName} - ${item?.quantity}`
-                              )
-                              .join(", ")}
-                          </td>
-                          <td className="py-3 px-0 text-center">
-                            ${order?.totalPrice}
-                          </td>
-                          <td className="py-3 px-0 text-center">
-                            {truncateText(
-                              `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
-                              30
-                            )}
-                          </td>
-                          <td className="py-3 px-0 text-center">
-                            {editableOrderId === order?.orderId ? (
+                      <tr
+                        key={order.orderId}
+                        className="border-b border-gray-200 hover:bg-gray-100"
+                      >
+                        <td className="py-3 px-0 text-left whitespace-nowrap">
+                          <span className="font-medium">
+                            {truncateText(order?.orderId, 8)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-0 text-left">
+                          {order.items
+                            .map(
+                              (item) =>
+                                `${item?.productName} - ${item?.quantity}`
+                            )
+                            .join(", ")}
+                        </td>
+                        <td className="py-3 px-0 text-center">
+                          ${order?.totalPrice}
+                        </td>
+                        <td className="py-3 px-0 text-center">
+                          {truncateText(
+                            `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
+                            30
+                          )}
+                        </td>
+                        <td className="py-3 px-0 text-center">
+                          {editableOrderId === order?.orderId ? (
+                            // Check if the order status is not CANCELLED or COMPLETED
+                            order.status !== "CANCELLED" &&
+                            order.status !== "COMPLETED" ? (
                               <select
                                 value={newStatus}
                                 onChange={(e) =>
@@ -187,7 +201,7 @@ const AdminOrders = () => {
                               >
                                 <option value="PENDING">PENDING</option>
                                 <option value="COMPLETED">COMPLETED</option>
-                                <option value="CANCELLED">CANCELLED</option>
+                                {/* <option value="CANCELLED">CANCELLED</option> */}
                               </select>
                             ) : (
                               <span
@@ -195,61 +209,73 @@ const AdminOrders = () => {
                                   order.status
                                 )} py-1 px-3 rounded-full text-xs`}
                               >
-                                {order?.status.toUpperCase()}
+                                {order.status.toUpperCase()}
                               </span>
-                            )}
-                          </td>
-                          <td className="py-3 px-0 text-center">
+                            )
+                          ) : (
                             <span
-                              className={`py-1 px-3 rounded-full text-xs ${
-                                order?.paymentStatus === "paid"
-                                  ? "bg-green-200 text-green-600"
-                                  : "bg-red-200 text-red-600"
-                              }`}
+                              className={`${chooseColor(
+                                order.status
+                              )} py-1 px-3 rounded-full text-xs`}
                             >
-                              {order?.paymentStatus}
+                              {order.status.toUpperCase()}
                             </span>
-                          </td>
-                          <td className="py-3 px-0 text-left">
-                            {new Date(order?.createdAt).toLocaleString()}
-                          </td>
+                          )}
+                        </td>
+                        <td className="py-3 px-0 text-center">
+                          <span
+                            className={`py-1 px-3 rounded-full text-xs ${choosePaymentColor(
+                              order?.paymentStatus
+                            )}`}
+                          >
+                            {order?.paymentStatus}
+                          </span>
+                        </td>
 
-                          <td className="py-3 px-0 text-center flex items-center justify-center space-x-2">
-                            <EyeIcon
-                              className="w-8 h-8 cursor-pointer hover:text-purple-500"
-                              onClick={() => handleShow(order)}
-                            />
-                            <Pencil
-                              className={`w-8 h-8 cursor-pointer ${
+                        <td className="py-3 px-0 text-left">
+                          {new Date(order?.createdAt).toLocaleString()}
+                        </td>
+
+                        <td className="py-3 px-0 text-center flex items-center justify-center space-x-2">
+                          <EyeIcon
+                            className="w-8 h-8 cursor-pointer hover:text-purple-500"
+                            onClick={() => handleShow(order)}
+                          />
+                          <Pencil
+                            className={`w-8 h-8 cursor-pointer ${
+                              order.status === "CANCEL"
+                                ? "opacity-50 cursor-not-allowed"
+                                : "hover:text-purple-500"
+                            }`}
+                            onClick={() => {
+                              if (editableOrderId === order.orderId) {
+                                // If the same order is clicked twice, cancel edit mode
+                                setEditableOrderId(null);
+                                setNewStatus(""); // Reset status
+                              } else {
+                                setEditableOrderId(order.orderId);
+                                setNewStatus(order.status); // Set the current status for the dropdown
+                              }
+                            }}
+                          />
+                        </td>
+                        <td className="py-3 px-0 text-center">
+                          <td className="py-3 px-0 text-center">
+                            <button
+                              className={`mt-4 text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
                                 order.status === "CANCEL"
                                   ? "opacity-50 cursor-not-allowed"
-                                  : "hover:text-purple-500"
+                                  : ""
                               }`}
-                              onClick={() => {
-                                if (order?.status !== "CANCEL") {
-                                  setEditableOrderId(order.orderId);
-                                  setNewStatus(order.status); // Set the current status for the dropdown
-                                }
-                              }}
-                            />
+                              disabled={order?.status === "CANCEL"}
+                              onClick={() => openConfirmModal(order)}
+                            >
+                              Cancel Order
+                            </button>
                           </td>
-                          <td className="py-3 px-0 text-center">
-                            <td className="py-3 px-0 text-center">
-                              <button
-                                className={`mt-4 text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
-                                  order.status === "CANCEL"
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : ""
-                                }`}
-                                disabled={order?.status === "CANCEL"}
-                                onClick={() => openConfirmModal(order)}
-                              >
-                                Cancel Order
-                              </button>
-                            </td>
-                          </td>
-                        </tr>
-                      ))}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
 
@@ -305,14 +331,13 @@ const AdminOrders = () => {
                       <div className="flex flex-col gap-2">
                         <div className="flex gap-3">
                           <h3
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              selectedOrder.paymentStatus === "paid"
-                                ? "bg-green-200 text-green-600"
-                                : "bg-red-200 text-red-600"
-                            }`}
+                            className={`px-2 py-1 rounded-full text-xs ${choosePaymentColor(
+                              selectedOrder.paymentStatus
+                            )}`}
                           >
                             {selectedOrder.paymentStatus.toUpperCase()}
                           </h3>
+
                           <h3
                             className={`px-2 py-1 rounded-full text-xs ${chooseColor(
                               selectedOrder.status.toUpperCase() // Remove the curly braces
@@ -334,7 +359,7 @@ const AdminOrders = () => {
                           <div className="flex gap-2 items-center" key={index}>
                             <img
                               className="h-10 w-10 rounded-lg"
-                              src={item.image[0]}
+                              src={item.image}
                               alt="Product Image"
                             />
                             <div>

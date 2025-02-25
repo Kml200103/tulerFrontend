@@ -51,7 +51,7 @@ const AdminProfile = () => {
   }
 
   return (
-    <div className="container flex flex-col max-w-[954px] rounded-[30px]">
+    <div className="container flex flex-col max-w-[954px] rounded-[30px] my-20">
       <div className="flex flex-col items-start px-11 pt-7 pb-72 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-5 max-md:pb-24 max-md:max-w-full ">
         <div className="flex gap-2">
           <h1 className="text-3xl font-semibold leading-loose text-neutral-700">

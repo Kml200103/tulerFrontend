@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useCallback } from "react";
 import CardItem from "./CheckoutCardItem";
 import AddressForm from "../../components/AddressForm";
@@ -134,13 +132,11 @@ const Checkout = () => {
     const payload = {
       userId,
       addressId: selectedAddress._id, // Address ID from selected address
-      items: cartData?.items.map((item) => {
-        return {
-          variantId: item.variant._id,
-          productId: item.productId, // Ensure it's the correct product ID
-          quantity: item.quantity,
-        };
-      }),
+      items: cartData?.items.map((item) => ({
+        variantId: item.variant._id,
+        productId: item.productId, // Ensure it's the correct product ID
+        quantity: item.quantity,
+      })),
       totalPrice: discountedPrice ? discountedPrice : cartData.totalPrice,
       offerId: selectedOffer ? selectedOffer._id : null, // Include selected offer ID
     };
@@ -148,15 +144,18 @@ const Checkout = () => {
     try {
       const response = await post("/order/create", payload);
       if (response.receiveObj.status === true) {
-        NotificationService.sendSuccessMessage("Order placed successfully!");
-        navigate("/success-page", {
-          state: { orderId: response.receiveObj.orderId },
-        });
+        // NotificationService.sendSuccessMessage("Order placed successfully!");
+
+        // Redirect user to the Stripe checkout session
+        window.location.href = response.receiveObj.session;
+
+        // Clear saved offer after redirection
         localStorage.removeItem("savedOffer");
       } else {
         NotificationService.sendErrorMessage("Failed to place order");
       }
-    } catch {
+    } catch (error) {
+      console.error("Error placing order:", error);
       alert("Error placing order. Please try again.");
     }
   };

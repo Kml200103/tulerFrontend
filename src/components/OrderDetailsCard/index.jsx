@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { post } from "../../services/http/axiosApi";
+import ConfirmModal from "../ConfirmModal";
 
 export const OrderDetailsCard = ({ group }) => {
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   if (!group || !group.orders?.length)
     return <p className="text-gray-600">No orders found.</p>;
 
-  const cancelOrder = async (orderId) => {
+  const cancelOrder = async () => {
+    if (!selectedOrderId) return;
     const { receiveObj } = await post("/order/status", {
-      orderId: orderId,
+      orderId: selectedOrderId,
       status: "CANCEL",
     });
-    if (receiveObj.status == true) {
+
+    if (receiveObj.status === true) {
+      setOpenModal(false); // Close modal after successful cancellation
+      setSelectedOrderId(null); // Reset selected order
     }
   };
 
@@ -55,16 +62,26 @@ export const OrderDetailsCard = ({ group }) => {
             <span>${order.totalPrice}</span>
           </div>
 
-          {order.status == "PENDING" && (
+          {order.status === "PENDING" && (
             <button
               className="mt-4 text-red-500 text-sm font-semibold rounded-md hover:underline transition"
-              onClick={() => cancelOrder(order.orderId)}
+              onClick={() => {
+                setSelectedOrderId(order.orderId); // Set selected order
+                setOpenModal(true); // Open confirmation modal
+              }}
             >
               Cancel Order
             </button>
           )}
         </div>
       ))}
+      <ConfirmModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onConfirm={cancelOrder}
+        title="Cancel Order"
+        message="Are you sure you want to cancel this order? This action cannot be undone."
+      />
     </div>
   );
 };

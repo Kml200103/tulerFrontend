@@ -26,6 +26,7 @@ import SuccessOrderPage from "./pages/SuccessOrderPage";
 import Spin from "./pages/Spinwheel";
 import OfferManagement from "./pages/Offers";
 import ProductDescription from "./pages/ProductDescription";
+import PaymentSuccess from "./pages/Payment-Success";
 
 export default function App() {
   return (
@@ -258,6 +259,14 @@ export default function App() {
                   ) : (
                     <OfferManagement />
                   )}
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payment-success"
+              element={
+                <ProtectedRoute>
+                  <PaymentSuccess />
                 </ProtectedRoute>
               }
             />
