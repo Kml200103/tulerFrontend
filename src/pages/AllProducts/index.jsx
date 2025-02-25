@@ -37,8 +37,8 @@ const AllProducts = () => {
     defaultValues: {
       name: "",
       description: "",
-      images: null,
-      otherImages: [], // Initialize with an empty array for other images
+      coverImage: null,
+      images: [], // Initialize with an empty array for other images
       variants: [{ weight: "", price: null, quantity: null }],
       benefits: [""],
     },
@@ -97,7 +97,7 @@ const AllProducts = () => {
         setPreviewImages([e.target.result]); // Show the selected image preview
 
         // Update form value using setValue from RHF
-        setValue("images", file, { shouldValidate: true });
+        setValue("coverImage", file, { shouldValidate: true });
       };
       reader.readAsDataURL(file);
     }
@@ -111,19 +111,19 @@ const AllProducts = () => {
     const files = e.target.files;
     if (files && files.length > 0) {
       if (files.length > 5) {
-        setError("otherImages", {
+        setError("images", {
           type: "manual",
           message: "You can upload a maximum of 5 images.",
         });
         return;
       } else {
-        clearErrors("otherImages");
+        clearErrors("images");
       }
 
       const validTypes = ["image/jpeg", "image/png", "image/gif"];
       for (let i = 0; i < files.length; i++) {
         if (!validTypes.includes(files[i].type)) {
-          setError("otherImages", {
+          setError("images", {
             type: "manual",
             message: "Only JPEG, PNG, and GIF images are allowed.",
           });
@@ -175,7 +175,7 @@ const AllProducts = () => {
   const handleUpdateProduct = async (data) => {
     // Check if the cover image input is visible and no new image is selected
     if (showImageInput && (!data.images || data.images.length === 0)) {
-      setError("images", {
+      setError("coverImage", {
         type: "manual",
         message: "Please select a cover image to upload.",
       });
@@ -184,7 +184,7 @@ const AllProducts = () => {
 
     // Check for other images
     if (showOtherImageInput && previewOtherImages.length === 0) {
-      setError("otherImages", {
+      setError("images", {
         type: "manual",
         message: "Please select at least one other image to upload.",
       });
@@ -201,14 +201,14 @@ const AllProducts = () => {
     formData.append("productId", selectedProduct._id);
 
     // Append new cover image if uploaded
-    if (data.images && data.images.length > 0) {
-      formData.append("images", data.images[0]); // Main image
+    if (data.coverImage && data.coverImage.length > 0) {
+      formData.append("coverImage", data.coverImage[0]); // Main image
     }
 
     // Append new other images if uploaded
-    if (data.otherImages && data.otherImages.length > 0) {
-      Array.from(data.otherImages).forEach((file) => {
-        formData.append("otherImages", file);
+    if (data.images && data.images.length > 0) {
+      Array.from(data.images).forEach((file) => {
+        formData.append("images", file);
       });
     }
 
@@ -271,13 +271,14 @@ const AllProducts = () => {
         status: updatedStatus, // Send the new status in the payload
       };
 
-      const response = await post(`/product/disable/${product._id}`, payload); // Use product.id instead of id
+      const response = await post(`/product/disable/${product._id}`, payload); // Use product._id
 
       if (response.isSuccess) {
         // Update the product's disabled state in the local state
         setProducts((prevProducts) =>
-          prevProducts.map((p) =>
-            p.id === product.id ? { ...p, isDisabled: updatedStatus } : p
+          prevProducts.map(
+            (p) =>
+              p._id === product._id ? { ...p, isDisabled: updatedStatus } : p // Use p._id
           )
         );
 
@@ -335,8 +336,12 @@ const AllProducts = () => {
                 {currentProducts.map((product) => (
                   <tr
                     key={product._id}
-                    className={`border-b hover:bg-gray-50 transition ${
-                      product.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"
+                    className={`border-b transition ${
+                      product.isPermanentDeleted
+                        ? "bg-red-300 opacity-50 cursor-not-allowed" // Always red for permanently deleted
+                        : product.isDisabled
+                        ? "bg-gray-100 opacity-60"
+                        : "bg-white hover:bg-gray-50" // Normal hover effect for other products
                     }`}
                   >
                     <td className="px-4 py-3 border-b text-center">
@@ -344,13 +349,19 @@ const AllProducts = () => {
                         src={product.images}
                         alt="Product"
                         className={`w-20 h-20 object-cover rounded-lg border ${
-                          product.isDisabled ? "opacity-50" : ""
+                          product.isPermanentDeleted || product.isDisabled
+                            ? "opacity-50"
+                            : ""
                         }`}
                       />
                     </td>
                     <td
                       className={`px-4 py-3 border-b font-semibold ${
-                        product.isDisabled ? "text-gray-400" : "text-gray-900"
+                        product.isPermanentDeleted
+                          ? "text-gray-500"
+                          : product.isDisabled
+                          ? "text-gray-400"
+                          : "text-gray-900"
                       }`}
                     >
                       {product.name}
@@ -374,22 +385,26 @@ const AllProducts = () => {
                         <button
                           onClick={() => handleOpenModal(product)}
                           className={`p-2 rounded-lg transition ${
-                            product.isDisabled
+                            product.isPermanentDeleted || product.isDisabled
                               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                               : "bg-gray-200 hover:bg-gray-300"
                           }`}
-                          disabled={product.isDisabled}
+                          disabled={
+                            product.isPermanentDeleted || product.isDisabled
+                          }
                         >
                           <PencilIcon className="h-6 w-6" />
                         </button>
                         <button
                           onClick={() => handleDeleteProduct(product)}
                           className={`p-2 rounded-lg transition ${
-                            product.isDisabled
+                            product.isPermanentDeleted || product.isDisabled
                               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                               : "bg-red-200 hover:bg-red-300"
                           }`}
-                          disabled={product.isDisabled}
+                          disabled={
+                            product.isPermanentDeleted || product.isDisabled
+                          }
                         >
                           <TrashIcon className="h-6 w-6" />
                         </button>
@@ -403,6 +418,7 @@ const AllProducts = () => {
                             checked={product.isDisabled}
                             onChange={() => handleToggle(product)}
                             className="sr-only"
+                            disabled={product.isPermanentDeleted} // Disable checkbox if product is permanently deleted
                           />
                           <div
                             className={`block w-14 h-8 rounded-full transition-colors duration-300 ${
@@ -544,7 +560,6 @@ const AllProducts = () => {
                       </div>
                     </div>
 
-                    {/* Images */}
                     <div>
                       <label
                         htmlFor="images"
@@ -566,7 +581,10 @@ const AllProducts = () => {
                         {!showImageInput ? (
                           <button
                             type="button"
-                            onClick={() => setShowImageInput(true)} // Show file input
+                            onClick={() => {
+                              setShowImageInput(true);
+                              setPreviewImages([]); // Reset preview images when showing input
+                            }} // Show file input
                             className="mt-2 inline-flex items-center justify-center rounded-md bg-yellow-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
                           >
                             Update Cover Image
@@ -574,7 +592,10 @@ const AllProducts = () => {
                         ) : (
                           <button
                             type="button"
-                            onClick={() => setShowImageInput(false)} // Hide file input
+                            onClick={() => {
+                              setShowImageInput(false); // Hide file input
+                              setPreviewImages([]); // Reset preview images when canceling
+                            }}
                             className="mt-2 inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                           >
                             Cancel
@@ -585,7 +606,7 @@ const AllProducts = () => {
                         <input
                           type="file"
                           accept="image/jpeg, image/png, image/gif"
-                          {...register("images", {
+                          {...register("coverImage", {
                             required: "Cover image is required", // Make it required if needed
                             validate: {
                               validateFiles: (files) => {
@@ -611,9 +632,9 @@ const AllProducts = () => {
                         />
                       )}
 
-                      {errors.images && (
+                      {errors.coverImage && (
                         <p className="text-red-600 text-sm mt-2">
-                          {errors.images.message}
+                          {errors.coverImage.message}
                         </p>
                       )}
 
@@ -649,7 +670,10 @@ const AllProducts = () => {
                         {!showOtherImageInput ? (
                           <button
                             type="button"
-                            onClick={() => setShowOtherImageInput(true)}
+                            onClick={() => {
+                              setShowOtherImageInput(true);
+                              setPreviewOtherImages([]); // Reset preview images when showing input
+                            }}
                             className="mt-2 inline-flex items-center justify-center rounded-md bg-yellow-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
                           >
                             Update Images
@@ -659,7 +683,8 @@ const AllProducts = () => {
                             type="button"
                             onClick={() => {
                               setShowOtherImageInput(false);
-                              clearErrors("otherImages"); // Clear error when hiding input
+                              clearErrors("images"); // Clear error when hiding input
+                              setPreviewOtherImages([]); // Reset preview images when canceling
                             }}
                             className="mt-2 text-red-600 hover:underline"
                           >
@@ -674,7 +699,7 @@ const AllProducts = () => {
                           type="file"
                           multiple
                           accept="image/jpeg, image/png, image/gif"
-                          {...register("otherImages", {
+                          {...register("images", {
                             validate: {
                               maxFiles: (files) => {
                                 if (files.length > 5) {
@@ -703,9 +728,9 @@ const AllProducts = () => {
                       )}
 
                       {/* Error Messages */}
-                      {errors.otherImages && (
+                      {errors.images && (
                         <p className="text-red-600 text-sm mt-2">
-                          {errors.otherImages.message}
+                          {errors.images.message}
                         </p>
                       )}
 
