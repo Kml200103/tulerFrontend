@@ -190,23 +190,35 @@ const AdminOrders = () => {
                         </td>
                         <td className="py-3 px-0 text-center">
                           {editableOrderId === order?.orderId ? (
-                            <select
-                              value={newStatus}
-                              onChange={(e) =>
-                                handleStatusChange(e, order.orderId)
-                              }
-                            >
-                              <option value="PENDING">PENDING</option>
-                              <option value="COMPLETED">COMPLETED</option>
-                              {/* <option value="CANCELLED">CANCELLED</option> */}
-                            </select>
+                            // Check if the order status is not CANCELLED or COMPLETED
+                            order.status !== "CANCELLED" &&
+                            order.status !== "COMPLETED" ? (
+                              <select
+                                value={newStatus}
+                                onChange={(e) =>
+                                  handleStatusChange(e, order.orderId)
+                                }
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                {/* <option value="CANCELLED">CANCELLED</option> */}
+                              </select>
+                            ) : (
+                              <span
+                                className={`${chooseColor(
+                                  order.status
+                                )} py-1 px-3 rounded-full text-xs`}
+                              >
+                                {order.status.toUpperCase()}
+                              </span>
+                            )
                           ) : (
                             <span
                               className={`${chooseColor(
                                 order.status
                               )} py-1 px-3 rounded-full text-xs`}
                             >
-                              {order?.status.toUpperCase()}
+                              {order.status.toUpperCase()}
                             </span>
                           )}
                         </td>

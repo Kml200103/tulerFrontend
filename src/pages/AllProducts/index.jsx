@@ -4,6 +4,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { useForm, useFieldArray } from "react-hook-form";
 import Pagination from "../../components/Pagination";
+import { NotificationService } from "../../services/Notifcation";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
@@ -103,8 +104,8 @@ const AllProducts = () => {
   };
 
   useEffect(() => {
-    getProducts();
-  }, []);
+    getProducts(); // Fetch products whenever currentPage or pageSize changes
+  }, [currentPage, pageSize]); // Add dependencies here
 
   const handleOtherImagePreview = (e) => {
     const files = e.target.files;
@@ -262,38 +263,71 @@ const AllProducts = () => {
     }
     return description;
   };
+  const handleToggle = async (product) => {
+    try {
+      const updatedStatus = !product.isDisabled; // Toggle the current status
 
+      const payload = {
+        status: updatedStatus, // Send the new status in the payload
+      };
+
+      const response = await post(`/product/disable/${product._id}`, payload); // Use product.id instead of id
+
+      if (response.isSuccess) {
+        // Update the product's disabled state in the local state
+        setProducts((prevProducts) =>
+          prevProducts.map((p) =>
+            p.id === product.id ? { ...p, isDisabled: updatedStatus } : p
+          )
+        );
+
+        // Show different notifications based on the new status
+        if (updatedStatus) {
+          NotificationService.sendSuccessMessage(
+            "Product disabled successfully."
+          );
+        } else {
+          NotificationService.sendSuccessMessage(
+            "Product enabled successfully."
+          );
+        }
+      } else {
+        NotificationService.sendErrorMessage(
+          "Failed to update product status."
+        );
+      }
+    } catch (error) {
+      NotificationService.sendErrorMessage(
+        "An error occurred while updating status."
+      );
+    }
+  };
   return (
     <>
-      <div className="container mx-auto p-6 min-h-screen">
-        <div className="flex justify-center mb-4">
+      <div className="w-full px-6 py-6 min-h-screen flex flex-col">
+        {/* Search Input */}
+        <div className="flex justify-center mb-6">
           <input
             type="text"
-            className="w-1/2 p-2 pl-3 py-4 text-md text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-            placeholder="Search Products here...."
+            className="w-2/3 max-w-4xl p-3 text-lg text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            placeholder="Search Products here..."
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
-        <div className="relative overflow-x-auto pt-[72px] md:pt-[96px]">
+        {/* Main Content Wrapper - Makes Table Expand */}
+        <div className="flex-grow relative overflow-x-auto">
           {currentProducts.length > 0 ? (
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <table className="w-full table-fixed text-md text-left text-gray-700">
               <thead>
-                <tr className="bg-gray-100">
-                  <th scope="col" className="px-6 py-3 border-b">
-                    Image
-                  </th>
-                  <th scope="col" className="px-6 py-3 border-b w-1/4">
-                    Name
-                  </th>
-                  <th scope="col" className="px-6 py-3 border-b">
-                    Description
-                  </th>
-                  <th scope="col" className="px-6 py-3 border-b">
-                    Variants
-                  </th>
-                  <th scope="col" className="px-6 py-3 border-b">
-                    Actions
+                <tr className="bg-gray-100 text-gray-900">
+                  <th className="px-4 py-3 border-b w-1/6">Image</th>
+                  <th className="px-4 py-3 border-b w-1/4">Name</th>
+                  <th className="px-4 py-3 border-b w-1/3">Description</th>
+                  <th className="px-4 py-3 border-b w-1/4">Variants</th>
+                  <th className="px-4 py-3 border-b w-1/6">Actions</th>
+                  <th className="px-4 py-3 border-b w-1/6 text-center">
+                    Status
                   </th>
                 </tr>
               </thead>
@@ -301,44 +335,87 @@ const AllProducts = () => {
                 {currentProducts.map((product) => (
                   <tr
                     key={product._id}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                    className={`border-b hover:bg-gray-50 transition ${
+                      product.isDisabled ? "bg-gray-100 opacity-60" : "bg-white"
+                    }`}
                   >
-                    <td className="px-6 py-4 border-b">
+                    <td className="px-4 py-3 border-b text-center">
                       <img
-                        src={product.images} // Display the first image
-                        height={50}
-                        width={50}
-                        alt="Product Image"
-                        className="rounded-lg"
+                        src={product.images}
+                        alt="Product"
+                        className={`w-20 h-20 object-cover rounded-lg border ${
+                          product.isDisabled ? "opacity-50" : ""
+                        }`}
                       />
                     </td>
-                    <td className="px-6 py-4 border-b">{product.name}</td>
-                    <td className="px-6 py-4 text-center border-b">
-                      {trimDescription(product.description, 50)}{" "}
-                      {/* Trimmed description */}
+                    <td
+                      className={`px-4 py-3 border-b font-semibold ${
+                        product.isDisabled ? "text-gray-400" : "text-gray-900"
+                      }`}
+                    >
+                      {product.name}
                     </td>
-                    <td className="px-6 py-4 text-center border-b">
+                    <td className="px-4 py-3 border-b">
+                      {trimDescription(product.description, 100)}
+                    </td>
+                    <td className="px-4 py-3 border-b text-center">
                       {product.variants.map((variant) => (
-                        <div key={variant._id}>
-                          {variant.weight} - ${variant.price} (Qty:{" "}
-                          {variant.quantity})
+                        <div key={variant._id} className="py-1">
+                          {variant.weight} -{" "}
+                          <span className="font-semibold">
+                            ${variant.price}
+                          </span>{" "}
+                          (Qty: {variant.quantity})
                         </div>
                       ))}
                     </td>
-                    <td className="px-6 py-4 flex items-center">
-                      <button
-                        type="button"
-                        className="text-white p-2 rounded-lg flex items-center justify-center"
-                        onClick={() => handleOpenModal(product)}
-                      >
-                        <PencilIcon className="h-6 w-6 text-gray-500" />
-                      </button>
-                      <button
-                        className="bg-white font-bold rounded-full p-2 flex items-center justify-center mr-2"
-                        onClick={() => handleDeleteProduct(product)} // Call the delete function
-                      >
-                        <TrashIcon className="h-6 w-6 text-gray-500" />
-                      </button>
+                    <td className="px-4 py-3 border-b text-center">
+                      <div className="flex justify-center space-x-2">
+                        <button
+                          onClick={() => handleOpenModal(product)}
+                          className={`p-2 rounded-lg transition ${
+                            product.isDisabled
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : "bg-gray-200 hover:bg-gray-300"
+                          }`}
+                          disabled={product.isDisabled}
+                        >
+                          <PencilIcon className="h-6 w-6" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product)}
+                          className={`p-2 rounded-lg transition ${
+                            product.isDisabled
+                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              : "bg-red-200 hover:bg-red-300"
+                          }`}
+                          disabled={product.isDisabled}
+                        >
+                          <TrashIcon className="h-6 w-6" />
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <label className="flex cursor-pointer items-center">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={product.isDisabled}
+                            onChange={() => handleToggle(product)}
+                            className="sr-only"
+                          />
+                          <div
+                            className={`block w-14 h-8 rounded-full transition-colors duration-300 ${
+                              product.isDisabled ? "bg-blue-600" : "bg-gray-200"
+                            }`}
+                          ></div>
+                          <div
+                            className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              product.isDisabled ? "translate-x-6" : ""
+                            }`}
+                          ></div>
+                        </div>
+                      </label>
                     </td>
                   </tr>
                 ))}
@@ -351,15 +428,18 @@ const AllProducts = () => {
           )}
         </div>
 
-        {/* Pagination Component */}
-        <Pagination
-          totalItems={filteredProducts.length}
-          itemsPerPage={pageSize}
-          onPageChange={setCurrentPage}
-          setPageSize={setPageSize}
-          currentPage={currentPage}
-        />
+        {/* Pagination at the Bottom of the Page */}
+        <div className="mt-auto py-6">
+          <Pagination
+            totalItems={currentProducts.length}
+            itemsPerPage={pageSize}
+            onPageChange={setCurrentPage}
+            setPageSize={setPageSize}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
+
       {isModalOpen && (
         <Dialog
           open={isModalOpen}
@@ -370,6 +450,25 @@ const AllProducts = () => {
           <div className="flex items-center justify-center fixed inset-0 z-50">
             <DialogPanel className="relative transform overflow-scroll rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[85vh]">
               <div className="bg-gray-50 px-6 py-8 sm:px-10">
+                <button
+                  onClick={handleCloseModal}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition duration-300 ease-in-out"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
                 <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
                   Update Product
                 </h1>
@@ -420,6 +519,7 @@ const AllProducts = () => {
                       <div className="mt-2">
                         <textarea
                           id="description"
+                          maxLength={150}
                           {...register("description", {
                             required: "Description is required",
                             validate: {
@@ -782,13 +882,6 @@ const AllProducts = () => {
 
                     {/* Submit Button */}
                     <div className="mt-6 flex justify-end space-x-4">
-                      <button
-                        type="button"
-                        onClick={handleCloseModal}
-                        className="inline-flex justify-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-300"
-                      >
-                        Cancel
-                      </button>
                       <button
                         type="submit"
                         className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"

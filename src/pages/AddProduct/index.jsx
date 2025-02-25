@@ -314,15 +314,14 @@ const ProductPage = () => {
               <div className="mt-2">
                 <textarea
                   id="description"
-                  maxLength={150}
+                  maxLength={230}
                   {...register("description", {
                     required: "Description is required",
                     validate: {
                       minLength: (value) => {
-                        const trimmedValue = value.replace(/\s/g, ""); // Remove spaces
                         return (
-                          trimmedValue.length >= 10 ||
-                          "Description must be at least 10 characters long"
+                          value.length >= 230 ||
+                          "Description must be at least 230 characters long"
                         );
                       },
                     },
