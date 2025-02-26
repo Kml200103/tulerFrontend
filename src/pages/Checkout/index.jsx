@@ -55,7 +55,11 @@ const Checkout = () => {
   const fetchCartData = useCallback(async () => {
     if (!userId) return;
     try {
-      const { receiveObj } = await get(`/cart/${userId}`);
+      const { receiveObj } = await get(
+        `/cart/${userId}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
     } catch (err) {
       console.error("Error fetching cart data:", err);
@@ -65,7 +69,11 @@ const Checkout = () => {
   const fetchAddresses = useCallback(async () => {
     if (!userId) return;
     try {
-      const { receiveObj } = await get(`/address/${userId}`);
+      const { receiveObj } = await get(
+        `/address/${userId}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       const addresses = receiveObj.addresses || [];
       setPreviousAddresses(addresses);
       // Don't set a default selected address
@@ -75,7 +83,11 @@ const Checkout = () => {
     }
   }, [userId]);
   const fetchAvailableOffers = useCallback(async () => {
-    const { receiveObj } = await get("/offer");
+    const { receiveObj } = await get(
+      "/offer",
+      {},
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     setAvailableOffers(receiveObj.offers);
     const savedOffer = JSON.parse(localStorage.getItem("savedOffer"));
     if (savedOffer) {
