@@ -9,7 +9,7 @@ const PaymentSuccess = () => {
   const queryParams = new URLSearchParams(location.search);
   const sessionId = queryParams.get("session_id");
   const orderId = queryParams.get("order_id");
-  console.log(orderId);
+  // console.log(orderId);
 
   const [orderDetails, setOrderDetails] = useState(null);
   const [paymentFailed, setPaymentFailed] = useState(false);

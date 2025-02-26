@@ -19,7 +19,7 @@ function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
     if (!userId) {
-      console.log("product", product);
+      // console.log("product", product);
       // NotificationService.sendErrorMessage("Please Login First");
       const payload = {
         variant: { weight: selectedVariant.weight },
@@ -55,7 +55,7 @@ function ProductCard({ product }) {
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
-      console.log("Cart API Response:", response);
+      // console.log("Cart API Response:", response);
 
       if (response.receiveObj) {
         NotificationService.sendSuccessMessage(response.receiveObj.message);
@@ -72,7 +72,7 @@ function ProductCard({ product }) {
     // Get the product name and format it for the URL
     const productName = product.name.trim().replace(/\s+/g, "-"); // Replace spaces with hyphens
     const productId = product._id;
-    console.log(productName);
+    // console.log(productName);
     navigate(`/product/description/${productName}/${productId}`); // Navigate to the product description page
   };
 

@@ -48,14 +48,18 @@ const ProductDescription = () => {
 
     try {
       if (userId) {
-        const response = await post("/cart/add", {
-          userId,
-          productId: product._id,
-          weight: selectedVariant.weight,
-          quantity: 1,
-          price: selectedVariant.price,
-          variantId: selectedVariant._id,
-        });
+        const response = await post(
+          "/cart/add",
+          {
+            userId,
+            productId: product._id,
+            weight: selectedVariant.weight,
+            quantity: 1,
+            price: selectedVariant.price,
+            variantId: selectedVariant._id,
+          },
+          { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+        );
         if (response.receiveObj) {
           NotificationService.sendSuccessMessage(response.receiveObj.message);
         } else {
@@ -63,7 +67,7 @@ const ProductDescription = () => {
         }
       }
 
-      console.log("selectedVariant", selectedVariant);
+      // console.log("selectedVariant", selectedVariant);
     } catch (error) {
       console.error("Error adding product to cart:", error);
       alert("Error adding product to cart.");

@@ -22,7 +22,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
-  console.log(user);
+  // console.log(user);
 
   const {
     handleSubmit,
@@ -110,7 +110,7 @@ const Checkout = () => {
         {},
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
-      console.log(receiveObj);
+      // console.log(receiveObj);
 
       // After successfully removing the address
       setPreviousAddresses((prevAddresses) =>
@@ -182,16 +182,16 @@ const Checkout = () => {
   };
 
   const placeOrder = async () => {
-    console.log("selected", selectedAddress);
+    // ("selectconsole.loged", selectedAddress);
 
     if (!selectedAddress) {
       NotificationService.sendErrorMessage("Please add address details");
       return; // Prevent order placement if no address is selected
     }
 
-    console.log("User ID:", userId);
-    console.log("Selected Address:", selectedAddress);
-    console.log("Cart Items:", cartData.items);
+    // console.log("User ID:", userId);
+    // console.log("Selected Address:", selectedAddress);
+    // console.log("Cart Items:", cartData.items);
 
     if (!userId || cartData.items.length === 0) {
       NotificationService.sendErrorMessage(
@@ -218,13 +218,13 @@ const Checkout = () => {
       quantity: item.quantity,
     }));
 
-    console.log("Payload:", payload);
+    // console.log("Payload:", payload);
 
     try {
       const response = await post("/order/create", payload, {
         Authorization: `Bearer ${localStorage.getItem("userToken")}`,
       });
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
       if (response.receiveObj.status) {
         window.location.href = response.receiveObj.session;
         localStorage.removeItem("savedOffer");
@@ -253,7 +253,7 @@ const Checkout = () => {
     };
 
     // Log the payload for debugging
-    console.log(payload);
+    // console.log(payload);
 
     // Construct the endpoint based on whether an ID is present
     const endpoint = data.id

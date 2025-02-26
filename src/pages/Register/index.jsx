@@ -57,7 +57,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     if (validatePassword(data.password)) {
-      console.log(data);
+      // console.log(data);
       try {
         const res = await registerUser(data);
         if (res.data.success) {
@@ -261,25 +261,37 @@ const Register = () => {
         <span className="text-yellow-400">policy</span>
       </div>
 
-      <form className="mt-5 w-full px-4 sm:px-6 md:px-8" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="mt-5 w-full px-4 sm:px-6 md:px-8"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         {/* Name Input */}
         <div className="mt-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Name
           </label>
           <input
             id="name"
             type="text"
             {...register("name", { required: "Name is required" })}
-            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${errors.name ? "border-red-400" : "border-gray-300"
-              } text-neutral-700 focus:ring focus:ring-yellow-300`}
+            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${
+              errors.name ? "border-red-400" : "border-gray-300"
+            } text-neutral-700 focus:ring focus:ring-yellow-300`}
           />
-          {errors.name && <p className="text-red-400 text-sm mt-2">*{errors.name.message}</p>}
+          {errors.name && (
+            <p className="text-red-400 text-sm mt-2">*{errors.name.message}</p>
+          )}
         </div>
 
         {/* Email Input */}
         <div className="mt-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700"
+          >
             Email
           </label>
           <input
@@ -289,15 +301,21 @@ const Register = () => {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email format" },
             })}
-            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${errors.email ? "border-red-400" : "border-gray-300"
-              } text-neutral-700 focus:ring focus:ring-yellow-300`}
+            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${
+              errors.email ? "border-red-400" : "border-gray-300"
+            } text-neutral-700 focus:ring focus:ring-yellow-300`}
           />
-          {errors.email && <p className="text-red-400 text-sm mt-2">*{errors.email.message}</p>}
+          {errors.email && (
+            <p className="text-red-400 text-sm mt-2">*{errors.email.message}</p>
+          )}
         </div>
 
         {/* Phone Number Input */}
         <div className="mt-4">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
             Phone Number
           </label>
           <input
@@ -311,16 +329,22 @@ const Register = () => {
                 message: "Must be 10 digits and start with 6-9.",
               },
             })}
-            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${errors.phone ? "border-red-400" : "border-gray-300"
-              } text-neutral-700 focus:ring focus:ring-yellow-300`}
+            className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${
+              errors.phone ? "border-red-400" : "border-gray-300"
+            } text-neutral-700 focus:ring focus:ring-yellow-300`}
           />
-          {errors.phone && <p className="text-red-400 text-sm mt-2">*{errors.phone.message}</p>}
+          {errors.phone && (
+            <p className="text-red-400 text-sm mt-2">*{errors.phone.message}</p>
+          )}
         </div>
 
         {/* Password Input */}
         <div className="mt-4 relative">
           <div className="flex justify-between items-center">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <a href="#" className="text-xs text-red-400">
@@ -332,8 +356,9 @@ const Register = () => {
               id="password"
               type={showPassword ? "text" : "password"}
               {...register("password", { required: "Password is required" })}
-              className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${errors.password ? "border-red-400" : "border-gray-300"
-                } text-neutral-700 focus:ring focus:ring-yellow-300`}
+              className={`px-2.5 py-4 mt-3 w-full text-md bg-white rounded-lg border ${
+                errors.password ? "border-red-400" : "border-gray-300"
+              } text-neutral-700 focus:ring focus:ring-yellow-300`}
             />
             <button
               type="button"
@@ -363,7 +388,11 @@ const Register = () => {
               )}
             </button>
           </div>
-          {errors.password && <p className="text-red-400 text-sm mt-2">*{errors.password.message}</p>}
+          {errors.password && (
+            <p className="text-red-400 text-sm mt-2">
+              *{errors.password.message}
+            </p>
+          )}
         </div>
 
         {/* Submit Button */}
@@ -377,13 +406,15 @@ const Register = () => {
         {/* Login Link */}
         <p className="mt-4 text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link to="/login" className="text-yellow-400 font-medium hover:underline">
+          <Link
+            to="/login"
+            className="text-yellow-400 font-medium hover:underline"
+          >
             Login here
           </Link>
         </p>
       </form>
     </div>
-
   );
 };
 

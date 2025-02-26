@@ -27,7 +27,7 @@ export default function Cart({ onClose }) {
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
-      console.log("Cart API Response Data:", receiveObj);
+      // console.log("Cart API Response Data:", receiveObj);
 
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
     } catch (error) {
@@ -39,14 +39,14 @@ export default function Cart({ onClose }) {
     fetchCartData();
   }, []);
 
-  console.log("cartData", cartData);
+  // console.log("cartData", cartData);
   // Update quantity and refresh cart
   const updateQuantity = useCallback(
     async (productId, weight, change) => {
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
-      console.log("productId :>> ", productId);
+      // console.log("productId :>> ", productId);
       // Get current quantity from cartData instead of local state
       const currentItem = cartData?.items?.find(
         (item) => item.productId === productId && item.variant.weight === weight
@@ -172,7 +172,7 @@ export default function Cart({ onClose }) {
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
           cartData?.items?.map((item) => {
-            console.log("item :>> ", item);
+            // console.log("item :>> ", item);
             return (
               <div
                 key={item._id}

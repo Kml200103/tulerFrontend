@@ -120,7 +120,7 @@ const ProductPage = () => {
       { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
     );
 
-    console.log("Add Category Response:", result); // Debugging
+    // console.log("Add Category Response:", result); // Debugging
 
     if (result.isSuccess && result.receiveObj) {
       setIsCategoryDialogOpen(false);
@@ -166,10 +166,10 @@ const ProductPage = () => {
       {},
       { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
     );
-    console.log(result);
+    // console.log(result);
 
     if (result.isSuccess) {
-      console.log("categoroes", categories);
+      // console.log("categoroes", categories);
 
       setCategories(result.receiveObj.categories);
     } else {
@@ -178,8 +178,8 @@ const ProductPage = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form Data:", data); // Log the entire form data
-    console.log("Selected Category ID:", data.categoryId); // Log the category ID
+    // console.log("Form Data:", data); // Log the entire form data
+    // console.log("Selected Category ID:", data.categoryId); // Log the category ID
     const formData = new FormData();
 
     formData.append("name", data.name);
@@ -213,7 +213,7 @@ const ProductPage = () => {
     benefits.forEach((benefit, index) => {
       formData.append(`benefits[${index}]`, benefit);
     });
-    console.log("formData", formData);
+    // console.log("formData", formData);
     try {
       const result = await post(
         "/product",
@@ -225,7 +225,7 @@ const ProductPage = () => {
       );
 
       if (result.isSuccess) {
-        console.log("Product saved successfully:", result.receiveObj);
+        // console.log("Product saved successfully:", result.receiveObj);
         NotificationService.sendSuccessMessage("Product saved successfully!");
 
         reset();

@@ -13,7 +13,7 @@ export default function Header({ toggleSearchInput }) {
   const navigate = useNavigate(); // Access navigate function
   const { isLoggedIn, user } = useSelector((state) => state.auth);
   const isAdmin = isLoggedIn && user?.role === "admin"; // Added optional chaining
-  console.log(isAdmin);
+  // console.log  (isAdmin);
 
   const [menuOpen, setMenuOpen] = useState(false);
 
