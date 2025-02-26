@@ -10,7 +10,7 @@ function ProductCard({ product }) {
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
   const navigate = useNavigate(); // Call useNavigate to get the navigate function
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const handleVariantChange = (event) => {
     const selectedId = event.target.value;
     const variant = product.variants.find((v) => v._id === selectedId);
@@ -19,7 +19,7 @@ function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
     if (!userId) {
-      console.log('product', product)
+      console.log("product", product);
       // NotificationService.sendErrorMessage("Please Login First");
       const payload = {
         variant: { weight: selectedVariant.weight },
@@ -29,9 +29,9 @@ function ProductCard({ product }) {
         totalPrice: selectedVariant.price,
         images: product.images,
         quantity: 1,
-        productName: product.name
-      }
-      dispatch(addToCart(payload))
+        productName: product.name,
+      };
+      dispatch(addToCart(payload));
       return;
     }
     if (!selectedVariant) {
@@ -41,17 +41,19 @@ function ProductCard({ product }) {
       return;
     }
 
-
-
     try {
-      const response = await post("/cart/add", {
-        userId,
-        productId: product._id, // Ensure this is defined
-        variantId: selectedVariant._id,
-        weight: selectedVariant.weight,
-        quantity: 1,
-        price: selectedVariant.price,
-      });
+      const response = await post(
+        "/cart/add",
+        {
+          userId,
+          productId: product._id, // Ensure this is defined
+          variantId: selectedVariant._id,
+          weight: selectedVariant.weight,
+          quantity: 1,
+          price: selectedVariant.price,
+        },
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       console.log("Cart API Response:", response);
 
@@ -105,11 +107,11 @@ function ProductCard({ product }) {
         className="flex gap-3.5 px-6 py-2.5 mt-9 text-xl text-white bg-black rounded-3xl max-md:px-5"
       >
         <img
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
-                    alt="Cart icon"
-                    className="object-contain shrink-0 aspect-[1.04] w-[26px]"
-                  />
-                  Add to cart
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
+          alt="Cart icon"
+          className="object-contain shrink-0 aspect-[1.04] w-[26px]"
+        />
+        Add to cart
       </button>
     </div>
   );

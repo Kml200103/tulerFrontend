@@ -28,7 +28,9 @@ const ProfileUpdateDialog = ({ onClose }) => {
   const onSubmit = async (data) => {
     const payload = { ...data, id };
 
-    const { receiveObj } = await post("/registerUpdate", payload);
+    const { receiveObj } = await post("/registerUpdate", payload, {
+      Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+    });
     if (receiveObj.success === true) {
       refetch();
 
