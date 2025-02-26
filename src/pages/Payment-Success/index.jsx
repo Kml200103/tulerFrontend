@@ -26,7 +26,11 @@ const PaymentSuccess = () => {
   // Fetch session details
   const getSessionStatus = async () => {
     try {
-      const { receiveObj } = await get(`/order/checkSession/${sessionId}`);
+      const { receiveObj } = await get(
+        `/order/checkSession/${sessionId}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       if (receiveObj.success) {
         setOrderDetails(receiveObj);

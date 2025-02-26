@@ -16,7 +16,9 @@ const MyOrders = () => {
     if (!userId) return;
     try {
       const response = await get(
-        `/order/allOrders/${userId}?page=${currentPage}&pageSize=${itemsPerPage}`
+        `/order/allOrders/${userId}?page=${currentPage}&pageSize=${itemsPerPage}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
       // If no orders exist (status: false)
