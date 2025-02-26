@@ -30,7 +30,7 @@ const StickyVideo = () => {
         className={`w-auto h-40 cursor-pointer`} // Fixed height for simplicity
         onClick={handleVideoClick}
         controls // Optional: Add controls for better user experience
-        loop 
+        loop
       />
       <button
         onClick={handleClose}

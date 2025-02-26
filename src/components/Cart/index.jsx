@@ -3,7 +3,6 @@ import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have
 import { useSelector } from "react-redux";
 import { Link } from "react-router"; // Fixed import for react-router-dom
 
-
 export default function Cart({ onClose }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -13,16 +12,20 @@ export default function Cart({ onClose }) {
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
 
-  const cart = useSelector((state) => state?.cart)
-  
+  const cart = useSelector((state) => state?.cart);
+
   // Fetch Cart Data
   const fetchCartData = useCallback(async () => {
-    if (!id) { 
-      setCartData(cart) 
-      return
+    if (!id) {
+      setCartData(cart);
+      return;
     }
     try {
-      const { receiveObj } = await get(`/cart/${id}`);
+      const { receiveObj } = await get(
+        `/cart/${id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       console.log("Cart API Response Data:", receiveObj);
 
@@ -36,8 +39,7 @@ export default function Cart({ onClose }) {
     fetchCartData();
   }, []);
 
-
-  console.log('cartData', cartData)
+  console.log("cartData", cartData);
   // Update quantity and refresh cart
   const updateQuantity = useCallback(
     async (productId, weight, change) => {
@@ -59,13 +61,19 @@ export default function Cart({ onClose }) {
       const newQuantity = Math.max(currentItem.quantity + change, 1);
 
       try {
-        await put("/cart/update", {
-          userId: id,
-          productId,
-          weight,
-          quantity: newQuantity, // Send updated quantity to API
-        });
-
+        const { receiveObj } = await put(
+          "/cart/update",
+          {
+            userId: id,
+            productId,
+            weight,
+            quantity: newQuantity, // Send updated quantity to API
+          },
+          { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+        );
+        if (receiveObj.status === 401) {
+          NotificationService.sendErrorMessage(receiveObj.message);
+        }
         // Refresh cart after update
         await fetchCartData();
       } catch (error) {
@@ -83,12 +91,18 @@ export default function Cart({ onClose }) {
       setUpdating(true);
 
       try {
-        await del("/cart/remove", {
-          userId: id,
-          productId,
-          weight,
-        });
-
+        const { receiveObj } = await del(
+          "/cart/remove",
+          {
+            userId: id,
+            productId,
+            weight,
+          },
+          { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+        );
+        if (receiveObj.status === 401) {
+          NotificationService.sendErrorMessage(receiveObj.message);
+        }
         await fetchCartData();
       } catch (error) {
         console.error("Error removing item from cart:", error);
@@ -103,7 +117,14 @@ export default function Cart({ onClose }) {
     if (!id) return;
     setUpdating(true);
     try {
-      await del(`/cart/clear/${id}`);
+      const { receiveObj } = await del(
+        `/cart/clear/${id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
+      if (receiveObj.status === 401) {
+        NotificationService.sendErrorMessage(receiveObj.message);
+      }
       setCartData({ items: [], totalPrice: 0 });
     } catch (error) {
       console.error("Error clearing cart:", error);
@@ -114,8 +135,9 @@ export default function Cart({ onClose }) {
 
   return (
     <div
-      className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${isCartOpen ? "open" : "closed"
-        } ${isFadingOut ? "fade-out" : ""}`}
+      className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${
+        isCartOpen ? "open" : "closed"
+      } ${isFadingOut ? "fade-out" : ""}`}
     >
       <div className="flex items-center justify-between">
         <img

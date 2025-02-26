@@ -23,7 +23,11 @@ const OfferManagement = () => {
 
   const fetchOffers = useCallback(async () => {
     try {
-      const { receiveObj } = await get("/offer");
+      const { receiveObj } = await get(
+        "/offer",
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       setOffers(receiveObj?.offers || []);
     } catch (error) {
       console.error("Error fetching offers:", error);
@@ -34,14 +38,18 @@ const OfferManagement = () => {
   const onSubmit = async (data) => {
     try {
       if (isEdit && selectedOffer) {
-        const { receiveObj } = await post(`/offer/${selectedOffer._id}`, data);
+        const { receiveObj } = await post(`/offer/${selectedOffer._id}`, data, {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        });
         setOffers((prevOffers) =>
           prevOffers.map((offer) =>
             offer._id === selectedOffer._id ? receiveObj?.offer : offer
           )
         );
       } else {
-        const { receiveObj } = await post("/offer/add", data);
+        const { receiveObj } = await post("/offer/add", data, {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        });
         setOffers((prevOffers) => [...prevOffers, receiveObj.offer]);
       }
       resetForm();
@@ -53,7 +61,11 @@ const OfferManagement = () => {
   // Delete Offer
   const handleDeleteOffer = async (offerId) => {
     try {
-      await del(`/offer/${offerId}`);
+      await del(
+        `/offer/${offerId}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       setOffers((prevOffers) =>
         prevOffers.filter((offer) => offer._id !== offerId)
       );

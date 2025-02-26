@@ -73,7 +73,9 @@ const AdminOrders = () => {
   const getAdminOrders = async () => {
     try {
       const response = await get(
-        `/order/all?page=${currentPage}&pageSize=${pageSize}`
+        `/order/all?page=${currentPage}&pageSize=${pageSize}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
       const orders = response?.receiveObj?.orders || [];
       const pagination = response?.receiveObj?.pagination || {};
@@ -86,10 +88,14 @@ const AdminOrders = () => {
     }
   };
   const cancelOrder = async (orderId) => {
-    const { receiveObj } = await post("/order/status", {
-      orderId: orderId,
-      status: "CANCEL",
-    });
+    const { receiveObj } = await post(
+      "/order/status",
+      {
+        orderId: orderId,
+        status: "CANCEL",
+      },
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     if (receiveObj.status === true) {
       // Optionally refresh orders after cancellation
       getAdminOrders();
@@ -97,10 +103,14 @@ const AdminOrders = () => {
   };
 
   const updateOrderStatus = async (orderId, status) => {
-    const { receiveObj } = await post("/order/status", {
-      orderId: orderId,
-      status: status,
-    });
+    const { receiveObj } = await post(
+      "/order/status",
+      {
+        orderId: orderId,
+        status: status,
+      },
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     if (receiveObj.status === true) {
       // Update local orders state
       setOrders((prevOrders) =>

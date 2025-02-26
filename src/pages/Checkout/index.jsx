@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import CardItem from "./CheckoutCardItem";
 import AddressForm from "../../components/AddressForm";
-import { get, post } from "../../services/http/axiosApi";
+import { del, get, post } from "../../services/http/axiosApi";
 import { useSelector } from "react-redux";
 import { NotificationService } from "../../services/Notifcation";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
 
 const Checkout = () => {
   const [showPreviousAddresses, setShowPreviousAddresses] = useState(false);
@@ -14,13 +15,43 @@ const Checkout = () => {
   const [cartData, setCartData] = useState({ items: [], totalPrice: 0 });
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [isOfferAvailable, setIsOfferAvailable] = useState(false);
-  const [availableOffers, setAvailableOffers] = useState([]); // State for available offers
-  const [selectedOffer, setSelectedOffer] = useState(null); // State for selected offer
-  const [offerError, setOfferError] = useState(""); // State for offer error message
+  const [formError, setFormError] = useState("");
+  const [availableOffers, setAvailableOffers] = useState([]);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+  const [offerError, setOfferError] = useState("");
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
+  console.log(user);
 
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    getValues,
+    clearErrors,
+    formState: { errors },
+    reset, // Import reset to clear the form after submission
+  } = useForm({
+    defaultValues: {
+      fullName: user?.name || "", // Assuming 'name' corresponds to 'fullName'
+      streetAddress: "", // This will be filled when an address is selected
+      city: "", // This will be filled when an address is selected
+      email: user?.email || "", // Assuming the user email is available
+      state: "", // This will be filled when an address is selected
+      country: "", // This will be filled when an address is selected
+      phone: user?.phone || "", // Assuming the user phone is available
+      id: "", // This can be used to store the address ID if needed
+      pincode: "", // This will be filled when an address is selected
+      addressType: "", // Optional: if you want to include address type
+    },
+  });
+  const countries = [
+    { value: "", label: "Select Country" },
+    { value: "United States", label: "United States" },
+    { value: "Canada", label: "Canada" },
+    { value: "India", label: "India" },
+  ];
   const fetchCartData = useCallback(async () => {
     if (!userId) return;
     try {
@@ -37,25 +68,22 @@ const Checkout = () => {
       const { receiveObj } = await get(`/address/${userId}`);
       const addresses = receiveObj.addresses || [];
       setPreviousAddresses(addresses);
-      setSelectedAddress(addresses.length > 0 ? addresses[0] : null);
+      // Don't set a default selected address
+      setSelectedAddress(null);
     } catch (err) {
       console.error("Error fetching addresses:", err);
     }
   }, [userId]);
-
   const fetchAvailableOffers = useCallback(async () => {
     const { receiveObj } = await get("/offer");
     setAvailableOffers(receiveObj.offers);
-
-    // Check if the saved offer exists in the fetched offers
     const savedOffer = JSON.parse(localStorage.getItem("savedOffer"));
     if (savedOffer) {
       const offer = receiveObj.offers.find(
         (offer) => offer._id === savedOffer.id
       );
-
       if (offer) {
-        setSelectedOffer(offer); // Set the saved offer as selected if it exists
+        setSelectedOffer(offer);
       }
     }
   }, []);
@@ -64,7 +92,7 @@ const Checkout = () => {
     if (userId) {
       fetchCartData();
       fetchAddresses();
-      fetchAvailableOffers(); // Fetch available offers
+      fetchAvailableOffers();
     }
   }, [fetchCartData, fetchAddresses, fetchAvailableOffers]);
 
@@ -74,16 +102,34 @@ const Checkout = () => {
       setIsOfferAvailable(true);
     }
   }, []);
-  const handleChangeAddressClick = () => {
-    setShowPreviousAddresses(true);
-  };
 
-  const handleCloseDialog = () => {
-    setShowPreviousAddresses(false);
-  };
+  const removeAddress = async (address) => {
+    try {
+      const { receiveObj } = await del(
+        `/address/${address._id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
+      console.log(receiveObj);
 
-  const handleAddAddressClick = () => {
-    setShowAddAddressForm(true);
+      // After successfully removing the address
+      setPreviousAddresses((prevAddresses) =>
+        prevAddresses.filter((addr) => addr._id !== address._id)
+      );
+
+      // If the removed address was the selected address, clear the selection and reset the form
+      if (selectedAddress && selectedAddress._id === address._id) {
+        setSelectedAddress(null); // Clear the selected address
+        reset(); // Reset the form fields
+        clearErrors(); // Clear any validation errors
+      }
+
+      // Refresh the page
+      window.location.reload();
+    } catch (error) {
+      console.error("Error removing address:", error);
+      NotificationService.sendErrorMessage("Failed to remove address.");
+    }
   };
 
   const applyOffer = async () => {
@@ -99,22 +145,21 @@ const Checkout = () => {
       setOfferError(
         `Offer of ${selectedOffer.option} cannot be applied as the total price is less than or equal to the discount.`
       );
-      return; // Exit the function if the offer cannot be applied
+      return;
     }
 
-    setOfferError(""); // Clear any previous error
+    setOfferError("");
 
-    // Prepare the payload for the API request
     const payload = {
       totalPrice: cartData.totalPrice,
       offerId: selectedOffer._id,
     };
 
     try {
-      // Make the API call to apply the discount
-      const { receiveObj } = await post("/apply-discount", payload);
-
-      if (receiveObj.success == true) {
+      const { receiveObj } = await post("/apply-discount", payload, {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      });
+      if (receiveObj.success) {
         setDiscountedPrice(receiveObj.discountedPrice);
       }
     } catch (error) {
@@ -123,236 +168,633 @@ const Checkout = () => {
     }
   };
 
+  const onSelectAddress = (address) => {
+    setSelectedAddress(address);
+    setValue("fullName", address.name || ""); // Autofill full name
+    setValue("streetAddress", address.streetAddress || ""); // Autofill street address
+    setValue("city", address.city || ""); // Autofill city
+    setValue("state", address.state || ""); // Autofill state
+    setValue("country", address.country || ""); // Autofill country
+    setValue("pincode", address.pincode || ""); // Autofill pincode
+    setValue("phone", user?.phone || ""); // Autofill phone if available
+    setValue("addressType", address.addressType || "");
+    clearErrors(); // Clear any previous errors
+  };
+
   const placeOrder = async () => {
-    if (!userId || !selectedAddress || cartData.items.length === 0) {
-      alert("Please select an address and ensure your cart is not empty.");
+    console.log("selected", selectedAddress);
+
+    if (!selectedAddress) {
+      NotificationService.sendErrorMessage("Please add address details");
+      return; // Prevent order placement if no address is selected
+    }
+
+    console.log("User ID:", userId);
+    console.log("Selected Address:", selectedAddress);
+    console.log("Cart Items:", cartData.items);
+
+    if (!userId || cartData.items.length === 0) {
+      NotificationService.sendErrorMessage(
+        "Please ensure your cart is not empty."
+      );
       return;
     }
 
+    // Clear any previous error messages
+    setFormError("");
+
+    // Construct the payload using the specified structure
     const payload = {
-      userId,
-      addressId: selectedAddress._id, // Address ID from selected address
-      items: cartData?.items.map((item) => ({
-        variantId: item.variant._id,
-        productId: item.productId, // Ensure it's the correct product ID
-        quantity: item.quantity,
-      })),
+      addressId: selectedAddress._id, // Use the selected address ID
+      userId: userId,
+      // Optionally include the discounted price if applicable
       totalPrice: discountedPrice ? discountedPrice : cartData.totalPrice,
-      offerId: selectedOffer ? selectedOffer._id : null, // Include selected offer ID
     };
 
+    // Add cart items to the payload
+    payload.items = cartData.items.map((item) => ({
+      variantId: item.variant._id,
+      productId: item.productId,
+      quantity: item.quantity,
+    }));
+
+    console.log("Payload:", payload);
+
     try {
-      const response = await post("/order/create", payload);
-      if (response.receiveObj.status === true) {
-        // NotificationService.sendSuccessMessage("Order placed successfully!");
-
-        // Redirect user to the Stripe checkout session
+      const response = await post("/order/create", payload, {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      });
+      console.log("API Response:", response);
+      if (response.receiveObj.status) {
         window.location.href = response.receiveObj.session;
-
-        // Clear saved offer after redirection
         localStorage.removeItem("savedOffer");
       } else {
         NotificationService.sendErrorMessage("Failed to place order");
       }
     } catch (error) {
       console.error("Error placing order:", error);
-      alert("Error placing order. Please try again.");
+      NotificationService.sendErrorMessage(
+        "Error placing order. Please try again."
+      );
     }
   };
+  const onSubmit = async (data) => {
+    // Create a payload object, including 'name' instead of 'fullName' and excluding 'email'
+    const payload = {
+      name: data.fullName, // Use 'fullName' from the form data and rename it to 'name'
+      streetAddress: data.streetAddress,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+      pincode: data.pincode,
+      addressType: data.addressType,
+      userId: userId, // Include userId
+      // Exclude 'email' from the payload
+    };
 
+    // Log the payload for debugging
+    console.log(payload);
+
+    // Construct the endpoint based on whether an ID is present
+    const endpoint = data.id
+      ? `/address/add/${userId}/${data.id}` // Update existing address
+      : `/address/add/${userId}`; // Add new address
+
+    try {
+      // Make the API call
+      const { receiveObj } = await post(endpoint, payload, {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      });
+      if (receiveObj.success) {
+        NotificationService.sendSuccessMessage(receiveObj.message);
+        reset(); // Reset the form after successful submission
+        fetchAddresses(); // Optionally refetch addresses to update the list
+      } else {
+        NotificationService.sendErrorMessage("Error processing the address.");
+      }
+    } catch (error) {
+      console.error("Error submitting address:", error);
+      NotificationService.sendErrorMessage(
+        "An error occurred while processing the address."
+      );
+    }
+  };
   return (
     <div className="container flex flex-col pt-[72px] md:pt-[96px] mt-10 py-4 mx-auto w-full bg-white min-h-screen">
-      <div className="flex gap-5 justify-between items-center w-full text-sm">
-        <div className="flex flex-col w-full text-black">
-          <div className="text-neutral-700">
-            Deliver to: <b>{selectedAddress?.name}</b>
-          </div>
-          <div className="leading-5 text-neutral-600">
-            {selectedAddress
-              ? `${selectedAddress.streetAddress}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}, ${selectedAddress.pincode}`
-              : "No address selected"}
-          </div>
-        </div>
-        <div
-          className="my-auto font-semibold leading-none text-red-400 cursor-pointer"
-          onClick={handleChangeAddressClick}
-        >
-          Change
-        </div>
-      </div>
-      {showPreviousAddresses && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[1000px] h-auto max-h-[90vh] relative flex flex-col shadow-lg">
-            <button
-              onClick={handleCloseDialog}
-              className="absolute top-3 right-3 text-2xl text-gray-600 hover:text-gray-900"
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              Select Your Address
-            </h2>
-            <div className="flex-grow overflow-y-auto p-4 bg-white rounded-lg shadow-md">
-              {previousAddresses.length > 0 ? (
-                previousAddresses.map((address, index) => (
-                  <div
-                    key={address._id || index}
-                    className="flex items-center mb-3 p-2 rounded hover:bg-blue-50 transition duration-200"
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-x-8 gap-y-10">
+        {/* Left Side: Address Form */}
+        <div className="lg:col-span-3">
+          <form
+            className="bg-white px-3 py-3"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className="border-b border-gray-900/10 pb-12">
+              <h2 className="text-xl font-semibold leading-7 text-gray-900">
+                Personal Information
+              </h2>
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                {/* Full Name */}
+                <div className="sm:col-span-3">
+                  <label
+                    htmlFor="full-name"
+                    className="block text-sm font-medium leading-6 text-gray-900"
                   >
+                    Full name
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      {...register("fullName", {
+                        required: "Full name is required",
+                      })}
+                      id="full-name"
+                      autoComplete="given-name"
+                      className="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.fullName && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.fullName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phone Number */}
+                <div className="sm:col-span-3">
+                  <label
+                    htmlFor="phone-number"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Phone Number
+                  </label>
+                  <div className="mt-2 flex gap-x-4">
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        id="phone-number"
+                        maxLength={10}
+                        {...register("phone", {
+                          required: "Phone Number is required",
+                          validate: {
+                            validLength: (value) =>
+                              value.length === 10 ||
+                              "Phone Number must be exactly 10 digits",
+                            validStart: (value) =>
+                              /^[6-9]/.test(value) ||
+                              "Phone Number must start with 6, 7, 8, or 9",
+                          },
+                        })}
+                        onInput={(e) => {
+                          const target = e.target;
+                          target.value = target.value
+                            .replace(/[^0-9]/g, "")
+                            .slice(0, 10);
+                        }}
+                        autoComplete="tel"
+                        className="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        defaultValue={user?.phone || ""}
+                        disabled={!!user?.phone}
+                      />
+                      {errors.phone && (
+                        <p className="text-red-500 text-sm mt-2">
+                          *{errors.phone.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Email Address */}
+                <div className="sm:col-span-4">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Email address
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      id="email"
+                      {...register("email", { required: "Email is required" })}
+                      type="email"
+                      autoComplete="email"
+                      className="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.email && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.email.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Country */}
+                <div className="sm:col-span-3">
+                  <label
+                    htmlFor="country"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Country <span className="text-red-600">*</span>
+                  </label>
+                  <div className="mt-2">
+                    <select
+                      id="country"
+                      className="block w-full rounded-md border-0 p-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      {...register("country", {
+                        required: "Country is required",
+                      })}
+                    >
+                      {countries.map((country) => (
+                        <option key={country.value} value={country.value}>
+                          {country.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.country && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.country.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Street Address */}
+                <div className="sm:col-span-3">
+                  <label
+                    htmlFor="street-address"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Street address <span className="text-red-600">*</span>
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="street-address"
+                      {...register("streetAddress", {
+                        required: "Street Address is required",
+                      })}
+                      autoComplete="street-address"
+                      className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.streetAddress && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.streetAddress.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* City */}
+                <div className="sm:col-span-2 sm:col-start-1">
+                  <label
+                    htmlFor="city"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    City <span className="text-red-600">*</span>
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="city"
+                      {...register("city", { required: "City is required" })}
+                      autoComplete="address-level2"
+                      className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.city && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.city.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* State */}
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="state"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    State <span className="text-red-600">*</span>
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="state"
+                      {...register("state", { required: "State is required" })}
+                      autoComplete="address-level1"
+                      className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.state && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.state.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* ZIP / Postal Code */}
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="zip"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    ZIP / Postal code <span className="text-red-600">*</span>
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="zipCode"
+                      maxLength={6}
+                      {...register("pincode", {
+                        required: "ZIP code is required",
+                        pattern: {
+                          value: /^[0-9]{6}$/,
+                          message: "Invalid Zip code",
+                        },
+                      })}
+                      autoComplete="postal-code"
+                      className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                    {errors.pincode && (
+                      <p className="text-red-600 text-sm mt-2">
+                        *{errors.pincode.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Address Type Checkbox */}
+                <div className="sm:col-span-6">
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Address Type
+                  </label>
+                  <div className="mt-2 flex items-center">
                     <input
                       type="radio"
-                      id={`address-${index}`}
-                      name="address"
-                      value={address._id}
-                      checked={selectedAddress?._id === address._id}
-                      onChange={() => setSelectedAddress(address)}
-                      className="mr-3 accent-blue-500 cursor-pointer"
+                      id="addressTypeHome"
+                      {...register("addressType", {
+                        required: "Address type is required",
+                      })}
+                      value="home"
+                      className="mr-2"
                     />
                     <label
-                      htmlFor={`address-${index}`}
-                      className="text-gray-700 text-lg cursor-pointer"
+                      htmlFor="addressTypeHome"
+                      className="text-sm text-gray-700"
                     >
-                      {address
-                        ? `${address.name}, ${address.streetAddress}, ${address.city}, ${address.state}, ${address.country}, ${address.pincode}`
-                        : "No address selected"}
+                      Home
+                    </label>
+
+                    <input
+                      type="radio"
+                      id="addressTypeWork"
+                      {...register("addressType", {
+                        required: "Address type is required",
+                      })}
+                      value="office"
+                      className="ml-4 mr-2"
+                    />
+                    <label
+                      htmlFor="addressTypeWork"
+                      className="text-sm text-gray-700"
+                    >
+                      Office
                     </label>
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500">
-                  No previous addresses available.
-                </p>
-              )}
-            </div>
-            <div className="flex justify-end mt-4">
-              {showAddAddressForm ? (
-                <button
-                  className="text-red-500 hover:text-red-700 hover:underline"
-                  onClick={() => setShowAddAddressForm(false)}
-                >
-                  Cancel
-                </button>
-              ) : (
-                <button
-                  className="text-blue-500 hover:text-blue-700 hover:underline"
-                  onClick={handleAddAddressClick}
-                >
-                  Add New Address
-                </button>
-              )}
-            </div>
-            {showAddAddressForm && <AddressForm title="Add" button="Add" />}
-          </div>
-        </div>
-      )}
-      <div className="flex flex-col items-start px-7 mt-7 w-full text-sm font-semibold">
-        {cartData.items.length > 0 ? (
-          cartData.items.map((item, index) => {
-            const { productId, quantity, productName, images } = item;
-            const { weight, price } = item?.variant;
-
-            return (
-              <CardItem
-                key={index}
-                imgSrc={images || "default-image-url"}
-                imgAlt={productName}
-                description={`${productName} - ${weight}`}
-                oldPrice={`$${(price * 1.2).toFixed(2)}`}
-                discountedPrice={`$${price}`}
-                discount="20% off"
-                quantity={quantity}
-              />
-            );
-          })
-        ) : (
-          <p className="text-gray-500 text-lg">
-            Please add products to place an order.
-          </p>
-        )}
-      </div>
-      {isOfferAvailable && (
-        <div className="mt-10">
-          <h3 className="text-lg font-semibold">Available Offer</h3>
-          <div className="flex flex-col mt-2">
-            <select
-              value={selectedOffer ? selectedOffer._id : ""}
-              onChange={(e) => {
-                const selectedValue = e.target.value;
-                const offer = availableOffers.find(
-                  (offer) => offer._id === selectedValue
-                );
-                setSelectedOffer(offer);
-                setOfferError(""); // Clear any previous error
-              }}
-              className="p-2 border rounded"
-            >
-              <option value="" disabled>
-                Select an offer
-              </option>
-              {availableOffers.map((offer) => {
-                // Check if the offer is the selected offer
-                const isSelectedOffer =
-                  selectedOffer && offer._id === selectedOffer._id;
-
-                // Disable all offers except the selected one
-                const isDisabled = !isSelectedOffer;
-
-                return (
-                  <option
-                    key={offer._id}
-                    value={offer._id}
-                    disabled={isDisabled}
-                  >
-                    {offer.option}
-                  </option>
-                );
-              })}
-            </select>
-            {offerError && <p className="text-red-500 mt-2">{offerError}</p>}
-            <button
-              onClick={applyOffer}
-              className={`mt-2 p-2 rounded text-blue-500 hover:underline transition duration-200 w-auto`} // Set width to auto
-              disabled={!!offerError}
-            >
-              Apply Offer
-            </button>
-          </div>
-        </div>
-      )}
-      {cartData.items.length > 0 && (
-        <div className="flex flex-col gap-5 mt-4 w-full text-sm font-bold leading-none text-neutral-700 px-8">
-          <div className="flex justify-between">
-            <div>Total Amount</div>
-            <div>${cartData.totalPrice.toFixed(2)}</div>
-          </div>
-          {discountedPrice !== null && (
-            <>
-              <div className="flex justify-between text-red-500">
-                <div>Discount Applied:</div>
-                <div>
-                  -${(cartData.totalPrice - discountedPrice).toFixed(2)}
+                  {errors.addressType && (
+                    <p className="text-red-600 text-sm mt-2">
+                      *{errors.addressType.message}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="flex justify-between">
-                <div>Discounted Price</div>
-                <div>${discountedPrice.toFixed(2)}</div>
+            </div>
+            <div className="mt-6">
+              <button
+                type="submit"
+                className="block w-1.2 justify-end rounded-md bg-yellow-500 px-3 py-1.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+              >
+                Add Address
+              </button>
+            </div>
+
+            {previousAddresses.length > 0 && (
+              <div className="border-b border-gray-900/10 pb-12">
+                <h2 className="text-base font-semibold mt-6 leading-7 text-gray-900">
+                  Existing Addresses
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-gray-600">
+                  Choose from Existing Address
+                </p>
+                <div className="max-h-60 overflow-y-auto">
+                  {" "}
+                  {/* Set max height and enable scrolling */}
+                  <ul role="list" className="divide-y divide-gray-100">
+                    {previousAddresses.map((address, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between px-5 gap-x-6 py-5 border-solid border-2 border-gray-200"
+                      >
+                        <div className="flex min-w-0 gap-x-4">
+                          <input
+                            name="address"
+                            type="radio"
+                            className="h-4 w-4 border-gray-300 text-yellow-600 focus:ring-indigo-600"
+                            checked={
+                              selectedAddress &&
+                              selectedAddress._id === address._id
+                            }
+                            onChange={() => onSelectAddress(address)}
+                          />
+                          <div className="min-w-0 flex-auto">
+                            <p className="text-md font-semibold leading-6 text-gray-900">
+                              {address.name}
+                            </p>
+                            <p className="mt-1 truncate text-sm leading-5 text-gray-500">
+                              {address.streetAddress}
+                            </p>
+                            <p className="mt-1 truncate text-sm leading-5 text-gray-500">
+                              {address.city}, {address.state}
+                            </p>
+                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                              {address.pincode}
+                            </p>
+                            <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                              {address.addressType.charAt(0).toUpperCase() +
+                                address.addressType.slice(1)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                          <p className="text-md leading-6 font-semibold text-gray-900">
+                            {address.country}
+                          </p>
+                          <div className="mt-auto">
+                            <button
+                              onClick={() => removeAddress(address)}
+                              className="mt-2 text-xs text-red-600 hover:text-red-700"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </>
-          )}
+            )}
+          </form>
         </div>
-      )}
-      {cartData.items.length > 0 ? (
-        <div
-          className="flex justify-center items-center gap-10 px-20 py-5 mt-10 max-w-full bg-black rounded-[30px] w-full sm:w-[406px] mx-auto cursor-pointer"
-          role="button"
-          tabIndex="0"
-          onClick={placeOrder}
-        >
-          <div className="text-sm font-semibold text-center text-yellow-400">
-            Place Order
+
+        {/* Right Side: Order Summary */}
+        <div className="lg:col-span-2 mt-6">
+          <h2 className="text-lg font-semibold leading-7 text-gray-900">
+            Order Summary
+          </h2>
+          <div className="mt-4 border-t border-gray-200 pt-4">
+            <ul role="list" className="divide-y divide-gray-200">
+              {cartData.items && cartData.items.length > 0 ? (
+                cartData.items.map((item, index) => (
+                  <li key={index} className="flex items-center py-4">
+                    <img
+                      src={item.images || "default-image-url"}
+                      alt={item.productName}
+                      className="h-16 w-16 flex-none rounded-md border border-gray-200"
+                    />
+                    <div className="ml-4 flex-auto">
+                      <h3 className="font-medium text-gray-900 text-sm">
+                        <Link
+                          to={`/product/description/${item.productName
+                            .trim()
+                            .replace(/\s+/g, "-")}/${item.productId}`} // Link to the product description page
+                          className="hover:underline"
+                        >
+                          {item.productName}
+                        </Link>
+                      </h3>
+                      <p className="text-gray-500 text-xs">
+                        {item.variant.weight}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        ${item.variant.price}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        Quantity: {item.quantity}
+                      </p>
+                    </div>
+                    <div className="ml-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          dispatch(
+                            removeItemFromCart({
+                              userId: user?.id,
+                              itemId: item.id,
+                            })
+                          )
+                        }
+                        className="text-xs font-medium text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <div className="text-xl font-semibold mt-2 mb-2 text-red-600 text-center">
+                  Please Add Products to Checkout
+                </div>
+              )}
+            </ul>
+
+            {cartData.items && cartData.items.length > 0 && (
+              <div className="mt-6 border-t border-gray-200 pt-4">
+                {/* Apply Offer Section */}
+                {isOfferAvailable && selectedOffer && (
+                  <div className="mt-10">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold mr-2">
+                        Available Offer
+                      </h3>
+                      <p className="text-gray-700 text-md font-bold">
+                        {selectedOffer.option}
+                      </p>
+                    </div>
+                    <div className="flex justify-center mt-2">
+                      <button
+                        onClick={applyOffer}
+                        className={`p-2 rounded text-yellow-500 transition duration-200 w-auto`} // Set width to auto
+                        disabled={!!offerError}
+                      >
+                        Apply Offer
+                      </button>
+                    </div>
+                    {offerError && (
+                      <p className="text-red-500 mt-2">{offerError}</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Subtotal Section */}
+                <div className="flex justify-between text-base font-medium text-gray-900">
+                  <p>Subtotal</p>
+                  <p>${cartData.totalPrice.toFixed(2)}</p>
+                </div>
+                {discountedPrice !== null && (
+                  <>
+                    <div className="flex justify-between text-red-500">
+                      <div>Discount Applied:</div>
+                      <div>
+                        -${(cartData.totalPrice - discountedPrice).toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between">
+                      <div>Discounted Price</div>
+                      <div>${discountedPrice.toFixed(2)}</div>
+                    </div>
+                  </>
+                )}
+                <div className="mt-6 flex justify-center">
+                  {" "}
+                  {/* Center the button */}
+                  <button
+                    className="max-w-[406px] rounded-[30px] w-full bg-black" // Set background color here
+                    onClick={placeOrder}
+                    disabled={
+                      !selectedAddress ||
+                      formError !== "" ||
+                      cartData.items.length === 0
+                    }
+                  >
+                    <div className="flex justify-center gap-10 px-20 py-5">
+                      {" "}
+                      {/* Center the text */}
+                      <span className="text-sm font-semibold text-yellow-400">
+                        Pay and Order
+                      </span>
+                    </div>
+                  </button>
+                  {formError && (
+                    <p className="text-red-600 mt-4">*{formError}</p>
+                  )}
+                </div>
+                <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                  <p>
+                    or{" "}
+                    <Link
+                      href="/products"
+                      className="font-medium text-indigo-600 hover:text-indigo-500"
+                    >
+                      Continue Shopping<span aria-hidden="true"> &rarr;</span>
+                    </Link>
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      ) : null}
+      </div>
     </div>
   );
 };

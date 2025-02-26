@@ -21,19 +21,14 @@ export default function Header({ toggleSearchInput }) {
     return isAdmin ? <AdminNavigationLinks /> : <NavigationLinks />;
   };
 
-  // Determine if the current path is the home page
-  const isHomePage = location.pathname === "/";
-
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-          isHomePage ? "bg-transparent" : "bg-white"
-        }`}
-      >
+      <header className="fixed top-0 left-0 w-full z-50 bg-white transition-all duration-300">
         <nav
           className={`relative w-full flex items-center justify-between px-6 py-4 transition-all duration-300 ${
-            isHomePage ? "md:flex-row md:items-center md:max-h-[308px]" : ""
+            location.pathname !== "/"
+              ? "md:flex-row md:items-center md:max-h-[308px]"
+              : ""
           }`}
           role="navigation"
           aria-label="Main navigation"
@@ -53,7 +48,7 @@ export default function Header({ toggleSearchInput }) {
 
           <div className="flex items-center">
             <button
-              className={`md:hidden block text-gray-600 mr-4 z-50 ${
+              className={`md:hidden  block text-gray-600 mr-4 z-50 ${
                 menuOpen ? "hidden" : ""
               } `}
               onClick={() => setMenuOpen(!menuOpen)}

@@ -64,7 +64,9 @@ const AllProducts = () => {
 
   const getProducts = async () => {
     const { receiveObj } = await get(
-      `/products?page=${currentPage}&pageSize=${pageSize}`
+      `/products?page=${currentPage}&pageSize=${pageSize}`,
+      {},
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
     );
     if (receiveObj.success) {
       setProducts(receiveObj.products);
@@ -226,11 +228,16 @@ const AllProducts = () => {
 
     try {
       // Call your update API
-      const result = await post("/product", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const result = await post(
+        "/product",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      });
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       if (result.isSuccess) {
         console.log("Product updated successfully:", result.receiveObj);
@@ -246,7 +253,11 @@ const AllProducts = () => {
 
   const handleDeleteProduct = async (product) => {
     try {
-      const { receiveObj } = await del(`/product/${product._id}`); // Use the correct product ID
+      const { receiveObj } = await del(
+        `/product/${product._id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      ); // Use the correct product ID
       if (receiveObj.success) {
         console.log("Product deleted successfully:", receiveObj);
         window.location.reload(); // Refresh the entire page
@@ -271,7 +282,9 @@ const AllProducts = () => {
         status: updatedStatus, // Send the new status in the payload
       };
 
-      const response = await post(`/product/disable/${product._id}`, payload); // Use product._id
+      const response = await post(`/product/disable/${product._id}`, payload, {
+        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+      }); // Use product._id
 
       if (response.isSuccess) {
         // Update the product's disabled state in the local state

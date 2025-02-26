@@ -16,6 +16,7 @@ const ProfilePage = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [modalPurpose, setModalPurpose] = useState("add"); // "add" or "edit"
   const [addressIdToRemove, setAddressIdToRemove] = useState(null);
   const [isEditProfileDialog, setIsEditProfileDialog] = useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
@@ -46,7 +47,11 @@ const ProfilePage = () => {
 
   const handleRemove = async (id) => {
     try {
-      const { receiveObj } = await del(`/address/${id}`);
+      const { receiveObj } = await del(
+        `/address/${id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       if (receiveObj.success) {
         NotificationService.sendSuccessMessage(`${receiveObj.message}`);
@@ -71,7 +76,11 @@ const ProfilePage = () => {
 
   const getAllAddress = async () => {
     try {
-      const { receiveObj } = await get(`/address/${id}`);
+      const { receiveObj } = await get(
+        `/address/${id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       setAddresses(receiveObj.addresses || []);
     } catch (error) {
       console.error("Error fetching addresses:", error);
@@ -101,7 +110,13 @@ const ProfilePage = () => {
   };
 
   const handleOpenModal = (address = null) => {
-    setSelectedAddress(address);
+    if (address) {
+      setSelectedAddress(address);
+      setModalPurpose("edit");
+    } else {
+      setSelectedAddress(null);
+      setModalPurpose("add");
+    }
     setModalOpen(true);
   };
 
@@ -117,7 +132,11 @@ const ProfilePage = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      const { receiveObj } = await del(`/remove/${id}`);
+      const { receiveObj } = await del(
+        `/remove/${id}`,
+        {},
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
       if (receiveObj.success) {
         NotificationService.sendSuccessMessage(receiveObj.message);
         dispatch(logout());
@@ -206,10 +225,11 @@ const ProfilePage = () => {
             <div className="flex text-lg font-medium text-black">
               <button
                 className="px-8 py-4 bg-yellow-400 rounded-[30px]"
-                onClick={() => handleOpenModal()}
+                onClick={() => handleOpenModal()} // This will call with null, setting purpose to "add"
               >
                 + Add New Address
               </button>
+
               <Link to="/my-orders">
                 <button className="px-8 py-4 bg-blue-500 text-white rounded-[30px] ml-4">
                   My Orders
@@ -242,7 +262,7 @@ const ProfilePage = () => {
                     <div className="flex justify-between mt-10 w-full">
                       <button
                         className="px-16 py-4 text-lg bg-yellow-400 rounded-[30px] max-md:px-5"
-                        onClick={() => handleOpenModal(address)}
+                        onClick={() => handleOpenModal(address)} // This will pass the address, setting purpose to "edit"
                       >
                         Edit
                       </button>
@@ -269,7 +289,8 @@ const ProfilePage = () => {
             isOpen={modalOpen}
             onClose={handleCloseModal}
             initialValues={selectedAddress}
-            button={"Update"}
+            button={modalPurpose === "edit" ? "Update" : "Add"}
+            title={modalPurpose === "edit" ? "Update" : "Add "}
           />
 
           <ConfirmModal

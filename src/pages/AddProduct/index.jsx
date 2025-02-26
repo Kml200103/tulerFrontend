@@ -114,7 +114,12 @@ const ProductPage = () => {
   // };
 
   const addCategory = async (name) => {
-    const result = await post("/category/createUpdate", { name });
+    const result = await post(
+      "/category/createUpdate",
+      { name },
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
+
     console.log("Add Category Response:", result); // Debugging
 
     if (result.isSuccess && result.receiveObj) {
@@ -126,10 +131,14 @@ const ProductPage = () => {
 
   // Update category via API
   const updateCategory = async (id, newName) => {
-    const result = await post(`/category/createUpdate`, {
-      name: newName,
-      _id: id,
-    });
+    const result = await post(
+      `/category/createUpdate`,
+      {
+        name: newName,
+        _id: id,
+      },
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     if (result.isSuccess) {
       setIsCategoryDialogOpen(false);
     } else {
@@ -139,7 +148,11 @@ const ProductPage = () => {
 
   // Delete category via API
   const deleteCategory = async (id) => {
-    const result = await del(`/category/${id}`);
+    const result = await del(
+      `/category/${id}`,
+      {},
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     if (result.isSuccess) {
       setIsCategoryDialogOpen(false);
     } else {
@@ -148,7 +161,11 @@ const ProductPage = () => {
   };
 
   const getCategory = async () => {
-    const result = await get("/category/all");
+    const result = await get(
+      "/category/all",
+      {},
+      { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+    );
     console.log(result);
 
     if (result.isSuccess) {
@@ -198,9 +215,14 @@ const ProductPage = () => {
     });
     console.log("formData", formData);
     try {
-      const result = await post("/product", formData, {
-        "Content-Type": "multipart/form-data",
-      });
+      const result = await post(
+        "/product",
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        },
+        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      );
 
       if (result.isSuccess) {
         console.log("Product saved successfully:", result.receiveObj);
