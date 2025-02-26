@@ -1,5 +1,6 @@
 import AdminLayout from "./AdminLayout";
-import MainLayout from "./Mainlayout";
+import MainLayout from "./MainLayout";
+
 
 export const Layout = {
   main: MainLayout,
