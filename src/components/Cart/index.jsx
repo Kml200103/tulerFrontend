@@ -1,23 +1,30 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
-import { useSelector } from "react-redux";
-import { Link } from "react-router"; // Fixed import for react-router-dom
+import { useDispatch, useSelector } from "react-redux";
+import { Link, Navigate, useNavigate } from "react-router"; // Fixed import for react-router-dom
+import {
+  clearCart as clearCartAction,
+  removeItem as removeItemAction,
+  decreaseQuantity as decreaseQuantityAction,
+  increaseQuantity as increaseQuantityAction, // Ensure this is imported
+} from "../../redux/cart/cartSlice";
 
 export default function Cart({ onClose }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [cartData, setCartData] = useState(null);
   const [updating, setUpdating] = useState(false); // Prevent multiple API calls
-
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
-
-  const cart = useSelector((state) => state?.cart);
+const navigate=useNavigate()
+  const cart = useSelector((state) => state.cart);
 
   // Fetch Cart Data
   const fetchCartData = useCallback(async () => {
     if (!id) {
       setCartData(cart);
+
       return;
     }
     try {
@@ -27,68 +34,35 @@ export default function Cart({ onClose }) {
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
-      // console.log("Cart API Response Data:", receiveObj);
-
       setCartData(receiveObj?.cart || { items: [], totalPrice: 0 });
     } catch (error) {
       console.error("Error fetching cart data:", error);
     }
-  }, [id]);
+  }, [id, cart]);
 
   useEffect(() => {
     fetchCartData();
-  }, []);
+  }, [fetchCartData]);
 
-  // console.log("cartData", cartData);
-  // Update quantity and refresh cart
-  const updateQuantity = useCallback(
-    async (productId, weight, change) => {
-      if (updating) return; // Prevent multiple requests at the same time
+  const removeItem = useCallback(
+    async (productId, variantId) => {
+      // Accept variantId as a parameter
+      if (updating) return;
       setUpdating(true);
 
-      // console.log("productId :>> ", productId);
-      // Get current quantity from cartData instead of local state
-      const currentItem = cartData?.items?.find(
-        (item) => item.productId === productId && item.variant.weight === weight
-      );
-
-      if (!currentItem) {
-        console.error("Item not found in cart");
+      if (!id) {
+        // Dispatch the removeItem action if userId is not present
+        dispatch(removeItemAction({ productId, variantId })); // Pass both productId and variantId
+        setCartData((prev) => ({
+          ...prev,
+          items: prev.items.filter(
+            (item) =>
+              item.productId !== productId || item.variantId !== variantId // Ensure both IDs are checked
+          ),
+        }));
         setUpdating(false);
         return;
       }
-
-      const newQuantity = Math.max(currentItem.quantity + change, 1);
-
-      try {
-        const { receiveObj } = await put(
-          "/cart/update",
-          {
-            userId: id,
-            productId,
-            weight,
-            quantity: newQuantity, // Send updated quantity to API
-          },
-          { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
-        );
-        if (receiveObj.status === 401) {
-          NotificationService.sendErrorMessage(receiveObj.message);
-        }
-        // Refresh cart after update
-        await fetchCartData();
-      } catch (error) {
-        console.error("Error updating cart quantity:", error);
-      } finally {
-        setUpdating(false);
-      }
-    },
-    [id, updating, fetchCartData, cartData]
-  );
-
-  const removeItem = useCallback(
-    async (productId, weight) => {
-      if (updating) return;
-      setUpdating(true);
 
       try {
         const { receiveObj } = await del(
@@ -96,25 +70,39 @@ export default function Cart({ onClose }) {
           {
             userId: id,
             productId,
-            weight,
+            variantId, // Include variantId in the API call
           },
           { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
         );
+
         if (receiveObj.status === 401) {
           NotificationService.sendErrorMessage(receiveObj.message);
+        } else {
+          // Only update the local state if the API call was successful
+          setCartData((prev) => ({
+            ...prev,
+            items: prev.items.filter(
+              (item) =>
+                item.productId !== productId || item.variantId !== variantId // Ensure both IDs are checked
+            ),
+          }));
         }
-        await fetchCartData();
       } catch (error) {
         console.error("Error removing item from cart:", error);
       } finally {
         setUpdating(false);
       }
     },
-    [id, updating, fetchCartData]
+    [id, updating, dispatch]
   );
 
   const clearCart = useCallback(async () => {
-    if (!id) return;
+    if (!id) {
+      // Dispatch the clearCart action if userId is not present
+      dispatch(clearCartAction());
+      setCartData({ items: [], totalPrice: 0 });
+      return;
+    }
     setUpdating(true);
     try {
       const { receiveObj } = await del(
@@ -131,8 +119,70 @@ export default function Cart({ onClose }) {
     } finally {
       setUpdating(false);
     }
-  }, [id]);
+  }, [id, dispatch]);
 
+  const updateQuantity = useCallback(
+    async (productId, variantId, change) => {
+      // Accept variantId as a parameter
+      if (updating) return; // Prevent multiple requests at the same time
+      setUpdating(true);
+
+      const currentItem = cartData?.items?.find(
+        (item) => item.productId === productId && item.variantId === variantId // Check for both productId and variantId
+      );
+
+      if (!currentItem) {
+        console.error("Item not found in cart");
+        setUpdating(false);
+        return;
+      }
+
+      const newQuantity = Math.max(currentItem.quantity + change, 1);
+
+      if (!id) {
+        // Dispatch the decreaseQuantity or increaseQuantity action based on the change
+        if (change < 0) {
+          dispatch(decreaseQuantityAction({ productId, variantId })); // Pass both productId and variantId
+        } else {
+          dispatch(increaseQuantityAction({ productId, variantId })); // Pass both productId and variantId
+        }
+        // Update local state to reflect the change immediately
+        setCartData((prev) => ({
+          ...prev,
+          items: prev.items.map((item) =>
+            item.productId === productId && item.variantId === variantId
+              ? { ...item, quantity: newQuantity }
+              : item
+          ),
+        }));
+        setUpdating(false);
+        return;
+      }
+
+      try {
+        const { receiveObj } = await put(
+          "/cart/update",
+          {
+            userId: id,
+            productId,
+            variantId, // Include variantId in the API call
+            quantity: newQuantity, // Send updated quantity to API
+          },
+          { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+        );
+        if (receiveObj.status === 401) {
+          NotificationService.sendErrorMessage(receiveObj.message);
+        }
+        // Refresh cart after update
+        await fetchCartData();
+      } catch (error) {
+        console.error("Error updating cart quantity:", error);
+      } finally {
+        setUpdating(false);
+      }
+    },
+    [id, updating, fetchCartData, cartData, dispatch]
+  );
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${
@@ -171,17 +221,15 @@ export default function Cart({ onClose }) {
 
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
-          cartData?.items?.map((item) => {
-            // console.log("item :>> ", item);
+          cartData.items.map((item) => {
+            // Remove the extra curly braces here
             return (
               <div
                 key={item._id}
                 className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
               >
                 <button
-                  onClick={() =>
-                    removeItem(item.productId, item.variant.weight)
-                  }
+                  onClick={() => removeItem(item.productId, item.variantId)} // Pass variantId
                   className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
                 >
                   Remove
@@ -190,27 +238,26 @@ export default function Cart({ onClose }) {
                 <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                   <button
                     onClick={() =>
-                      updateQuantity(item.productId, item.variant.weight, 1)
-                    }
+                      updateQuantity(item.productId, item.variantId, 1)
+                    } // Pass variantId
                     className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
                     disabled={updating}
                   >
                     +
                   </button>
                   <span className="py-2 text-lg font-semibold">
-                    {item.quantity}
+                    {item.quantity}{" "}
                   </span>
                   <button
                     onClick={() =>
-                      updateQuantity(item.productId, item.variant.weight, -1)
-                    }
+                      updateQuantity(item.productId, item.variantId, -1)
+                    } // Pass variantId
                     className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
                     disabled={updating}
                   >
                     -
                   </button>
                 </div>
-
                 <img
                   loading="lazy"
                   src={item?.images || ""}
@@ -238,7 +285,7 @@ export default function Cart({ onClose }) {
         )}
       </div>
 
-      {cartData?.items?.length > 0 ? (
+      {cartData?.items?.length > 0 && id  ? (
         <Link
           to="/checkout"
           className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"
@@ -249,9 +296,9 @@ export default function Cart({ onClose }) {
           </span>
         </Link>
       ) : (
-        <p className="text-center text-red-500 mt-4">
-          Please add products to your cart to proceed to checkout.
-        </p>
+        <button onClick={()=>navigate('/login')} className="text-center text-red-500 mt-4">
+          Please Login 
+        </button>
       )}
     </div>
   );

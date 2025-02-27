@@ -19,19 +19,23 @@ function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
     if (!userId) {
-      // console.log("product", product);
-      // NotificationService.sendErrorMessage("Please Login First");
       const payload = {
-        variant: { weight: selectedVariant.weight },
+        variant: {
+          weight: selectedVariant.weight,
+          price: selectedVariant.price, // Ensure price is included
+        },
         productId: product._id,
-        variantId: selectedVariant._id,
+        variantId: selectedVariant._id, // Include variantId
         weight: selectedVariant.weight,
-        totalPrice: selectedVariant.price,
+        price: selectedVariant.price, // Ensure price is explicitly included
+        totalPrice: selectedVariant.price, // Explicitly set totalPrice
         images: product.images,
-        quantity: 1,
+        quantity: 1, // Default quantity is 1
         productName: product.name,
       };
-      dispatch(addToCart(payload));
+
+      NotificationService.sendSuccessMessage("Item Added to Cart");
+      dispatch(addToCart(payload)); // Dispatch the action
       return;
     }
     if (!selectedVariant) {

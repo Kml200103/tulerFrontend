@@ -9,7 +9,6 @@ import Slider from "@mui/material/Slider";
 const Products = () => {
   const navigate = useNavigate();
   const searchTerm = useSelector((state) => state.search.term);
-
   const [products, setProducts] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(1000);
@@ -24,21 +23,11 @@ const Products = () => {
   const [sortOption, setSortOption] = useState("default");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  useEffect(() => {
-    const userRole = localStorage.getItem("userRole");
-    if (userRole === "admin") {
-      navigate("/all-products");
-    } else {
-      fetchProducts();
-    }
-  }, [navigate, currentPage, itemsPerPage]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      const response = await get(
-        `/product?page=${currentPage}&limit=${itemsPerPage}`
-      );
+      const response = await get(`/product?page=${currentPage}&limit=${itemsPerPage}`);
       if (response.isSuccess) {
         setProducts(response.receiveObj.products);
         setTotalProducts(response.receiveObj.totalProducts);
@@ -52,82 +41,85 @@ const Products = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage])
+
+  const getProductsByCategories = useCallback(async () => {
+    try {
+      const { receiveObj } = await get("/category/all");
+      if (receiveObj.success) {
+        setCategories(receiveObj.categories);
+      } else {
+        setError("Failed to fetch categories.");
+      }
+    } catch (error) {
+      setError("Failed to fetch categories.");
+    }
+  }, []);
+
+  const fetchProductsByCategory = useCallback(async (categoryId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      let url = `/product?page=${currentPage}&limit=${itemsPerPage}`;
+      if (categoryId) {
+        url += `&categoryId=${categoryId}`;
+      }
+      const { receiveObj } = await get(url);
+      setProducts(receiveObj.products);
+      setTotalProducts(receiveObj.totalProducts);
+      setTotalPages(receiveObj.totalPages);
+    } catch (error) {
+      setError("Failed to fetch products.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, itemsPerPage]);
+  ;
+
+  useEffect(() => {
+    const userRole = localStorage.getItem("userRole");
+    if (userRole === "admin") {
+      navigate("/all-products");
+    } else {
+      fetchProductsByCategory(null);
+    }
+  }, [navigate, fetchProductsByCategory]);
+
+  useEffect(() => {
+    getProductsByCategories();
+  }, [getProductsByCategories]);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
       const minVariantPrice = Math.min(...product.variants.map((v) => v.price));
-      const matchesPrice =
-        minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
-
+      const matchesPrice = minVariantPrice >= minPrice && minVariantPrice <= maxPrice;
       return matchesSearch && matchesPrice;
     });
   }, [products, minPrice, maxPrice, searchTerm]);
 
   const sortedProducts = useMemo(() => {
     let sorted = [...filteredProducts];
-    if (sortOption === "lowToHigh") {
-      sorted.sort((a, b) => {
-        const aPrice = Math.min(...a.variants.map((v) => v.price));
-        const bPrice = Math.min(...b.variants.map((v) => v.price));
-        return aPrice - bPrice;
-      });
-    } else if (sortOption === "highToLow") {
-      sorted.sort((a, b) => {
-        const aPrice = Math.min(...a.variants.map((v) => v.price));
-        const bPrice = Math.min(...b.variants.map((v) => v.price));
-        return bPrice - aPrice;
-      });
-    }
+    sorted.sort((a, b) => {
+      const aPrice = Math.min(...a.variants.map((v) => v.price));
+      const bPrice = Math.min(...b.variants.map((v) => v.price));
+      if (sortOption === "lowToHigh") return aPrice - bPrice;
+      if (sortOption === "highToLow") return bPrice - aPrice;
+      return 0;
+    });
     return sorted;
   }, [filteredProducts, sortOption]);
 
-  const getProductsByCategories = async () => {
-    const { receiveObj } = await get("/category/all");
-    if (receiveObj.success) {
-      setCategories(receiveObj.categories);
-    }
-  };
-
-  const fetchProductsByCategory = async (categoryId) => {
-    setError(null);
-    try {
-      const { receiveObj } = await get(
-        `/product?categoryId=${categoryId}&page=${currentPage}&limit=${itemsPerPage}`
-      );
-      setProducts(receiveObj.products);
-      setTotalProducts(receiveObj.totalProducts);
-      setTotalPages(receiveObj.totalPages);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    getProductsByCategories();
-  }, []);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-  const handleSortOptionChange = (option) => {
+  const toggleDropdown = useCallback(() => setIsDropdownOpen((prev) => !prev), []);
+  const handleSortOptionChange = useCallback((option) => {
     setSortOption(option);
     setIsDropdownOpen(false);
-  };
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const setPageSize = (size) => {
+  }, []);
+  const onPageChange = useCallback((page) => setCurrentPage(page), []);
+  const setPageSize = useCallback((size) => {
     setItemsPerPage(size);
     setCurrentPage(1);
-  };
+  }, []);
 
   return (
     <div className="container flex  flex-col bg-white ">
@@ -184,6 +176,12 @@ const Products = () => {
               Product categories
             </div>
             <div className="mt-2 text-lg font-medium leading-[32px] text-neutral-700 max-md:mr-2.5 max-md:ml-1">
+              <div
+                onClick={() => fetchProductsByCategory(null)}
+                className="cursor-pointer " // Added margin-bottom for spacing
+              >
+                All
+              </div>
               {categories?.map((category) => (
                 <div
                   key={category.id}

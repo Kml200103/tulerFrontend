@@ -204,6 +204,7 @@ const Home = () => {
                                 Category
                             </div>
                             <button
+                            onClick={()=>navigate('/products')}
                                 className="px-8 py-3 mt-8 md:mt-14 w-full md:w-auto text-base md:text-lg bg-yellow-400 font-medium text-center text-black rounded-[90px] transition duration-300 hover:bg-yellow-500"
                                 aria-label="View all categories"
                             >

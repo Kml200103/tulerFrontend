@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import "../../global.css";
 import { Wheel } from "react-custom-roulette";
 import { useGetWheelDataQuery } from "../../services/http/spinService";
@@ -9,65 +9,66 @@ const SpinWheel = () => {
   const [mustSpin, setMustSpin] = useState(false);
   const [prizeNumber, setPrizeNumber] = useState(0);
   const [savedOffer, setSavedOffer] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [winMessage, setWinMessage] = useState(""); // State for win message
-  const [loginMessage, setLoginMessage] = useState(""); // State for login message
-  const sidebarRef = useRef(null);
+  const [winMessage, setWinMessage] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
   const { isLoggedIn } = useSelector((state) => state.auth);
   const { data, isLoading } = useGetWheelDataQuery();
 
   useEffect(() => {
-    if (data?.offers?.length) {
+    if (data && data.offers && data.offers.length) {
       setSpinData(data.offers);
     }
 
-    // Check if an offer is already saved in localStorage
-    const storedOffer = JSON.parse(localStorage.getItem("savedOffer"));
-    if (storedOffer) {
-      setSavedOffer(storedOffer);
+    try {
+      const storedOffer = JSON.parse(localStorage.getItem("savedOffer"));
+      if (storedOffer) {
+        setSavedOffer(storedOffer);
+      }
+    } catch (error) {
+      console.error("Error parsing savedOffer from localStorage:", error);
     }
   }, [data]);
 
-  const handleSpinClick = () => {
+  const handleSpinClick = useCallback(() => {
     if (!isLoggedIn) {
       setLoginMessage("Please log in to apply the offer.");
-      return; // Exit if not logged in
-    } else {
-      setLoginMessage(""); // Clear login message if logged in
+      return;
+    } else if (loginMessage) {
+      setLoginMessage("");
     }
 
     if (!mustSpin && spinData.length > 0 && !savedOffer) {
       const randomIndex = Math.floor(Math.random() * spinData.length);
       setPrizeNumber(randomIndex);
       setMustSpin(true);
-      setWinMessage(""); // Clear any previous win message
+      setWinMessage("");
     }
-  };
+  }, [isLoggedIn, mustSpin, spinData, savedOffer, loginMessage]);
 
-  const handleStopSpinning = () => {
+  const handleStopSpinning = useCallback(() => {
     if (spinData.length > 0) {
       const wonOffer = spinData[prizeNumber];
-
-      // Save the offer with ID to localStorage
       const offerToSave = { id: wonOffer._id, option: wonOffer.option };
 
       if (isLoggedIn) {
         localStorage.setItem("savedOffer", JSON.stringify(offerToSave));
       }
       setSavedOffer(offerToSave);
-
-      // Set the win message
       setWinMessage(`You won: ${wonOffer.option}!`);
-
-      // Send offerToSave to backend if required
-      // sendOfferToBackend(offerToSave);
     }
     setMustSpin(false);
-  };
+  }, [spinData, prizeNumber, isLoggedIn]);
 
-  const wheelData = spinData?.length
-    ? spinData.map((offer) => ({ option: offer.option }))
-    : [];
+  const wheelData = useMemo(
+    () => (spinData.length ? spinData.map((offer) => ({ option: offer.option })) : []),
+    [spinData]
+  );
+
+  const buttonText = useMemo(() => {
+    if (savedOffer) return `Offer: ${savedOffer?.option}`;
+    if (mustSpin) return "Spinning...";
+    return "Spin";
+  }, [savedOffer, mustSpin]);
 
   return (
     <div className="spin-wheel-page">
@@ -98,18 +99,10 @@ const SpinWheel = () => {
           onClick={handleSpinClick}
           disabled={mustSpin || !!savedOffer}
         >
-          {savedOffer
-            ? `Offer: ${savedOffer?.option}`
-            : mustSpin
-            ? "Spinning..."
-            : "Spin"}
+          {buttonText}
         </button>
-        {winMessage && <div className="win-message">{winMessage}</div>}{" "}
-        {/* Display win message */}
-        {loginMessage && (
-          <div className="text-red-500 mt-2">{loginMessage}</div>
-        )}{" "}
-        {/* Display login message */}
+        {winMessage && <div className="win-message">{winMessage}</div>}
+        {loginMessage && <div className="text-red-500 mt-2">{loginMessage}</div>}
       </div>
     </div>
   );

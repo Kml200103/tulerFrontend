@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import Header from "../Header";
+import React, { useEffect, useState } from "react";
 import { Footer } from "../Footer";
 import AdminHeader from "../AdminHeader";
 
 const AdminLayout = ({ children }) => {
-  const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
+  const isBrowser = () => typeof window !== "undefined";
   const [isVisible, setIsVisible] = useState(false);
 
   function scrollToTop() {
@@ -13,7 +12,6 @@ const AdminLayout = ({ children }) => {
   }
 
   const handleScroll = () => {
-    // Show the button when the user scrolls down
     if (window.scrollY > 100) {
       setIsVisible(true);
     } else {
@@ -22,10 +20,7 @@ const AdminLayout = ({ children }) => {
   };
 
   useEffect(() => {
-    // Add scroll event listener when the component mounts
     window.addEventListener("scroll", handleScroll);
-
-    // Remove the event listener when the component unmounts
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -34,8 +29,9 @@ const AdminLayout = ({ children }) => {
   return (
     <>
       <div className="">
-        <AdminHeader></AdminHeader>
-        <div className="mt-10">{children}</div>
+        <AdminHeader />
+        {/* Add padding-top to the children container */}
+        <div className="pt-[60px] mt-10">{children}</div>
 
         <div className={`scrollToTopButton ${isVisible ? "visible" : ""}`}>
           <button

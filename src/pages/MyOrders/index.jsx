@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { OrderDetailsCard } from "../../components/OrderDetailsCard";
 import { get } from "../../services/http/axiosApi";
 import { useSelector } from "react-redux";
@@ -7,13 +7,16 @@ import Pagination from "../../components/Pagination";
 const MyOrders = () => {
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
-  const [groupedOrders, setGroupedOrders] = useState(null);
+  const [ordersData, setOrdersData] = useState({ orders: {}, totalOrders: 0, loading: true, error: null });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [totalOrders, setTotalOrders] = useState(0);
 
-  const getMyOrders = async () => {
-    if (!userId) return;
+  const getMyOrders = useCallback(async () => {
+    if (!userId) {
+      setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: null });
+      return;
+    }
+    setOrdersData(prev => ({ ...prev, loading: true, error: null }));
     try {
       const response = await get(
         `/order/allOrders/${userId}?page=${currentPage}&pageSize=${itemsPerPage}`,
@@ -21,22 +24,16 @@ const MyOrders = () => {
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
-      // If no orders exist (status: false)
       if (!response.receiveObj?.status) {
-        setGroupedOrders({}); // Set to empty object to trigger "No orders" UI
-        setTotalOrders(0);
+        setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: null });
         return;
       }
 
-      // If orders exist (status: true)
       const orders = response.receiveObj.orders || [];
-      const pagination = response.receiveObj.pagination || {};
+      const totalOrders = response.receiveObj.pagination?.totalOrders || 0;
 
-      setTotalOrders(pagination.totalOrders);
-
-      // Group orders by addressId
       const grouped = orders.reduce((acc, order) => {
-        const addressId = order.address?._id || "unknown"; // Handle missing address
+        const addressId = order.address?._id || "unknown";
         if (!acc[addressId]) {
           acc[addressId] = {
             address: order.address || "Address not available",
@@ -47,48 +44,56 @@ const MyOrders = () => {
         return acc;
       }, {});
 
-      setGroupedOrders(grouped);
+      setOrdersData({ orders: grouped, totalOrders, loading: false, error: null });
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setGroupedOrders({}); // Fallback to empty state on error
+      setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: "Failed to fetch orders." });
     }
-  };
-  useEffect(() => {
-    getMyOrders();
   }, [userId, currentPage, itemsPerPage]);
 
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-  };
+  useEffect(() => {
+    getMyOrders();
+  }, [getMyOrders]);
 
-  const setPageSize = (size) => {
+  const onPageChange = useCallback((page) => {
+    setCurrentPage(page);
+  }, []);
+
+  const setPageSize = useCallback((size) => {
     setItemsPerPage(size);
-    setCurrentPage(1); // Reset to first page when changing page size
-  };
+    setCurrentPage(1);
+  }, []);
+
+  const orderKeys = useMemo(() => Object.keys(ordersData.orders), [ordersData.orders]);
 
   return (
     <div className="flex flex-col text-3xl font-semibold leading-[64px] max-w-full rounded-[30px] text-neutral-700">
       <h1 className="text-2xl font-bold mb-4 px-11 pt-7">All Orders</h1>
       <div className="px-11 pt-7 w-full bg-white pb-10 rounded-[30px] shadow-md max-md:px-5 max-md:pb-28">
         <div>
-          {groupedOrders && Object.keys(groupedOrders).length > 0 ? (
-            Object.entries(groupedOrders).map(([addressId, group]) => (
-              <OrderDetailsCard key={addressId} group={group} />
+          {ordersData.loading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 text-lg">Loading orders...</p>
+            </div>
+          ) : ordersData.error ? (
+            <div className="text-center py-8">
+              <p className="text-red-600 text-lg">{ordersData.error}</p>
+            </div>
+          ) : orderKeys.length > 0 ? (
+            orderKeys.map((addressId) => (
+              <OrderDetailsCard key={addressId} group={ordersData.orders[addressId]} />
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-600 text-lg">
-                {totalOrders === 0 ? "No orders found." : "Loading orders..."}
-              </p>
+              <p className="text-gray-600 text-lg">No orders found.</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Pagination - Only show if orders exist */}
-      {totalOrders > 0 && (
+      {ordersData.totalOrders > 0 && (
         <Pagination
-          totalItems={totalOrders}
+          totalItems={ordersData.totalOrders}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           onPageChange={onPageChange}

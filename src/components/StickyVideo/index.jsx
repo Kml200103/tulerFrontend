@@ -1,43 +1,44 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 
 const StickyVideo = () => {
   const [playing, setPlaying] = useState(false);
-  const [isOpen, setIsOpen] = useState(true); // State to control visibility
+  const [isOpen, setIsOpen] = useState(true);
   const videoRef = useRef(null);
 
-  const handleVideoClick = () => {
+  const handleVideoClick = useCallback(() => {
     if (playing) {
       videoRef.current.pause();
     } else {
       videoRef.current.play();
     }
     setPlaying(!playing);
-  };
+  }, [playing]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
-  };
+  }, []);
 
-  if (!isOpen) return null; // If closed, return null
+  if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed bottom-0 right-0 p-2 transition-all duration-300 z-50`}
-    >
+    <div className={`fixed bottom-0 right-0 p-2 transition-all duration-300 z-50`}>
       <video
         ref={videoRef}
-        src="https://www.w3schools.com/html/mov_bbb.mp4" // Test video link
-        className={`w-auto h-40 cursor-pointer`} // Fixed height for simplicity
+        src="https://www.w3schools.com/html/mov_bbb.mp4"
+        className={`w-auto h-40 cursor-pointer`}
         onClick={handleVideoClick}
-        controls // Optional: Add controls for better user experience
+        controls
         loop
+        poster="placeholder.jpg" // Add a poster image
+        preload="metadata" // Load metadata first
+        aria-label="Sticky video"
       />
       <button
         onClick={handleClose}
         className="absolute top-0 right-1 m-2 text-white text-3xl"
-        aria-label="Close video"
+        aria-label="Close sticky video"
       >
-        &times; {/* This is the "X" icon */}
+        &times;
       </button>
     </div>
   );
