@@ -136,7 +136,7 @@ const AdminOrders = () => {
     getAdminOrders();
   }, [currentPage, pageSize]);
 
-  console.log("orders", orders);
+
   return (
     <div className="overflow-x-auto ">
       <div className="bg-white flex items-center justify-center font-sans overflow-hidden">

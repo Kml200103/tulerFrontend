@@ -9,7 +9,7 @@ const CategoryModal = ({
   deleteCategory,
   updateCategory,
 }) => {
-  console.log('categories', categories)
+
 
   const [newCategory, setNewCategory] = useState("");
   const [editCategory, setEditCategory] = useState(null);
@@ -22,7 +22,7 @@ const CategoryModal = ({
   };
 
   const handleUpdate = async () => {
-    console.log('editcate', editCategory)
+
     if (!editCategory?.name.trim()) return;
     await updateCategory(editCategory.id, editCategory.name);
     setEditCategory(null);

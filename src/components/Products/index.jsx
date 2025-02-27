@@ -66,7 +66,7 @@ const Products = () => {
         url += `&categoryId=${categoryId}`;
       }
       const { receiveObj } = await get(url);
-      console.log('recei', receiveObj)
+      
       setProducts(receiveObj.products);
       setTopProducts(receiveObj.topProducts)
       setTotalProducts(receiveObj.totalProducts);

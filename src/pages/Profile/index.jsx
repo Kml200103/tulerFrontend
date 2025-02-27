@@ -38,7 +38,7 @@ const ProfilePage = () => {
   const items = cartItems;
 
   const syncCartWithServer = async (cartItems, token) => {
-    console.log('cartItems', cartItems)
+  
     try {
       if (!id || !cartItems || cartItems.length === 0) { //check if id exists.
         return;
@@ -75,7 +75,7 @@ const ProfilePage = () => {
 
         syncCartWithServer(cartItems, token) // Correct argument order
           .then((res) => {
-            console.log('res', res);
+       
             setCartSynced(true); // Set cartSynced to true after successful sync
           })
           .catch((err) => {

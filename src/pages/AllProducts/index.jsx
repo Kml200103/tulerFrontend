@@ -240,7 +240,7 @@ const AllProducts = () => {
       );
 
       if (result.isSuccess) {
-        console.log("Product updated successfully:", result.receiveObj);
+     
         await getProducts(); // Refresh the product list
         handleCloseModal(); // Close the modal
       } else {
@@ -259,7 +259,7 @@ const AllProducts = () => {
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       ); // Use the correct product ID
       if (receiveObj.success) {
-        console.log("Product deleted successfully:", receiveObj);
+       
         window.location.reload(); // Refresh the entire page
       } else {
         console.error("Failed to delete product:", receiveObj);
