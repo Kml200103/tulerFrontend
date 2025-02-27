@@ -43,6 +43,7 @@ const Products = () => {
     }
   }, [currentPage, itemsPerPage])
 
+ 
   const getProductsByCategories = useCallback(async () => {
     try {
       const { receiveObj } = await get("/category/all");
@@ -65,7 +66,9 @@ const Products = () => {
         url += `&categoryId=${categoryId}`;
       }
       const { receiveObj } = await get(url);
+      console.log('recei', receiveObj)
       setProducts(receiveObj.products);
+      setTopProducts(receiveObj.topProducts)
       setTotalProducts(receiveObj.totalProducts);
       setTotalPages(receiveObj.totalPages);
     } catch (error) {
@@ -120,7 +123,7 @@ const Products = () => {
     setItemsPerPage(size);
     setCurrentPage(1);
   }, []);
-
+  console.log('top', topProducts)
   return (
     <div className="container flex  flex-col bg-white ">
       <div className="container flex flex-col self-center mb-4 ml-2.5 w-full max-w-[1385px] max-md:mt-5 max-md:max-w-full">
@@ -265,7 +268,7 @@ const Products = () => {
             </div>
             {isLoading && <div>Loading...</div>}
             {error && <div className="text-red-500">{error}</div>}
-            {topProducts.length > 0 ? (
+            {topProducts?.length > 0 ? (
               topProducts.map((product) => (
                 <div key={product._id} className="mb-4">
                   {/* Add margin-bottom for spacing */}
