@@ -261,20 +261,20 @@ export default function Cart({ onClose }) {
                 <img
                   loading="lazy"
                   src={item?.images || ""}
-                  alt={item.productName || "Unknown Product"}
+                  alt={item?.productName || "Unknown Product"}
                   className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
                 />
 
                 <div className="flex flex-col self-stretch my-auto text-sm">
                   <div className="text-neutral-900">{item.productName}</div>
                   <div className="text-gray-600 mt-1">
-                    Price: ${item.totalPrice.toFixed(2) || ""}
+                    Price: ${item?.totalPrice?.toFixed(2) || ""}
                   </div>
                   <div className="text-gray-600 mt-1">
-                    Quantity: {item.quantity}
+                    Quantity: {item?.quantity}
                   </div>
                   <div className="text-gray-600 mt-1">
-                    Weight: {item.variant.weight}
+                    Weight: {item?.variant?.weight}
                   </div>
                 </div>
               </div>
@@ -292,7 +292,7 @@ export default function Cart({ onClose }) {
         >
           <span className="text-sm font-semibold">Checkout</span>
           <span className="px-5 py-2.5 text-base font-bold bg-yellow-400 text-black rounded-xl">
-            ${cartData?.totalPrice ? cartData.totalPrice.toFixed(2) : "0.00"}
+            ${cartData?.totalPrice ? cartData?.totalPrice?.toFixed(2) : "0.00"}
           </span>
         </Link>
       ) : id ? (
