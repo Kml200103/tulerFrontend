@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
 import { useDispatch, useSelector } from "react-redux";
-import { Link, Navigate, useNavigate } from "react-router"; // Fixed import for react-router-dom
+import { Link, useNavigate } from "react-router"; // Fixed import for react-router-dom
 import {
   clearCart as clearCartAction,
   removeItem as removeItemAction,
@@ -17,7 +17,7 @@ export default function Cart({ onClose }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
-const navigate=useNavigate()
+  const navigate = useNavigate()
   const cart = useSelector((state) => state.cart);
 
   // Fetch Cart Data
@@ -45,19 +45,20 @@ const navigate=useNavigate()
   }, [fetchCartData]);
 
   const removeItem = useCallback(
-    async (productId, variantId) => {
+    async (productId, weight) => {
+    
       // Accept variantId as a parameter
       if (updating) return;
       setUpdating(true);
 
       if (!id) {
         // Dispatch the removeItem action if userId is not present
-        dispatch(removeItemAction({ productId, variantId })); // Pass both productId and variantId
+        dispatch(removeItemAction({ productId, weight })); // Pass both productId and variantId
         setCartData((prev) => ({
           ...prev,
           items: prev.items.filter(
             (item) =>
-              item.productId !== productId || item.variantId !== variantId // Ensure both IDs are checked
+              !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
           ),
         }));
         setUpdating(false);
@@ -70,7 +71,7 @@ const navigate=useNavigate()
           {
             userId: id,
             productId,
-            variantId, // Include variantId in the API call
+            weight, // Include variantId in the API call
           },
           { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
         );
@@ -83,7 +84,7 @@ const navigate=useNavigate()
             ...prev,
             items: prev.items.filter(
               (item) =>
-                item.productId !== productId || item.variantId !== variantId // Ensure both IDs are checked
+                !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
             ),
           }));
         }
@@ -122,13 +123,13 @@ const navigate=useNavigate()
   }, [id, dispatch]);
 
   const updateQuantity = useCallback(
-    async (productId, variantId, change) => {
+    async (productId, weight, change) => {
       // Accept variantId as a parameter
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
       const currentItem = cartData?.items?.find(
-        (item) => item.productId === productId && item.variantId === variantId // Check for both productId and variantId
+        (item) => item.productId === productId && item.variant.weight === weight // Check for both productId and variantId
       );
 
       if (!currentItem) {
@@ -142,15 +143,15 @@ const navigate=useNavigate()
       if (!id) {
         // Dispatch the decreaseQuantity or increaseQuantity action based on the change
         if (change < 0) {
-          dispatch(decreaseQuantityAction({ productId, variantId })); // Pass both productId and variantId
+          dispatch(decreaseQuantityAction({ productId, weight })); // Pass both productId and variantId
         } else {
-          dispatch(increaseQuantityAction({ productId, variantId })); // Pass both productId and variantId
+          dispatch(increaseQuantityAction({ productId, weight })); // Pass both productId and variantId
         }
         // Update local state to reflect the change immediately
         setCartData((prev) => ({
           ...prev,
           items: prev.items.map((item) =>
-            item.productId === productId && item.variantId === variantId
+            item.productId === productId && item.variant.weight === weight
               ? { ...item, quantity: newQuantity }
               : item
           ),
@@ -165,7 +166,7 @@ const navigate=useNavigate()
           {
             userId: id,
             productId,
-            variantId, // Include variantId in the API call
+            weight, // Include variantId in the API call
             quantity: newQuantity, // Send updated quantity to API
           },
           { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
@@ -185,9 +186,8 @@ const navigate=useNavigate()
   );
   return (
     <div
-      className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${
-        isCartOpen ? "open" : "closed"
-      } ${isFadingOut ? "fade-out" : ""}`}
+      className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${isCartOpen ? "open" : "closed"
+        } ${isFadingOut ? "fade-out" : ""}`}
     >
       <div className="flex items-center justify-between">
         <img
@@ -229,7 +229,7 @@ const navigate=useNavigate()
                 className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
               >
                 <button
-                  onClick={() => removeItem(item.productId, item.variantId)} // Pass variantId
+                  onClick={() => removeItem(item.productId, item.variant.weight)} // Pass variantId
                   className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
                 >
                   Remove
@@ -238,7 +238,7 @@ const navigate=useNavigate()
                 <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
                   <button
                     onClick={() =>
-                      updateQuantity(item.productId, item.variantId, 1)
+                      updateQuantity(item.productId, item.variant.weight, 1)
                     } // Pass variantId
                     className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
                     disabled={updating}
@@ -250,7 +250,7 @@ const navigate=useNavigate()
                   </span>
                   <button
                     onClick={() =>
-                      updateQuantity(item.productId, item.variantId, -1)
+                      updateQuantity(item.productId, item.variant.weight, -1)
                     } // Pass variantId
                     className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
                     disabled={updating}
@@ -285,7 +285,7 @@ const navigate=useNavigate()
         )}
       </div>
 
-      {cartData?.items?.length > 0 && id  ? (
+      {cartData?.items?.length > 0 && id ? (
         <Link
           to="/checkout"
           className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"
@@ -295,9 +295,18 @@ const navigate=useNavigate()
             ${cartData?.totalPrice ? cartData.totalPrice.toFixed(2) : "0.00"}
           </span>
         </Link>
+      ) : id ? (
+        // If user is logged in but cart is empty
+        <p className="text-center text-gray-500 mt-4">
+          Please add products to checkout.
+        </p>
       ) : (
-        <button onClick={()=>navigate('/login')} className="text-center text-red-500 mt-4">
-          Please Login 
+        // If user is not logged in
+        <button
+          onClick={() => navigate("/login")}
+          className="text-center text-red-500 mt-4"
+        >
+          Please Login
         </button>
       )}
     </div>

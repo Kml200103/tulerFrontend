@@ -34,28 +34,29 @@ const dispatch=useDispatch()
 
   const handleAddToCart = useCallback(async () => {
     if (!userId) {
-      NotificationService.sendErrorMessage("Please Login First");
-      // console.log("product", product);
-      // NotificationService.sendErrorMessage("Please Login First");
       const payload = {
         variant: {
           weight: selectedVariant.weight,
-          price: selectedVariant.price,
+          price: selectedVariant.price, // Ensure price is included
         },
         productId: product._id,
-        variantId: selectedVariant._id,
+        variantId: selectedVariant._id, // Include variantId
         weight: selectedVariant.weight,
-        totalPrice: selectedVariant.price,
+        price: selectedVariant.price, // Ensure price is explicitly included
+        totalPrice: selectedVariant.price, // Explicitly set totalPrice
         images: product.images,
-        quantity: 1,
+        quantity: 1, // Default quantity is 1
         productName: product.name,
       };
+
       NotificationService.sendSuccessMessage("Item Added to Cart");
-      dispatch(addToCart(payload));
+      dispatch(addToCart(payload)); // Dispatch the action
       return;
     }
     if (!selectedVariant) {
-      NotificationService.sendErrorMessage("Please select a variant.");
+      NotificationService.sendErrorMessage(
+        "Please select a variant before adding to cart."
+      );
       return;
     }
 
@@ -64,27 +65,27 @@ const dispatch=useDispatch()
         "/cart/add",
         {
           userId,
-          productId: product._id,
+          productId: product._id, // Ensure this is defined
+          variantId: selectedVariant._id,
           weight: selectedVariant.weight,
           quantity: 1,
           price: selectedVariant.price,
-          variantId: selectedVariant._id,
         },
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
 
+      // console.log("Cart API Response:", response);
+
       if (response.receiveObj) {
-        if (response.receiveObj.success) {
-          NotificationService.sendSuccessMessage(response.receiveObj.message);
-        } else {
-          NotificationService.sendErrorMessage(response.receiveObj.message);
-        }
+        NotificationService.sendSuccessMessage(response.receiveObj.message);
+      } else {
+        NotificationService.sendErrorMessage(response.receiveObj.message);
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      NotificationService.sendErrorMessage("Error adding product to cart.");
+      alert("Error adding product to cart.");
     }
-  }, [userId, product, selectedVariant]);
+  }, [userId, product, selectedVariant, dispatch]);
 
   const thumbnails = useMemo(() => {
     if (!product) return [];

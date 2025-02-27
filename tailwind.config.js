@@ -6,6 +6,7 @@ module.exports = {
       fontFamily: {
         montserrat: ["Montserrat", "serif"],
         lato: ["Lato", "serif"],
+        playfair:[ "Playfair Display", "serif"]
       },
     },
     container: {

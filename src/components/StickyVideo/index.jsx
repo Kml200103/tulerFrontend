@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback,useEffect } from "react";
 
 const StickyVideo = () => {
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
   const videoRef = useRef(null);
 
@@ -18,13 +18,19 @@ const StickyVideo = () => {
     setIsOpen(false);
   }, []);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.play();
+    }
+  }, []); 
+
   if (!isOpen) return null;
 
   return (
     <div className={`fixed bottom-0 right-0 p-2 transition-all duration-300 z-50`}>
       <video
         ref={videoRef}
-        src="https://www.w3schools.com/html/mov_bbb.mp4"
+        src="/video/tulerVdo.mp4"
         className={`w-auto h-40 cursor-pointer`}
         onClick={handleVideoClick}
         controls

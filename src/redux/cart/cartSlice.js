@@ -17,24 +17,25 @@ const cartSlice = createSlice({
     },
 
     addToCart: (state, action) => {
+      const { productId, variant, price } = action.payload; // Extract weight from variant
+
       const itemIndex = state.items.findIndex(
         (item) =>
-          item.productId === action.payload.productId &&
-          item.variantId === action.payload.variantId // Check for variantId as well
+          item.productId === productId && item.variant.weight === variant.weight
       );
 
       if (itemIndex >= 0) {
         // If item exists, increase quantity and update totalPrice
         state.items[itemIndex].quantity += 1;
         state.items[itemIndex].totalPrice =
-          state.items[itemIndex].quantity * state.items[itemIndex].price; // Update totalPrice
+          state.items[itemIndex].quantity * state.items[itemIndex].price;
       } else {
         // Add new item with totalPrice
         const tempProduct = {
           ...action.payload,
           quantity: 1, // Default quantity
-          price: action.payload.price, // Ensure price is included
-          totalPrice: action.payload.price, // Initialize totalPrice
+          price, // Ensure price is included
+          totalPrice: price, // Initialize totalPrice
         };
         state.items.push(tempProduct);
       }
@@ -44,12 +45,11 @@ const cartSlice = createSlice({
     },
 
     removeItem: (state, action) => {
-      const { productId, variantId } = action.payload;
+      const { productId, weight } = action.payload;
 
       state.items = state.items.filter(
         (product) =>
-          product.productId !== productId ||
-          (product.productId === productId && product.variantId !== variantId) // Ensure only the matching variant gets removed
+          product.productId !== productId || product.variant.weight !== weight
       );
 
       // Recalculate total price and quantity
@@ -57,36 +57,38 @@ const cartSlice = createSlice({
     },
 
     decreaseQuantity: (state, action) => {
+      const { productId, weight } = action.payload;
+
       const cartItem = state.items.find(
-        (pd) =>
-          pd.productId === action.payload.productId &&
-          pd.variantId === action.payload.variantId // Check for both productId and variantId
+        (item) => item.productId === productId && item.variant.weight === weight
       );
+
       if (cartItem && cartItem.quantity > 1) {
-        cartItem.quantity -= 1; // Decrease quantity
-        cartItem.totalPrice = cartItem.quantity * cartItem.price; // Update totalPrice based on new quantity
+        cartItem.quantity -= 1;
+        cartItem.totalPrice = cartItem.quantity * cartItem.price;
       } else if (cartItem) {
-        const nextCartItems = state.items.filter(
+        state.items = state.items.filter(
           (product) =>
-            product.productId !== action.payload.productId ||
-            product.variantId !== action.payload.variantId // Check for both productId and variantId
+            product.productId !== productId || product.variant.weight !== weight
         );
-        state.items = nextCartItems;
       }
+
       // Recalculate total price and quantity
       getTotalAmount(state);
     },
 
     increaseQuantity: (state, action) => {
+      const { productId, weight } = action.payload;
+
       const cartItem = state.items.find(
-        (pd) =>
-          pd.productId === action.payload.productId &&
-          pd.variantId === action.payload.variantId // Check for both productId and variantId
+        (item) => item.productId === productId && item.variant.weight === weight
       );
+
       if (cartItem) {
-        cartItem.quantity += 1; // Increase quantity
-        cartItem.totalPrice = cartItem.quantity * cartItem.price; // Update totalPrice based on new quantity
+        cartItem.quantity += 1;
+        cartItem.totalPrice = cartItem.quantity * cartItem.price;
       }
+
       // Recalculate total price and quantity
       getTotalAmount(state);
     },
@@ -95,12 +97,12 @@ const cartSlice = createSlice({
       let quantity = 0;
       let total = 0;
       state.items.forEach((item) => {
-        quantity += item.quantity; // Use quantity
-        total += item.totalPrice; // Calculate total price based on totalPrice of each item
+        quantity += item.quantity;
+        total += item.totalPrice;
       });
 
-      state.cartQuantity = quantity; // Update total quantity
-      state.totalPrice = total; // Update total price in state
+      state.cartQuantity = quantity;
+      state.totalPrice = total;
     },
   },
 });

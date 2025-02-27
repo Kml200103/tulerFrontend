@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import CardItem from "./CheckoutCardItem";
 import AddressForm from "../../components/AddressForm";
 import { del, get, post } from "../../services/http/axiosApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NotificationService } from "../../services/Notifcation";
 import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 
 const Checkout = () => {
+    const [updating, setUpdating] = useState(false);
   const [showPreviousAddresses, setShowPreviousAddresses] = useState(false);
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -22,7 +23,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
-  // console.log(user);
+ const dispatch=useDispatch()
 
   const {
     handleSubmit,
@@ -100,21 +101,60 @@ const Checkout = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (userId) {
-      fetchCartData();
-      fetchAddresses();
-      fetchAvailableOffers();
-    }
-  }, [fetchCartData, fetchAddresses, fetchAvailableOffers]);
 
-  useEffect(() => {
-    const savedOffer = localStorage.getItem("savedOffer");
-    if (savedOffer) {
-      setIsOfferAvailable(true);
-    }
-  }, []);
 
+   const removeItem = useCallback(
+      async (productId, weight) => {
+        // Accept variantId as a parameter
+        if (updating) return;
+        setUpdating(true);
+  
+        if (!userId) {
+          // Dispatch the removeItem action if userId is not present
+          dispatch(removeItemAction({ productId, weight })); // Pass both productId and variantId
+          setCartData((prev) => ({
+            ...prev,
+            items: prev.items.filter(
+              (item) =>
+                !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
+            ),
+          }));
+          setUpdating(false);
+          return;
+        }
+  
+        try {
+          const { receiveObj } = await del(
+            "/cart/remove",
+            {
+              userId: userId,
+              productId:productId.productId,
+              weight:productId.weight, // Include variantId in the API call
+            },
+            { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+          );
+  
+          if (receiveObj.status === 401) {
+            NotificationService.sendErrorMessage(receiveObj.message);
+          } else {
+            fetchCartData();
+            // Only update the local state if the API call was successful
+            // setCartData((prev) => ({
+            //   ...prev,
+            //   items: prev.items.filter(
+            //     (item) =>
+            //       !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
+            //   ),
+            // }));
+          }
+        } catch (error) {
+          console.error("Error removing item from cart:", error);
+        } finally {
+          setUpdating(false);
+        }
+      },
+      [userId, updating, dispatch]
+    );
   const removeAddress = async (address) => {
     try {
       const { receiveObj } = await del(
@@ -250,6 +290,20 @@ const Checkout = () => {
       );
     }
   };
+  useEffect(() => {
+    if (userId) {
+      fetchCartData();
+      fetchAddresses();
+      fetchAvailableOffers();
+    }
+  }, [fetchCartData, fetchAddresses, fetchAvailableOffers]);
+
+  useEffect(() => {
+    const savedOffer = localStorage.getItem("savedOffer");
+    if (savedOffer) {
+      setIsOfferAvailable(true);
+    }
+  }, []);
   const onSubmit = async (data) => {
     // Create a payload object, including 'name' instead of 'fullName' and excluding 'email'
     const payload = {
@@ -699,12 +753,12 @@ const Checkout = () => {
                       <button
                         type="button"
                         onClick={() =>
-                          dispatch(
-                            removeItemFromCart({
-                              userId: user?.id,
-                              itemId: item.id,
+                          
+                            removeItem({
+                             productId:item.productId,
+                              weight: item.variant.weight,
                             })
-                          )
+                          
                         }
                         className="text-xs font-medium text-red-600 hover:text-red-700"
                       >

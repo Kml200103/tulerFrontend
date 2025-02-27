@@ -195,7 +195,7 @@ const Home = () => {
       <div className="flex flex-col items-center px-4 py-16 w-full bg-stone-50 md:px-16 md:pt-32 md:pb-20">
             <div className="w-full max-w-[1455px]">
                 <div className="flex flex-col md:flex-row gap-5">
-                    <div className="w-full md:w-2/6">
+                    <div className="w-full md:w-1/4">
                         <div className="flex flex-col items-start"> {/* Removed self-stretch */}
                             <div className="text-xl md:text-2xl font-semibold text-yellow-400 leading-tight"> {/* Added leading-tight */}
                                 Shop By
@@ -212,7 +212,7 @@ const Home = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="w-full md:w-3/6">
+                    <div className="w-full md:w-1/2">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8 md:mt-0">
                             {images.slice(0, 2).map((image, index) => (
                                 <div key={index} className="w-full">
@@ -226,7 +226,7 @@ const Home = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="w-full md:w-1/6">
+                    <div className="w-full md:w-1/4 ">
                         {images.length > 2 && (
                             <img
                                 loading="lazy"
