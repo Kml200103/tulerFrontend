@@ -34,8 +34,8 @@ const Login = () => {
         NotificationService.sendErrorMessage(response.message);
       }
     } catch (error) {
-      // console.log('error', error)
-      // NotificationService.sendErrorMessage(error.message)
+     
+      NotificationService.sendErrorMessage(error.data.error)
     }
   };
 

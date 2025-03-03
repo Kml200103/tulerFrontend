@@ -232,11 +232,13 @@ const AllProducts = () => {
         "/product",
         formData,
         {
-          headers: {
+          
             "Content-Type": "multipart/form-data",
-          },
+            Authorization: `Bearer ${localStorage.getItem("userToken")}` 
+          
+        
         },
-        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      
       );
 
       if (result.isSuccess) {
@@ -390,7 +392,7 @@ const AllProducts = () => {
                             <div key={variant._id} className="py-1">
                               {variant.weight} -{" "}
                               <span className="font-semibold">
-                                ${variant.price}
+                                ₹{variant.price}
                               </span>{" "}
                               (Qty: {variant.quantity})
                             </div>

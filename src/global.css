@@ -9,6 +9,7 @@
   padding: 20px;
 }
 
+
 /* Container for the spin wheel */
 .spin-wheel-container {
   display: flex;
@@ -20,6 +21,11 @@
   text-align: center;
 }
 
+@media (min-width: 768px) and (max-width: 856px) {
+  .wheel-container {
+    display: none;
+  }
+}
 /* Wheel container styling */
 .wheel-container {
   position: relative;
@@ -29,6 +35,7 @@
   width: 350px;
   height: 350px;
 }
+
 
 /* Spin button styling */
 .spin-button {
@@ -159,3 +166,4 @@ li {
   font-size: 1.2rem;
   color: #333; /* Dark text for list items */
 }
+
