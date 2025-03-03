@@ -13,7 +13,7 @@ const ProductDescription = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
-const dispatch=useDispatch()
+  const dispatch = useDispatch();
   const getProduct = useCallback(async () => {
     try {
       const { receiveObj } = await get(`/product/${productId}`);
@@ -105,33 +105,37 @@ const dispatch=useDispatch()
   }
 
   return (
-    <main className="flex overflow-hidden flex-col bg-white my-10 md:my-20 lg:my-40">
-      <section className="self-center mx-3 w-full max-w-[1398px]">
-        <div className="max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
+    <main className="flex overflow-hidden flex-col bg-white my-6 md:my-10 lg:my-20">
+      <section className="self-center w-full max-w-[1398px] px-4 md:px-6">
+        <div className="max-w-full">
+          <div className="flex flex-col md:flex-row gap-5">
             {/* Product Images Section */}
-            <div className="w-full max-md:w-full">
+            <div className="w-full md:w-1/2">
               <div className="flex flex-col items-center">
                 {/* Main Image */}
                 <img
                   src={selectedImage}
                   alt={product.name}
-                  className="object-contain w-3/4 max-w-[400px] aspect-[1.01] max-md:w-[250px] max-md:mt-10"
+                  className="object-contain w-full max-w-[350px] md:max-w-[400px] aspect-square"
                 />
 
-                <div className="mt-8 w-full">
-                  {/* Thumbnails Section - Includes Main Image + Other Images */}
-                  <div className="flex gap-5 justify-center max-md:flex-col">
+                {/* Thumbnails Section */}
+                <div className="mt-4 md:mt-8 w-full">
+                  <div className="flex gap-2 md:gap-4 justify-center overflow-x-auto pb-2">
                     {[product.images, ...product.otherImages].map(
                       (src, index) => (
-                        <div key={index} className="w-[30%] max-md:w-full">
+                        <div
+                          key={index}
+                          className="w-[80px] md:w-[100px] flex-shrink-0"
+                        >
                           <img
                             src={src}
                             alt={`Product thumbnail ${index + 1}`}
-                            className={`object-contain grow shrink-0 mt-1.5 max-w-full rounded-none aspect-[0.99] w-full max-md:mt-8 cursor-pointer ${selectedImage === src
+                            className={`object-contain w-full aspect-square cursor-pointer ${
+                              selectedImage === src
                                 ? "border-2 border-blue-500"
-                                : ""
-                              }`}
+                                : "border border-gray-200"
+                            }`}
                             onClick={() => setSelectedImage(src)}
                           />
                         </div>
@@ -143,62 +147,73 @@ const dispatch=useDispatch()
             </div>
 
             {/* Product Details Section */}
-            <div className="w-full flex justify-center">
-              <div className="ml-5 w-full max-w-[600px] md:max-w-[700px] lg:max-w-[800px] xl:max-w-[900px] 2xl:max-w-[1000px] max-md:ml-0 max-md:w-full">
-                <section className="flex flex-col items-start w-full font-semibold text-black max-md:mt-10">
-                  <span className="px-3.5 py-1 text-sm md:text-lg bg-yellow-400 rounded-md">
+            <div className="w-full md:w-1/2 mt-8 md:mt-0">
+              <div className="w-full">
+                <section className="flex flex-col items-start w-full font-semibold text-black">
+                  <span className="px-3 py-1 text-sm bg-yellow-400 rounded-md">
                     {product.isAvailable ? "In stock" : "Out of stock"}
                   </span>
-                  <h1 className="mt-6 text-xl md:text-2xl lg:text-3xl">
+
+                  <h1 className="mt-4 text-xl md:text-2xl lg:text-3xl">
                     {product.name}
                   </h1>
-                  <p className="mt-2 text-sm md:text-lg text-gray-700">
+
+                  <p className="mt-2 text-sm text-gray-700">
                     Category: {product.categoryId?.name}
                   </p>
-                  <div className="flex flex-col self-stretch pr-5 pl-0.5 mt-4 font-medium">
-                    <p className="self-start text-xl md:text-2xl">
-                      ${selectedVariant ? selectedVariant.price : "Select a variant"}
+
+                  <div className="w-full mt-4 font-medium">
+                    <p className="text-xl md:text-2xl">
+                      $
+                      {selectedVariant
+                        ? selectedVariant.price
+                        : "Select a variant"}
                     </p>
-                    <article className="mt-6 text-base md:text-lg leading-6 md:leading-7">
+
+                    <article className="mt-4 text-sm md:text-base leading-6">
                       <p>{product.description}</p>
-                      <h2 className="mt-4 font-semibold text-base md:text-lg">Health Benefits:</h2>
+                      <h2 className="mt-4 font-semibold">Health Benefits:</h2>
                       <ul className="list-disc pl-5 mt-2">
                         {product.benefits.map((benefit, index) => (
-                          <li key={index} className="text-sm md:text-base">{benefit}</li>
+                          <li key={index} className="mb-1">
+                            {benefit}
+                          </li>
                         ))}
                       </ul>
                     </article>
                   </div>
-                  <hr className="shrink-0 self-stretch mt-8 md:mt-11 h-px bg-neutral-200 max-md:mt-10" />
+
+                  <hr className="w-full my-6" />
 
                   {/* Variants */}
-                  <h2 className="mt-6 text-base md:text-xl font-semibold">
-                    Available Variants:
-                  </h2>
-                  <div className="flex flex-wrap gap-4 mt-4">
+                  <h2 className="text-lg font-semibold">Available Variants:</h2>
+
+                  <div className="flex flex-wrap gap-3 mt-3">
                     {product.variants.map((variant, index) => (
                       <div
                         key={index}
-                        className={`border p-4 rounded-md cursor-pointer transition-all duration-200 w-[100px] md:w-[120px] text-center ${selectedVariant && selectedVariant._id === variant._id
+                        className={`border p-3 rounded-md cursor-pointer transition-all duration-200 w-[90px] text-center ${
+                          selectedVariant && selectedVariant._id === variant._id
                             ? "border-blue-500 bg-blue-100 shadow-md"
                             : "border-gray-300 bg-white"
-                          }`}
+                        }`}
                         onClick={() => setSelectedVariant(variant)}
                       >
-                        <p className="text-sm md:text-lg font-medium">{variant.weight}</p>
+                        <p className="text-sm font-medium">{variant.weight}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Add to Cart Button */}
                   <button
-                    className="flex gap-3.5 px-5 md:px-6 py-2.5 mt-8 md:mt-9 text-lg md:text-xl text-white bg-black rounded-3xl max-md:px-5"
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 mt-6 text-base md:text-lg text-white bg-black rounded-full w-full md:w-auto"
                     onClick={handleAddToCart}
+                    disabled={!selectedVariant}
                   >
                     <img
                       src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
                       alt="Cart icon"
-                      className="object-contain shrink-0 aspect-[1.04] w-[22px] md:w-[26px]"
+                      className="w-5 h-5 object-contain"
                     />
                     Add to cart
                   </button>
@@ -210,5 +225,5 @@ const dispatch=useDispatch()
       </section>
     </main>
   );
-}
-export default ProductDescription
+};
+export default ProductDescription;

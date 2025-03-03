@@ -52,7 +52,7 @@ const AdminProfile = () => {
 
   return (
     <div className="container flex flex-col max-w-[954px] rounded-[30px] my-20">
-      <div className="flex flex-col items-start px-11 pt-7 pb-72 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-5 max-md:pb-24 max-md:max-w-full ">
+      <div className="flex flex-col items-start px-11 pt-7 pb-72 w-full bg-white rounded-[30px] shadow-[0px_1px_20px_rgba(0,0,0,0.1)] max-md:px-5 max-md:pb-24 max-md:max-w-full">
         <div className="flex gap-2">
           <h1 className="text-3xl font-semibold leading-loose text-neutral-700">
             Admin Profile Details
@@ -62,39 +62,29 @@ const AdminProfile = () => {
             onClick={handleOpenEditProfileDialog}
           />
         </div>
+
         {isEditProfileDialog && (
           <ProfileUpdateDialog
             onClose={handleCloseEditProfileDialog}
             userData={data?.user}
           />
         )}
-        <div className="mt-16 w-full max-w-[653px] max-md:mt-10 max-md:max-w-full">
-          <div className="flex gap-5 max-md:flex-col">
-            <div className="flex flex-col w-[38%] max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col grow items-start text-xl font-medium text-neutral-700 max-md:mt-10">
-                {profileData.map((item, index) => (
-                  <div
-                    key={index}
-                    className={index > 0 ? "mt-11 max-md:mt-10" : ""}
-                  >
-                    {item.label}
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="flex flex-col ml-5 w-[62%] max-md:ml-0 max-md:w-full">
-              <div className="flex flex-col grow items-start text-xl font-medium text-neutral-700 max-md:mt-10">
-                {profileData.map((item, index) => (
-                  <div
-                    key={index}
-                    className={index > 0 ? "mt-11 max-md:mt-10" : ""}
-                  >
-                    {item.value}
-                  </div>
-                ))}
+        <div className="mt-16 w-full max-w-[653px] max-md:mt-10 max-md:max-w-full">
+          <div className="flex flex-col gap-6">
+            {profileData.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-col md:flex-row md:items-center"
+              >
+                <div className="w-[38%] text-xl font-medium text-neutral-700">
+                  {item.label}
+                </div>
+                <div className="w-[62%] text-xl font-medium text-neutral-700 md:ml-5 mt-2 md:mt-0">
+                  {item.value}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

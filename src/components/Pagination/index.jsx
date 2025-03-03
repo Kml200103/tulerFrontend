@@ -26,7 +26,7 @@ const Pagination = ({
           index + 1 === currentPage
             ? "bg-indigo-600 text-white"
             : "text-gray-400"
-        } px-4 py-2 text-sm font-semibold focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+        } px-2 py-1 text-sm font-semibold focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
       >
         {index + 1}
       </div>
@@ -34,8 +34,8 @@ const Pagination = ({
   };
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-      <div className="flex flex-1 justify-between sm:hidden">
+    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <div className="flex flex-1 justify-between items-center sm:hidden">
         <div
           onClick={() => handleClick(currentPage - 1)}
           className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
@@ -44,8 +44,12 @@ const Pagination = ({
               : "text-gray-700 hover:bg-gray-50"
           }`}
         >
-          Previous
+          <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
         </div>
+
+        {/* Add this to display page numbers */}
+        <div className="flex justify-center ml">{renderPageNumbers()}</div>
+
         <div
           onClick={() => handleClick(currentPage + 1)}
           className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium ${
@@ -54,9 +58,10 @@ const Pagination = ({
               : "text-gray-700 hover:bg-gray-50"
           }`}
         >
-          Next
+          <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
         </div>
       </div>
+
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
@@ -75,7 +80,7 @@ const Pagination = ({
         </div>
         <div>
           <nav
-            className="isolate inline-flex -space-x-px rounded-md shadow-sm"
+            className="isolate inline-flex items-center -space-x-px rounded-md shadow-sm"
             aria-label="Pagination"
           >
             <div
@@ -88,6 +93,7 @@ const Pagination = ({
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </div>
 
+            {/* Render Page Numbers Here */}
             {renderPageNumbers()}
 
             <div
@@ -99,22 +105,24 @@ const Pagination = ({
               }`}
             >
               <span className="sr-only">Next</span>
-              <ChevronRightIcon className="h-5 w- 5" aria-hidden="true" />
+              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
             </div>
           </nav>
         </div>
       </div>
-      <select
-        value={itemsPerPage}
-        onChange={(e) => setPageSize(Number(e.target.value))}
-        className="ml-4 px-2 py-1 text-sm border border-gray-300 rounded"
-      >
-        <option value={5}>5</option>
-        <option value={10}>10</option>
-        <option value={20}>20</option>
-        <option value={30}>30</option>
-        <option value={40}>40</option>
-      </select>
+      <div className="flex items-center mt-2 sm:mt-0">
+        <select
+          value={itemsPerPage}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+          className="ml-4 px-2 py-1 text-sm border border-gray-300 rounded"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={30}>30</option>
+          <option value={40}>40</option>
+        </select>
+      </div>
     </div>
   );
 };

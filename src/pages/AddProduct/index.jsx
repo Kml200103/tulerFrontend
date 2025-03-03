@@ -29,12 +29,15 @@ const ProductPage = () => {
     control,
     name: "variants",
   });
+  const token = localStorage.getItem("userToken");
+  console.log(token);
 
   const [previewImages, setPreviewImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [coverImagePreview, setCoverImagePreview] = useState(null);
+  const [benefitError, setBenefitError] = useState("");
   // const [previewImages, setPreviewImages] = useState([]);
   const [benefits, setBenefits] = useState([]);
   const [benefitText, setBenefitText] = useState("");
@@ -215,14 +218,10 @@ const ProductPage = () => {
     });
     // console.log("formData", formData);
     try {
-      const result = await post(
-        "/product",
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        },
-        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
-      );
+      const result = await post("/product", formData, {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      });
 
       if (result.isSuccess) {
         // console.log("Product saved successfully:", result.receiveObj);
@@ -250,77 +249,75 @@ const ProductPage = () => {
   }, []);
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+    <div className="flex min-h-full flex-1 flex-col justify-center px-3 sm:px-6 py-6 sm:py-12">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">
         Add Product
       </h1>
-      <div className="sm:mx-auto sm:w-full max-w-full">
-        <div className="border border-gray-300 rounded-lg p-6 shadow-md bg-white">
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="border border-gray-300 rounded-lg p-4 sm:p-6 shadow-md bg-white">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
             noValidate
           >
             <div>
               <label
                 htmlFor="name"
-                className="block text-md font-medium leading-6 text-gray-900"
+                className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
               >
                 Product Name <span className="text-red-600">*</span>
               </label>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <input
                   id="name"
                   type="text"
                   {...register("name", {
                     required: "Product Name is required",
                   })}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-base sm:leading-6"
                 />
                 {errors.name && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.name.message}
+                  <p className="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+                    *{errors.name.message}
                   </p>
                 )}
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 <label
                   htmlFor="category"
-                  className="block text-md font-medium leading-6 text-gray-900"
+                  className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
                 >
                   Category <span className="text-red-600">*</span>
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsCategoryDialogOpen(true)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm self-start sm:self-auto"
                 >
                   Manage Categories
                 </button>
               </div>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <select
                   id="category"
                   {...register("categoryId", {
                     required: "Category is required",
                   })}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-base sm:leading-6"
                 >
                   <option value="">Select Category</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
-                      {" "}
-                      {/* Use category.id here */}
                       {category.name}
                     </option>
                   ))}
                 </select>
                 {errors.categoryId && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.categoryId.message}
+                  <p className="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+                    *{errors.categoryId.message}
                   </p>
                 )}
               </div>
@@ -329,66 +326,82 @@ const ProductPage = () => {
             <div>
               <label
                 htmlFor="description"
-                className="block text-md font-medium leading-6 text-gray-900"
+                className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
               >
                 Description <span className="text-red-600">*</span>
               </label>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <textarea
                   id="description"
-                  maxLength={230}
+                  maxLength={250} // You can keep this if you want to limit the character count
                   {...register("description", {
                     required: "Description is required",
                     validate: {
-                      minLength: (value) => {
+                      maxWords: (value) => {
+                        const wordCount = value.trim().split(/\s+/).length; // Split by whitespace
                         return (
-                          value.length >= 230 ||
-                          "Description must be at least 230 characters long"
+                          wordCount <= 250 ||
+                          "Description must not exceed 250 words"
                         );
                       },
                     },
                   })}
                   rows={4}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-base sm:leading-6"
                 />
                 {errors.description && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.description.message}
+                  <p className="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+                    *{errors.description.message}
                   </p>
                 )}
               </div>
             </div>
+
             <div>
-              <label className="block text-md font-medium text-gray-900">
+              <label className="block text-sm sm:text-md font-medium text-gray-900">
                 Benefits <span className="text-red-600">*</span> (Max 5)
               </label>
-              <input
-                type="text"
-                value={benefitText}
-                onChange={(e) => setBenefitText(e.target.value)}
-                placeholder="Enter a benefit point (Max 70 words)"
-                className="block w-full border p-2 rounded-md"
-              />
+              <div className="mt-1 sm:mt-2">
+                <input
+                  type="text"
+                  value={benefitText}
+                  onChange={(e) => setBenefitText(e.target.value)}
+                  placeholder="Enter a benefit point (Max 70 words)"
+                  className="block w-full border p-2 rounded-md text-sm sm:text-base"
+                />
+                {benefitError && (
+                  <p className="text-red-600 text-xs sm:text-sm mt-2">
+                    *{benefitError}
+                  </p>
+                )}
+              </div>
               <button
                 type="button"
-                onClick={addBenefit}
+                onClick={() => {
+                  if (!benefitText.trim()) {
+                    setBenefitError("Benefit text cannot be empty");
+                    return;
+                  }
+                  setBenefitError("");
+                  addBenefit();
+                }}
                 disabled={benefits.length >= 5}
-                className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400"
+                className="mt-2 bg-indigo-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 text-sm sm:text-base"
               >
                 Add Benefit
               </button>
 
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-3 sm:mt-4 space-y-2">
                 {benefits.map((benefit, index) => (
                   <li
                     key={index}
-                    className="flex justify-between items-center bg-gray-100 p-2 rounded-md"
+                    className="flex justify-between items-center bg-gray-100 p-2 rounded-md text-sm sm:text-base"
                   >
-                    <span>{benefit}</span>
+                    <span className="mr-2 break-words flex-1">{benefit}</span>
                     <button
                       type="button"
                       onClick={() => removeBenefit(index)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 flex-shrink-0"
                     >
                       Remove
                     </button>
@@ -400,11 +413,11 @@ const ProductPage = () => {
             <div>
               <label
                 htmlFor="coverImage"
-                className="block text-md font-medium leading-6 text-gray-900"
+                className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
               >
                 Cover Image <span className="text-red-600">*</span>
               </label>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <input
                   type="file"
                   accept="image/jpeg, image/png, image/gif"
@@ -424,12 +437,12 @@ const ProductPage = () => {
                       return true;
                     },
                   })}
-                  onChange={handleCoverImagePreview} // Keep the onChange handler
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                  onChange={handleCoverImagePreview}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-base sm:leading-6"
                 />
                 {errors.coverImage && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.coverImage.message}
+                  <p className="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+                    *{errors.coverImage.message}
                   </p>
                 )}
                 {coverImagePreview && (
@@ -437,20 +450,21 @@ const ProductPage = () => {
                     <img
                       src={coverImagePreview}
                       alt="Cover Preview"
-                      className="w-20 h-20 object-cover rounded"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded"
                     />
                   </div>
                 )}
               </div>
             </div>
-            <div className="mt-4">
+
+            <div className="mt-2 sm:mt-4">
               <label
                 htmlFor="images"
-                className="block text-md font-medium leading-6 text-gray-900"
+                className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
               >
                 Other Images <span className="text-red-600">*</span>
               </label>
-              <div className="mt-2">
+              <div className="mt-1 sm:mt-2">
                 <input
                   type="file"
                   multiple
@@ -476,21 +490,21 @@ const ProductPage = () => {
                     },
                   })}
                   onChange={handleImagePreview}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-base sm:leading-6"
                 />
                 {errors.images && (
-                  <p className="text-red-600 text-sm mt-2">
-                    {errors.images.message}
+                  <p className="text-red-600 text-xs sm:text-sm mt-1 sm:mt-2">
+                    *{errors.images.message}
                   </p>
                 )}
                 {previewImages.length > 0 && (
-                  <div className="mt-2 flex space-x-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {previewImages.map((src, index) => (
                       <img
                         key={index}
                         src={src}
                         alt="Preview"
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded"
                       />
                     ))}
                   </div>
@@ -499,29 +513,29 @@ const ProductPage = () => {
             </div>
 
             <div>
-              <h3 className="text-md font-medium leading-6 text-gray-900">
+              <h3 className="text-sm sm:text-md font-medium leading-6 text-gray-900 mb-2">
                 Product Variants
               </h3>
               {fields.map((field, index) => (
                 <div
                   key={field.id}
-                  className="flex space-x-2 items-center mb-4"
+                  className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 items-start sm:items-center mb-4"
                 >
-                  <div className="w-1/3">
+                  <div className="w-full sm:w-1/3">
                     <input
                       {...register(`variants.${index}.weight`, {
                         required: "Weight is required",
                       })}
                       placeholder="Enter Weight"
-                      className="border p-2 rounded w-full"
+                      className="border p-2 rounded w-full text-sm sm:text-base"
                     />
                     {errors.variants?.[index]?.weight && (
-                      <p className="text-red-600 text-sm mt-2">
-                        {errors.variants[index].weight.message}
+                      <p className="text-red-600 text-xs sm:text-sm mt-1">
+                        *{errors.variants[index].weight.message}
                       </p>
                     )}
                   </div>
-                  <div className="w-1/3">
+                  <div className="w-full sm:w-1/3">
                     <input
                       {...register(`variants.${index}.price`, {
                         required: "Price is required",
@@ -532,15 +546,15 @@ const ProductPage = () => {
                       })}
                       type="number"
                       placeholder="Enter Price"
-                      className="border p-2 rounded w-full"
+                      className="border p-2 rounded w-full text-sm sm:text-base"
                     />
                     {errors.variants?.[index]?.price && (
-                      <p className="text-red-600 text-sm mt-2">
-                        {errors.variants[index].price.message}
+                      <p className="text-red-600 text-xs sm:text-sm mt-1">
+                        *{errors.variants[index].price.message}
                       </p>
                     )}
                   </div>
-                  <div className="w-1/3">
+                  <div className="w-full sm:w-1/3 flex items-center">
                     <input
                       {...register(`variants.${index}.quantity`, {
                         required: "Quantity is required",
@@ -551,36 +565,36 @@ const ProductPage = () => {
                       })}
                       type="number"
                       placeholder="Enter Stock"
-                      className="border p-2 rounded w-full"
+                      className="border p-2 rounded w-full text-sm sm:text-base"
                     />
-                    {errors.variants?.[index]?.quantity && (
-                      <p className="text-red-600 text-sm mt-2">
-                        {errors.variants[index].quantity.message}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => remove(index)}
+                      className="text-red-500 ml-2 text-xl"
+                    >
+                      ✕
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => remove(index)}
-                    className="text-red-500"
-                  >
-                    ✕
-                  </button>
+                  {errors.variants?.[index]?.quantity && (
+                    <p className="text-red-600 text-xs sm:text-sm mt-1">
+                      *{errors.variants[index].quantity.message}
+                    </p>
+                  )}
                 </div>
               ))}
               <button
                 type="button"
                 onClick={() => append({ weight: "", price: 0, quantity: 0 })}
-                className="mt-2 text-yellow-500"
+                className="mt-2 text-yellow-500 flex items-center gap-1 text-sm sm:text-base"
               >
-                + Add Variant
+                <span className="text-lg">+</span> Add Variant
               </button>
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-2 sm:pt-4">
               <button
                 type="submit"
-                className="w-1/4 rounded-md bg-indigo-600 py-1.5 text-md font-semibold text-white shadow-sm ring-1 ring-gray-900/10 hover:bg-indigo-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                className="w-full sm:w-1/2 md:w-1/3 rounded-md bg-indigo-600 py-1.5 text-sm sm:text-md font-semibold text-white shadow-sm ring-1 ring-gray-900/10 hover:bg-indigo-700 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
               >
                 Add Product
               </button>

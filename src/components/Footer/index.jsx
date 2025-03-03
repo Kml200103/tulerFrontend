@@ -43,8 +43,6 @@ export const Footer = () => {
     }
   };
   return (
-   
-
     <footer className="flex flex-col items-center px-4 py-16 w-full bg-sky-50 md:px-20 md:pt-20 md:pb-6">
       {" "}
       {/* Adjusted padding */}
@@ -115,34 +113,35 @@ export const Footer = () => {
           <div className="w-full md:w-auto hidden md:block w-px bg-neutral-200 h-full"></div>{" "}
           {/* Vertical separator (hide on mobile) */}
           <div className="w-full md:w-auto flex flex-col items-center md:items-start text-center md:text-left">
-            
             {/* Newsletter section width and alignment */}
-            <div className="text-center"> {/* Center the content */}
-      <div className="text-2xl md:text-3xl font-semibold text-neutral-900">
-        Subscribe to Newsletter
-      </div>
-      <form
-        onSubmit={handleSubscribe}
-        className="flex flex-col md:flex-row gap-4 mt-4 md:mt-5 bg-white rounded-[30px] p-3 shadow-md w-full max-w-md mx-auto" // Added max-w-md and mx-auto
-      >
-        <input
-          type="email"
-          id="emailInput"
-          className="w-full text-base font-semibold text-zinc-500 px-3 py-2 rounded-md focus:outline-none" // Responsive width
-          placeholder="Your e-mail address"
-          aria-label="Your e-mail address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className="w-full px-6 py-2 text-white bg-yellow-400 text-base font-medium rounded-[30px] hover:bg-yellow-500" // Responsive width and font size
-        >
-          Subscribe
-        </button>
-      </form>
-    </div>
+            <div className="text-center">
+              {" "}
+              {/* Center the content */}
+              <div className="text-2xl md:text-3xl font-semibold text-neutral-900">
+                Subscribe to Newsletter
+              </div>
+              <form
+                onSubmit={handleSubscribe}
+                className="flex flex-col md:flex-row gap-4 mt-4 md:mt-5 bg-white rounded-[30px] p-3 shadow-md w-full max-w-md mx-auto" // Added max-w-md and mx-auto
+              >
+                <input
+                  type="email"
+                  id="emailInput"
+                  className="w-full text-base font-semibold text-zinc-500 px-3 py-2 rounded-md focus:outline-none" // Responsive width
+                  placeholder="Your e-mail address"
+                  aria-label="Your e-mail address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="w-full px-6 py-2 text-white bg-yellow-400 text-base font-medium rounded-[30px] hover:bg-yellow-500" // Responsive width and font size
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
             <div className="mt-3 text-base font-medium leading-7 text-neutral-700">
               Sign up with your email address to receive <br />
               news and updates.

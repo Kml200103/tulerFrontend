@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Cart from "../Cart";
-import { Link, useNavigate } from "react-router"; // Make sure to import Link from react-router-dom
+import { Link, useLocation, useNavigate } from "react-router"; // Make sure to import Link from react-router-dom
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/auth/authSlice";
 
@@ -13,6 +13,7 @@ export default function SocialIcons({ toggleSearchInput }) {
   const dropdownRef = useRef(null); // Create a ref for the dropdown
   const cartRef = useRef(null); // Create a ref for the cart
   const router = useNavigate();
+  const location = useLocation();
   const toggleCart = () => {
     setIsCartOpen((prev) => !prev);
   };
@@ -48,18 +49,20 @@ export default function SocialIcons({ toggleSearchInput }) {
     <div className="relative">
       <div className="flex text-lg gap-2 items-start">
         {/* Social Media Icons */}
-        <button
-          className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
-          aria-label="Visit our Social media icon 1"
-          onClick={toggleSearchInput} // Open search input on click
-        >
-          <img
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/aa2e8eb6df9306011f739e1312541a3dabbc1507426c5a278cea2cd9c17faf0e?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
-            className="object-contain shrink-0 aspect-square w-[30px]"
-            alt="Social media icon 1"
-          />
-        </button>
+        {location.pathname === "/products" && (
+          <button
+            className="p-2 bg-transparent hover:bg-gray-200 rounded-full"
+            aria-label="Open search input"
+            onClick={toggleSearchInput} // Open search input on click
+          >
+            <img
+              loading="lazy"
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/aa2e8eb6df9306011f739e1312541a3dabbc1507426c5a278cea2cd9c17faf0e?placeholderIfAbsent=true&apiKey=2b2b8edf847e4405b4bc7a5d98ec0805"
+              className="object-contain shrink-0 aspect-square w-[30px]"
+              alt="Search icon"
+            />
+          </button>
+        )}
 
         <button
           className="p-2 bg-transparent hover:bg-gray-200 rounded-full"

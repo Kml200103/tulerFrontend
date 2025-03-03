@@ -19,6 +19,7 @@ import AdminNavigationLinks from "../AdminHeader/NavigationLinks";
 import AdminSocialIcons from "../AdminHeader/SocialIcons";
 import { setSearchTerm } from "../../redux/search/searchSlice";
 import StickyVideo from "../StickyVideo";
+import Popup from "../Popup";
 
 const honeyProducts = [
   {
@@ -44,7 +45,6 @@ const honeyProducts = [
   },
 ];
 
-
 const images = [
   {
     src: "https://cdn.builder.io/api/v1/image/assets/TEMP/029803649a115511fe8b7bebc7facac58828d1c6c02e673995196c25f594a584?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47",
@@ -59,8 +59,6 @@ const images = [
     alt: "Category product showcase 3",
   },
 ];
-
-
 
 const testimonials = [
   {
@@ -110,6 +108,7 @@ const Home = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef(null); // Create a ref for the search input
   const searchTerm = useSelector((state) => state.search.term);
+  const [showPopup, setShowPopup] = useState(false);
 
   const [isSearchInputOpen, setIsSearchInputOpen] = useState(false); // State for search input visibility
 
@@ -117,6 +116,22 @@ const Home = () => {
     setIsSearchInputOpen((prev) => !prev);
   };
 
+  useEffect(() => {
+    // Check if this is the first visit
+    const hasVisitedBefore = localStorage.getItem("popupShown");
+
+    // If no record in localStorage, this is first visit
+    if (!hasVisitedBefore) {
+      // Show popup
+      setShowPopup(true);
+      // Set flag in localStorage to prevent showing again
+      localStorage.setItem("popupShown", "true");
+    }
+  }, []);
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -136,47 +151,48 @@ const Home = () => {
   }, [searchInputRef]);
   return (
     <>
- <section
-            className="relative w-full min-h-screen bg-cover bg-center pt-20 md:pt-32"
-            style={{
-                backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47')`,
-            }}
-        >
-            <div className="absolute inset-0"></div>
-            <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 py-16 md:px-16 md:py-56">
-                <div className="max-w-7xl mx-auto w-full">
-                    <div className="flex flex-col md:flex-row gap-8 md:gap-5">
-                        <div className="w-full md:w-1/2 text-center md:text-left">
-                            <div className="text-xl md:text-2xl lg:text-3xl font-medium tracking-[3px] text-black">
-                                FRESH & SWEET AS HONEY
-                            </div>
-                            <div className="mt-2 text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-wider text-black leading-tight">
-                                HONEYBEE
-                            </div>
-                            <div className="mt-6 md:mt-14 text-base md:text-lg lg:text-xl font-extrabold tracking-wide text-gray-700">
-                                At Tuler, we are passionate about delivering pure, organic, and high-quality
-                                honey. Our honey is harvested from the finest floral sources, ensuring a
-                                rich taste, smooth texture, and countless health benefits.
-                            </div>
-                            <button
-                                className="mt-8 md:mt-11 px-6 py-4 md:px-9 md:py-5 text-base md:text-lg font-medium text-black bg-yellow-400 rounded-[30px] transition-colors duration-300 hover:bg-yellow-500"
-                                onClick={() => navigate("/products")} // Use navigate here
-                            >
-                                Shop Honey
-                            </button>
-                        </div>
-                        <div className="w-full md:w-1/2">
-                            <img
-                                loading="lazy"
-                                src="https://cdn.builder.io/api/v1/image/assets/TEMP/9f4153f0473c59ba62497d0b2c178a37869743aa7dbb9d1e43206ae2d4e47c43?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
-                                alt="Honey product showcase"
-                                className="object-contain w-full h-auto"
-                            />
-                        </div>
-                    </div>
+      <section
+        className="relative w-full min-h-screen bg-cover bg-center pt-20 md:pt-32"
+        style={{
+          backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets/TEMP/0e1fb0b7f9396ddf4588cb6e6ecefabae011142fad4929408b10aa3a877411dc?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47')`,
+        }}
+      >
+        <div className="absolute inset-0"></div>
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 py-16 md:px-16 md:py-56">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-5">
+              <div className="w-full md:w-1/2 text-center md:text-left">
+                <div className="text-xl md:text-2xl lg:text-3xl font-medium tracking-[3px] text-black">
+                  FRESH & SWEET AS HONEY
                 </div>
+                <div className="mt-2 text-4xl md:text-6xl lg:text-8xl font-extrabold tracking-wider text-black leading-tight">
+                  HONEYBEE
+                </div>
+                <div className="mt-6 md:mt-14 text-base md:text-lg lg:text-xl font-extrabold tracking-wide text-gray-700">
+                  At Tuler, we are passionate about delivering pure, organic,
+                  and high-quality honey. Our honey is harvested from the finest
+                  floral sources, ensuring a rich taste, smooth texture, and
+                  countless health benefits.
+                </div>
+                <button
+                  className="mt-8 md:mt-11 px-6 py-4 md:px-9 md:py-5 text-base md:text-lg font-medium text-black bg-yellow-400 rounded-[30px] transition-colors duration-300 hover:bg-yellow-500"
+                  onClick={() => navigate("/products")} // Use navigate here
+                >
+                  Shop Honey
+                </button>
+              </div>
+              <div className="w-full md:w-1/2">
+                <img
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/9f4153f0473c59ba62497d0b2c178a37869743aa7dbb9d1e43206ae2d4e47c43?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  alt="Honey product showcase"
+                  className="object-contain w-full h-auto"
+                />
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
       <div className=" container rounded-xl pt-5 ">
         <div className="flex gap-5 max-md:flex-col">
@@ -191,54 +207,59 @@ const Home = () => {
         </div>
       </div>
 
-
       <div className="flex flex-col items-center px-4 py-16 w-full bg-stone-50 md:px-16 md:pt-32 md:pb-20">
-            <div className="w-full max-w-[1455px]">
-                <div className="flex flex-col md:flex-row gap-5">
-                    <div className="w-full md:w-1/4">
-                        <div className="flex flex-col items-start"> {/* Removed self-stretch */}
-                            <div className="text-xl md:text-2xl font-semibold text-yellow-400 leading-tight"> {/* Added leading-tight */}
-                                Shop By
-                            </div>
-                            <div className="xl:text-6xl sm:text-2xl  md:text-5xl font-extrabold text-neutral-900 leading-tight"> {/* Added leading-tight */}
-                                Category
-                            </div>
-                            <button
-                            onClick={()=>navigate('/products')}
-                                className="px-8 py-3 mt-8 md:mt-14 w-full md:w-auto text-base md:text-lg bg-yellow-400 font-medium text-center text-black rounded-[90px] transition duration-300 hover:bg-yellow-500"
-                                aria-label="View all categories"
-                            >
-                                View All
-                            </button>
-                        </div>
-                    </div>
-                    <div className="w-full md:w-1/2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8 md:mt-0">
-                            {images.slice(0, 2).map((image, index) => (
-                                <div key={index} className="w-full">
-                                    <img
-                                        loading="lazy"
-                                        src={image.src}
-                                        alt={image.alt}
-                                        className="object-contain w-full h-auto rounded-none aspect-[0.92]"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="w-full md:w-1/4 ">
-                        {images.length > 2 && (
-                            <img
-                                loading="lazy"
-                                src={images[2].src}
-                                alt={images[2].alt}
-                                className="object-contain w-full h-auto rounded-none aspect-[0.92] mt-8 md:mt-0"
-                            />
-                        )}
-                    </div>
+        <div className="w-full max-w-[1455px]">
+          <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+            {/* Text Section */}
+            <div className="w-full md:w-1/4 md:pr-4">
+              <div className="flex flex-col items-start">
+                <div className="text-xl md:text-2xl font-semibold text-yellow-400 leading-tight">
+                  Shop By
                 </div>
+                <div className="xl:text-6xl sm:text-3xl md:text-5xl font-extrabold text-neutral-900 leading-tight">
+                  Category
+                </div>
+                <button
+                  onClick={() => navigate("/products")}
+                  className="px-6 py-2 mt-6 md:mt-8 w-full md:w-auto text-base md:text-lg bg-yellow-400 font-medium text-center text-black rounded-[90px] transition duration-300 hover:bg-yellow-500"
+                  aria-label="View all categories"
+                >
+                  View All
+                </button>
+              </div>
             </div>
+
+            {/* Image Grid */}
+            {/* Image Grid Section */}
+            <div className="w-full md:w-[55%]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-8 md:mt-0">
+                {images.slice(0, 2).map((image, index) => (
+                  <div key={index} className="w-full">
+                    <img
+                      loading="lazy"
+                      src={image.src}
+                      alt={image.alt}
+                      className="object-contain w-full h-auto rounded-none aspect-[1.05] md:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Single Image Section */}
+            <div className="w-full md:w-[30%]">
+              {images.length > 2 && (
+                <img
+                  loading="lazy"
+                  src={images[2].src}
+                  alt={images[2].alt}
+                  className="object-contain w-full h-auto rounded-none aspect-[1.05] mt-8 md:mt-0 md:scale-105 transition-transform duration-300"
+                />
+              )}
+            </div>
+          </div>
         </div>
+      </div>
 
       {/* benefits section */}
       <div
@@ -251,11 +272,11 @@ const Home = () => {
           loading="lazy"
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/028e9fe3de5a717452f980dfc02e1d79980b9640ef58165189a444cdc6cd89b6?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
           alt="Product showcase"
-          className="absolute top-2 left-0 object-contain w-full aspect-[0.73] max-w-[172px]"
+          className="absolute top-2 left-0 object-contain w-full aspect-[0.73] max-w-[150px] sm:max-w-[180px] md:max-w-[220px] lg:max-w-[250px]"
         />
 
-        <div className="text-center mt-[118px] w-1/2">
-          <div className="text-3xl font-semibold text-yellow-400 mt-2">
+        <div className="text-center mt-[118px] w-1/2 max-md:w-full">
+          <div className="text-3xl font-semibold text-yellow-400 mt-24">
             Discover
           </div>
           <div className="w-full text-7xl font-extrabold text-neutral-900 max-md:max-w-full max-md:text-4xl">
@@ -269,12 +290,11 @@ const Home = () => {
           make from plant nectar.
         </div>
 
-        <div className="flex mt-10 gap-[40px] mb-[200px]">
+        <div className="flex flex-col md:flex-row mt-10 gap-[40px] mb-[200px]">
           <div className="flex flex-wrap justify-center">
             <div className="flex flex-col items-start gap-[35px] ">
+              {/* First Column */}
               <div className="relative w-full max-w-[243px] mt-20">
-                {" "}
-                {/* Container for positioning */}
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
@@ -285,16 +305,15 @@ const Home = () => {
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/e330948d463d832f7408f67b12aaaed494b0c359f56e8b63af980662d8b90aeb?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
                   alt=""
-                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]"
                 />
-                <div className=" absolute top-28 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                <div className="absolute top-28 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
                   Promotes burn and <br />
                   wound healing
                 </div>
               </div>
+              {/* Second Column */}
               <div className="relative w-full max-w-[243px] mt-20">
-                {" "}
-                {/* Container for positioning */}
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
@@ -303,11 +322,11 @@ const Home = () => {
                 />
                 <img
                   loading="lazy"
-                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5c9a65e65eccbfd559a6ade45829a6d180a57ca242cf4d6e4b43f3b27682258?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
+                  src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5c9a65e65eccbfd559a6ade45829a6d180a57ca242cf4d6e4b43f3b27682258?placeholderIfAbsent=true&apiKey=712c726234fd496ca 49faeda0af47"
                   alt=""
-                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]"
                 />
-                <div className=" absolute top-32 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                <div className="absolute top-32 left-10 w-full text-base font-semibold text-center text-black max-w-[148px]">
                   Better for blood <br />
                   sugar levels
                 </div>
@@ -315,9 +334,8 @@ const Home = () => {
             </div>
 
             <div className="flex flex-col items-start ml-4 mt-[200px] gap-[35px]">
+              {/* Third Column */}
               <div className="relative w-full max-w-[243px] ">
-                {" "}
-                {/* Container for positioning */}
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
@@ -328,16 +346,15 @@ const Home = () => {
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/3614b1c4de446ef3c9c7e64c596ec50337cafc2826391996dc141e01a7c73805?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
                   alt=""
-                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]"
                 />
-                <div className=" absolute top-28 left-12 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                <div className="absolute top-28 left-12 w-full text-base font-semibold text-center text-black max-w-[148px]">
                   Improve health and <br />
                   immune support
                 </div>
               </div>
+              {/* Fourth Column */}
               <div className="relative w-full max-w-[243px] mt-20">
-                {" "}
-                {/* Container for positioning */}
                 <img
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/1f7347629fd9372e51acd39f64a8d722093302fca7dc563639f143154488dc73?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
@@ -348,9 +365,9 @@ const Home = () => {
                   loading="lazy"
                   src="https://cdn.builder.io/api/v1/image/assets/TEMP/81103e8ac05c90dcc9673a718695a05cd178db37719ae966daf5ab8e8609f6d5?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
                   alt=""
-                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]" // Positioned over the first image
+                  className="absolute top-8 left-20 object-contain w-full aspect-[1.01] max-w-[71px]"
                 />
-                <div className=" absolute top-28 left-11 w-full text-base font-semibold text-center text-black max-w-[148px]">
+                <div className="absolute top-28 left-11 w-full text-base font-semibold text-center text-black max-w-[148px]">
                   Contains a variety <br />
                   of nutrients
                 </div>
@@ -371,7 +388,7 @@ const Home = () => {
           loading="lazy"
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/504963f9f665c86d5d6664191f3b4697659eb9b172b1b67bcef6dbf6b660d7ad?placeholderIfAbsent=true&apiKey=712c726234fd496ca29d49faeda0af47"
           alt="Featured content"
-          className=" absolute right-0 bottom-0 object-contain w-full aspect-[0.9] max-w-[189px]"
+          className="absolute right-0 bottom-0 object-contain w-full aspect-[0.9] max-w-[189px]"
         />
       </div>
 
@@ -425,6 +442,7 @@ const Home = () => {
         </div>
       </div>
       <StickyVideo />
+      {showPopup && <Popup onClose={handleClosePopup} />}
     </>
   );
 };

@@ -106,17 +106,21 @@ function ProductCard({ product }) {
         </select>
       </div>
 
-      <button
-        onClick={handleAddToCart}
-        className="flex gap-3.5 px-6 py-2.5 mt-9 text-xl text-white bg-black rounded-3xl max-md:px-5"
-      >
-        <img
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
-          alt="Cart icon"
-          className="object-contain shrink-0 aspect-[1.04] w-[26px]"
-        />
-        Add to cart
-      </button>
+      <div className="flex justify-center mt-9">
+        {" "}
+        {/* Centering the button */}
+        <button
+          onClick={handleAddToCart}
+          className="flex gap-3.5 px-6 py-2.5 text-xl text-center text-white bg-black rounded-3xl max-md:px-5"
+        >
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/727d53825e6a14147b47563dfc8f4eaac0507e0d3ee80c28df0f723f93786223"
+            alt="Cart icon"
+            className="object-contain shrink-0 aspect-[1.04] w-[26px]"
+          />
+          Add to cart
+        </button>
+      </div>
     </div>
   );
 }

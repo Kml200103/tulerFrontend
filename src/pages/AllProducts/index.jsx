@@ -232,11 +232,13 @@ const AllProducts = () => {
         "/product",
         formData,
         {
-          headers: {
+          
             "Content-Type": "multipart/form-data",
-          },
+            Authorization: `Bearer ${localStorage.getItem("userToken")}` 
+          
+        
         },
-        { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
+      
       );
 
       if (result.isSuccess) {
@@ -323,133 +325,254 @@ const AllProducts = () => {
         <div className="flex justify-center mb-6">
           <input
             type="text"
-            className="w-2/3 max-w-4xl p-3 text-lg text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+            className="w-full max-w-4xl p-3 text-lg text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
             placeholder="Search Products here..."
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         {/* Main Content Wrapper - Makes Table Expand */}
-        <div className="flex-grow relative overflow-x-auto">
+        <div className="flex-grow relative">
           {currentProducts.length > 0 ? (
-            <table className="w-full table-fixed text-md text-left text-gray-700">
-              <thead>
-                <tr className="bg-gray-100 text-gray-900">
-                  <th className="px-4 py-3 border-b w-1/6">Image</th>
-                  <th className="px-4 py-3 border-b w-1/4">Name</th>
-                  <th className="px-4 py-3 border-b w-1/3">Description</th>
-                  <th className="px-4 py-3 border-b w-1/4">Variants</th>
-                  <th className="px-4 py-3 border-b w-1/6">Actions</th>
-                  <th className="px-4 py-3 border-b w-1/6 text-center">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+            <div>
+              {/* Desktop and tablet view - Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full table-fixed text-md text-left text-gray-700">
+                  <thead>
+                    <tr className="bg-gray-100 text-gray-900">
+                      <th className="px-4 py-3 border-b w-1/6">Image</th>
+                      <th className="px-4 py-3 border-b w-1/4">Name</th>
+                      <th className="px-4 py-3 border-b w-1/3">Description</th>
+                      <th className="px-4 py-3 border-b w-1/4">Variants</th>
+                      <th className="px-4 py-3 border-b w-1/6">Actions</th>
+                      <th className="px-4 py-3 border-b w-1/6 text-center">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentProducts.map((product) => (
+                      <tr
+                        key={product._id}
+                        className={`border-b transition ${
+                          product.isPermanentDeleted
+                            ? "bg-red-300 opacity-50 cursor-not-allowed"
+                            : product.isDisabled
+                            ? "bg-gray-100 opacity-60"
+                            : "bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        <td className="px-4 py-3 border-b text-center">
+                          <img
+                            src={product.images}
+                            alt="Product"
+                            className={`w-20 h-20 object-cover rounded-lg border ${
+                              product.isPermanentDeleted || product.isDisabled
+                                ? "opacity-50"
+                                : ""
+                            }`}
+                          />
+                        </td>
+                        <td
+                          className={`px-4 py-3 border-b font-semibold ${
+                            product.isPermanentDeleted
+                              ? "text-gray-500"
+                              : product.isDisabled
+                              ? "text-gray-400"
+                              : "text-gray-900"
+                          }`}
+                        >
+                          {product.name}
+                        </td>
+                        <td className="px-4 py-3 border-b">
+                          {trimDescription(product.description, 100)}
+                        </td>
+                        <td className="px-4 py-3 border-b text-center">
+                          {product.variants.map((variant) => (
+                            <div key={variant._id} className="py-1">
+                              {variant.weight} -{" "}
+                              <span className="font-semibold">
+                                ₹{variant.price}
+                              </span>{" "}
+                              (Qty: {variant.quantity})
+                            </div>
+                          ))}
+                        </td>
+                        <td className="px-4 py-3 border-b text-center">
+                          <div className="flex justify-center space-x-2">
+                            <button
+                              onClick={() => handleOpenModal(product)}
+                              className={`p-2 rounded-lg transition ${
+                                product.isPermanentDeleted || product.isDisabled
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-gray-200 hover:bg-gray-300"
+                              }`}
+                              disabled={
+                                product.isPermanentDeleted || product.isDisabled
+                              }
+                            >
+                              <PencilIcon className="h-6 w-6" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(product)}
+                              className={`p-2 rounded-lg transition ${
+                                product.isPermanentDeleted || product.isDisabled
+                                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                  : "bg-red-200 hover:bg-red-300"
+                              }`}
+                              disabled={
+                                product.isPermanentDeleted || product.isDisabled
+                              }
+                            >
+                              <TrashIcon className="h-6 w-6" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <label className="flex cursor-pointer items-center justify-center">
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={product.isDisabled}
+                                onChange={() => handleToggle(product)}
+                                className="sr-only"
+                                disabled={product.isPermanentDeleted}
+                              />
+                              <div
+                                className={`block w-14 h-8 rounded-full transition-colors duration-300 ${
+                                  product.isDisabled
+                                    ? "bg-blue-600"
+                                    : "bg-gray-200"
+                                }`}
+                              ></div>
+                              <div
+                                className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                                  product.isDisabled ? "translate-x-6" : ""
+                                }`}
+                              ></div>
+                            </div>
+                          </label>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile view - Card layout */}
+              <div className="md:hidden">
                 {currentProducts.map((product) => (
-                  <tr
+                  <div
                     key={product._id}
-                    className={`border-b transition ${
+                    className={`mb-4 rounded-lg shadow-sm border p-4 ${
                       product.isPermanentDeleted
-                        ? "bg-red-300 opacity-50 cursor-not-allowed" // Always red for permanently deleted
+                        ? "bg-red-300 opacity-50"
                         : product.isDisabled
                         ? "bg-gray-100 opacity-60"
-                        : "bg-white hover:bg-gray-50" // Normal hover effect for other products
+                        : "bg-white"
                     }`}
                   >
-                    <td className="px-4 py-3 border-b text-center">
+                    <div className="flex items-center space-x-3 mb-3">
                       <img
                         src={product.images}
                         alt="Product"
-                        className={`w-20 h-20 object-cover rounded-lg border ${
+                        className={`w-16 h-16 object-cover rounded-lg border ${
                           product.isPermanentDeleted || product.isDisabled
                             ? "opacity-50"
                             : ""
                         }`}
                       />
-                    </td>
-                    <td
-                      className={`px-4 py-3 border-b font-semibold ${
-                        product.isPermanentDeleted
-                          ? "text-gray-500"
-                          : product.isDisabled
-                          ? "text-gray-400"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {product.name}
-                    </td>
-                    <td className="px-4 py-3 border-b">
-                      {trimDescription(product.description, 100)}
-                    </td>
-                    <td className="px-4 py-3 border-b text-center">
-                      {product.variants.map((variant) => (
-                        <div key={variant._id} className="py-1">
-                          {variant.weight} -{" "}
-                          <span className="font-semibold">
-                            ${variant.price}
-                          </span>{" "}
-                          (Qty: {variant.quantity})
-                        </div>
-                      ))}
-                    </td>
-                    <td className="px-4 py-3 border-b text-center">
-                      <div className="flex justify-center space-x-2">
-                        <button
-                          onClick={() => handleOpenModal(product)}
-                          className={`p-2 rounded-lg transition ${
-                            product.isPermanentDeleted || product.isDisabled
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-gray-200 hover:bg-gray-300"
+                      <div className="flex-grow">
+                        <h3
+                          className={`font-semibold ${
+                            product.isPermanentDeleted
+                              ? "text-gray-500"
+                              : product.isDisabled
+                              ? "text-gray-400"
+                              : "text-gray-900"
                           }`}
-                          disabled={
-                            product.isPermanentDeleted || product.isDisabled
-                          }
                         >
-                          <PencilIcon className="h-6 w-6" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProduct(product)}
-                          className={`p-2 rounded-lg transition ${
-                            product.isPermanentDeleted || product.isDisabled
-                              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              : "bg-red-200 hover:bg-red-300"
-                          }`}
-                          disabled={
-                            product.isPermanentDeleted || product.isDisabled
-                          }
-                        >
-                          <TrashIcon className="h-6 w-6" />
-                        </button>
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {trimDescription(product.description, 60)}
+                        </p>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <label className="flex cursor-pointer items-center">
+                      <label className="flex cursor-pointer">
                         <div className="relative">
                           <input
                             type="checkbox"
                             checked={product.isDisabled}
                             onChange={() => handleToggle(product)}
                             className="sr-only"
-                            disabled={product.isPermanentDeleted} // Disable checkbox if product is permanently deleted
+                            disabled={product.isPermanentDeleted}
                           />
                           <div
-                            className={`block w-14 h-8 rounded-full transition-colors duration-300 ${
+                            className={`block w-10 h-6 rounded-full transition-colors duration-300 ${
                               product.isDisabled ? "bg-blue-600" : "bg-gray-200"
                             }`}
                           ></div>
                           <div
-                            className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                              product.isDisabled ? "translate-x-6" : ""
+                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              product.isDisabled ? "translate-x-4" : ""
                             }`}
                           ></div>
                         </div>
                       </label>
-                    </td>
-                  </tr>
+                    </div>
+
+                    <div className="text-sm mt-3 border-t pt-3">
+                      <p className="font-medium text-gray-700 mb-2">
+                        Variants:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {product.variants.map((variant) => (
+                          <div
+                            key={variant._id}
+                            className="bg-gray-50 p-1 px-2 rounded text-xs"
+                          >
+                            {variant.weight} -{" "}
+                            <span className="font-semibold">
+                              ${variant.price}
+                            </span>{" "}
+                            (Qty: {variant.quantity})
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end mt-3 pt-3 border-t">
+                      <button
+                        onClick={() => handleOpenModal(product)}
+                        className={`p-2 rounded-lg transition mr-2 ${
+                          product.isPermanentDeleted || product.isDisabled
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-gray-200 hover:bg-gray-300"
+                        }`}
+                        disabled={
+                          product.isPermanentDeleted || product.isDisabled
+                        }
+                      >
+                        <PencilIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(product)}
+                        className={`p-2 rounded-lg transition ${
+                          product.isPermanentDeleted || product.isDisabled
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-red-200 hover:bg-red-300"
+                        }`}
+                        disabled={
+                          product.isPermanentDeleted || product.isDisabled
+                        }
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </div>
           ) : (
             <div className="text-center text-gray-500 mt-8">
               <h1 className="text-xl">No products found</h1>
@@ -458,15 +581,17 @@ const AllProducts = () => {
         </div>
 
         {/* Pagination at the Bottom of the Page */}
-        <div className="mt-auto py-6">
-          <Pagination
-            totalItems={currentProducts.length}
-            itemsPerPage={pageSize}
-            onPageChange={setCurrentPage}
-            setPageSize={setPageSize}
-            currentPage={currentPage}
-          />
-        </div>
+        {currentProducts.length > 0 && (
+          <div className="mt-auto py-6">
+            <Pagination
+              totalItems={currentProducts.length}
+              itemsPerPage={pageSize}
+              onPageChange={setCurrentPage}
+              setPageSize={setPageSize}
+              currentPage={currentPage}
+            />
+          </div>
+        )}
       </div>
 
       {isModalOpen && (
@@ -476,16 +601,17 @@ const AllProducts = () => {
           className="relative z-50"
         >
           <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-          <div className="flex items-center justify-center fixed inset-0 z-50">
-            <DialogPanel className="relative transform overflow-scroll rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[85vh]">
-              <div className="bg-gray-50 px-6 py-8 sm:px-10">
+          <div className="flex items-center justify-center fixed inset-0 z-50 px-4 sm:px-0">
+            <DialogPanel className="relative transform overflow-scroll rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[90vh] md:max-h-[85vh]">
+              <div className="bg-gray-50 px-4 py-6 sm:px-10">
                 <button
                   onClick={handleCloseModal}
                   className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition duration-300 ease-in-out"
+                  aria-label="Close modal"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
+                    className="h-5 w-5 sm:h-6 sm:w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -498,16 +624,12 @@ const AllProducts = () => {
                     />
                   </svg>
                 </button>
-                <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">
                   Update Product
                 </h1>
-                <div
-                  onClick={handleCloseModal}
-                  className="absolute top-0 right-0 p-4 text-gray-400 hover:text-gray-600 transition duration-300 ease-in-out"
-                ></div>
                 <div className="flex flex-col items-center justify-center mx-auto w-full">
                   <form
-                    className="space-y-6 w-full mx-auto"
+                    className="space-y-4 sm:space-y-6 w-full mx-auto"
                     noValidate
                     onSubmit={handleSubmit(handleUpdateProduct)}
                   >
@@ -519,7 +641,7 @@ const AllProducts = () => {
                       >
                         Name <span className="text-red-600">*</span>
                       </label>
-                      <div className="mt-2">
+                      <div className="mt-1 sm:mt-2">
                         <input
                           id="name"
                           type="text"
@@ -530,7 +652,7 @@ const AllProducts = () => {
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         />
                         {errors.name && (
-                          <p className="text-red-500 text-sm mt-2">
+                          <p className="text-red-500 text-xs sm:text-sm mt-1">
                             *{errors.name.message}
                           </p>
                         )}
@@ -541,11 +663,11 @@ const AllProducts = () => {
                     <div>
                       <label
                         htmlFor="description"
-                        className="block text-md font-medium leading-6 text-gray-900"
+                        className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
                       >
                         Description <span className="text-red-600">*</span>
                       </label>
-                      <div className="mt-2">
+                      <div className="mt-1 sm:mt-2">
                         <textarea
                           id="description"
                           maxLength={150}
@@ -562,21 +684,22 @@ const AllProducts = () => {
                             },
                           })}
                           defaultValue={selectedProduct?.description}
-                          rows={4}
+                          rows={3}
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                         />
                         {errors.description && (
-                          <p className="text-red-600 text-sm mt-2">
+                          <p className="text-red-600 text-xs sm:text-sm mt-1">
                             *{errors.description.message}
                           </p>
                         )}
                       </div>
                     </div>
 
+                    {/* Cover Image */}
                     <div>
                       <label
                         htmlFor="images"
-                        className="block text-md font-medium leading-6 text-gray-900"
+                        className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
                       >
                         Cover Image
                       </label>
@@ -584,21 +707,21 @@ const AllProducts = () => {
                         <img
                           src={selectedProduct.images}
                           alt="Main Image"
-                          className="w-16 h-16 object-cover rounded border-2 border-blue-500"
+                          className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded border-2 border-blue-500"
                         />
                       ) : (
-                        <p>No image available.</p>
+                        <p className="text-sm">No image available.</p>
                       )}
 
-                      <div className="flex gap-3 mb-2">
+                      <div className="flex gap-2 sm:gap-3 mb-2 mt-2 flex-wrap">
                         {!showImageInput ? (
                           <button
                             type="button"
                             onClick={() => {
                               setShowImageInput(true);
-                              setPreviewImages([]); // Reset preview images when showing input
-                            }} // Show file input
-                            className="mt-2 inline-flex items-center justify-center rounded-md bg-yellow-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+                              setPreviewImages([]);
+                            }}
+                            className="inline-flex items-center justify-center rounded-md bg-yellow-500 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
                           >
                             Update Cover Image
                           </button>
@@ -606,10 +729,10 @@ const AllProducts = () => {
                           <button
                             type="button"
                             onClick={() => {
-                              setShowImageInput(false); // Hide file input
-                              setPreviewImages([]); // Reset preview images when canceling
+                              setShowImageInput(false);
+                              setPreviewImages([]);
                             }}
-                            className="mt-2 inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            className="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                           >
                             Cancel
                           </button>
@@ -620,7 +743,7 @@ const AllProducts = () => {
                           type="file"
                           accept="image/jpeg, image/png, image/gif"
                           {...register("coverImage", {
-                            required: "Cover image is required", // Make it required if needed
+                            required: "Cover image is required",
                             validate: {
                               validateFiles: (files) => {
                                 const validTypes = [
@@ -636,17 +759,17 @@ const AllProducts = () => {
                                     return "Only image files are allowed (JPEG, PNG, GIF)";
                                   }
                                 }
-                                return true; // All files are valid
+                                return true;
                               },
                             },
                           })}
                           onChange={handleImagePreview}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                          className="block w-full text-sm rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                         />
                       )}
 
                       {errors.coverImage && (
-                        <p className="text-red-600 text-sm mt-2">
+                        <p className="text-red-600 text-xs sm:text-sm mt-1">
                           {errors.coverImage.message}
                         </p>
                       )}
@@ -656,7 +779,7 @@ const AllProducts = () => {
                           <img
                             src={previewImages[0]}
                             alt="Preview"
-                            className="w-16 h-16 object-cover rounded border-2 border-blue-500"
+                            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded border-2 border-blue-500"
                           />
                         </div>
                       )}
@@ -664,30 +787,30 @@ const AllProducts = () => {
 
                     {/* Other Images */}
                     <div>
-                      <label className="block text-md font-medium leading-6 text-gray-900">
+                      <label className="block text-sm sm:text-md font-medium leading-6 text-gray-900">
                         Other Images
                       </label>
-                      <div className="mt-2 flex space-x-2">
+                      <div className="mt-1 sm:mt-2 flex flex-wrap gap-2">
                         {selectedProduct?.otherImages.map((image, index) => (
                           <img
                             key={index}
                             src={image}
                             alt={`Other Image ${index + 1}`}
-                            className="w-16 h-16 object-cover rounded"
+                            className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded"
                           />
                         ))}
                       </div>
 
                       {/* Toggle Buttons */}
-                      <div className="flex gap-3 mb-2">
+                      <div className="flex gap-2 sm:gap-3 mb-2 mt-2 flex-wrap">
                         {!showOtherImageInput ? (
                           <button
                             type="button"
                             onClick={() => {
                               setShowOtherImageInput(true);
-                              setPreviewOtherImages([]); // Reset preview images when showing input
+                              setPreviewOtherImages([]);
                             }}
-                            className="mt-2 inline-flex items-center justify-center rounded-md bg-yellow-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+                            className="inline-flex items-center justify-center rounded-md bg-yellow-500 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
                           >
                             Update Images
                           </button>
@@ -696,10 +819,10 @@ const AllProducts = () => {
                             type="button"
                             onClick={() => {
                               setShowOtherImageInput(false);
-                              clearErrors("images"); // Clear error when hiding input
-                              setPreviewOtherImages([]); // Reset preview images when canceling
+                              clearErrors("images");
+                              setPreviewOtherImages([]);
                             }}
-                            className="mt-2 text-red-600 hover:underline"
+                            className="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                           >
                             Cancel
                           </button>
@@ -718,7 +841,7 @@ const AllProducts = () => {
                                 if (files.length > 5) {
                                   return "You can upload a maximum of 5 images.";
                                 }
-                                return true; // Valid if 5 or fewer files
+                                return true;
                               },
                               validTypes: (files) => {
                                 const validTypes = [
@@ -731,31 +854,31 @@ const AllProducts = () => {
                                     return "Only image files are allowed (JPEG, PNG, GIF)";
                                   }
                                 }
-                                return true; // All files are valid
+                                return true;
                               },
                             },
                           })}
                           onChange={handleOtherImagePreview}
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
+                          className="block w-full text-sm rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-base sm:leading-6"
                         />
                       )}
 
                       {/* Error Messages */}
                       {errors.images && (
-                        <p className="text-red-600 text-sm mt-2">
+                        <p className="text-red-600 text-xs sm:text-sm mt-1">
                           {errors.images.message}
                         </p>
                       )}
 
                       {/* Preview Images */}
                       {previewOtherImages.length > 0 && (
-                        <div className="mt-2 flex space-x-2">
+                        <div className="mt-2 flex flex-wrap gap-2">
                           {previewOtherImages.map((src, index) => (
                             <img
                               key={index}
                               src={src}
                               alt={`Preview Other Image ${index + 1}`}
-                              className="w-16 h-16 object-cover rounded border-2 border-blue-500"
+                              className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded border-2 border-blue-500"
                             />
                           ))}
                         </div>
@@ -766,13 +889,13 @@ const AllProducts = () => {
                     <div>
                       <label
                         htmlFor="benefits"
-                        className="block text-md font-medium leading-6 text-gray-900"
+                        className="block text-sm sm:text-md font-medium leading-6 text-gray-900"
                       >
                         Benefits
                       </label>
-                      <div className="mt-2">
+                      <div className="mt-1 sm:mt-2">
                         {benefitFields.map((field, index) => (
-                          <div key={field.id} className="mb-4">
+                          <div key={field.id} className="mb-3">
                             <div className="flex items-center">
                               <input
                                 type="text"
@@ -782,18 +905,19 @@ const AllProducts = () => {
                                 {...register(`benefits.${index}`, {
                                   required: "Benefit is required",
                                 })}
-                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-sm sm:leading-6"
                               />
                               <button
                                 type="button"
                                 onClick={() => removeBenefit(index)}
                                 className="ml-2 text-red-600 hover:text-red-800"
+                                aria-label="Remove benefit"
                               >
                                 X
                               </button>
                             </div>
                             {errors.benefits?.[index] && (
-                              <p className="text-red-600 text-sm mt-2">
+                              <p className="text-red-600 text-xs sm:text-sm mt-1">
                                 *{errors.benefits[index].message}
                               </p>
                             )}
@@ -804,7 +928,7 @@ const AllProducts = () => {
                         <button
                           type="button"
                           onClick={() => appendBenefit("")}
-                          className="mt-2 text-indigo-600 "
+                          className="mt-1 text-indigo-600 text-sm sm:text-base"
                         >
                           + Add Benefit
                         </button>
@@ -816,13 +940,16 @@ const AllProducts = () => {
                       <label className="block text-sm font-medium leading-6 text-gray-900">
                         Variants
                       </label>
-                      <div className="mt-2">
+                      <div className="mt-1 sm:mt-2">
                         {variantFields.map((field, index) => (
-                          <div key={field.id} className="mb-4">
-                            <div className="flex space-x-4">
+                          <div
+                            key={field.id}
+                            className="mb-3 sm:mb-4 border border-gray-200 rounded-md p-3"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
                               {/* Weight Field */}
-                              <div className="flex-1">
-                                <label className="block text-sm font-medium leading-6 text-gray-900">
+                              <div className="sm:flex-1">
+                                <label className="block text-xs sm:text-sm font-medium leading-6 text-gray-900">
                                   Weight
                                 </label>
                                 <input
@@ -831,18 +958,18 @@ const AllProducts = () => {
                                     required: "Weight is required",
                                   })}
                                   placeholder="Weight"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-sm sm:leading-6"
                                 />
                                 {errors.variants?.[index]?.weight && (
-                                  <p className="text-red-600 text-sm mt-2">
+                                  <p className="text-red-600 text-xs mt-1">
                                     *{errors.variants[index].weight.message}
                                   </p>
                                 )}
                               </div>
 
                               {/* Price Field */}
-                              <div className="flex-1">
-                                <label className="block text-sm font-medium leading-6 text-gray-900">
+                              <div className="sm:flex-1">
+                                <label className="block text-xs sm:text-sm font-medium leading-6 text-gray-900">
                                   Price
                                 </label>
                                 <input
@@ -856,18 +983,18 @@ const AllProducts = () => {
                                     },
                                   })}
                                   placeholder="Price"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-sm sm:leading-6"
                                 />
                                 {errors.variants?.[index]?.price && (
-                                  <p className="text-red-600 text-sm mt-2">
+                                  <p className="text-red-600 text-xs mt-1">
                                     *{errors.variants[index].price.message}
                                   </p>
                                 )}
                               </div>
 
                               {/* Quantity Field */}
-                              <div className="flex-1">
-                                <label className="block text-sm font-medium leading-6 text-gray-900">
+                              <div className="sm:flex-1">
+                                <label className="block text-xs sm:text-sm font-medium leading-6 text-gray-900">
                                   Quantity
                                 </label>
                                 <input
@@ -880,24 +1007,25 @@ const AllProducts = () => {
                                     },
                                   })}
                                   placeholder="Quantity"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 p-2 font-semibold placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:text-sm sm:leading-6"
                                 />
                                 {errors.variants?.[index]?.quantity && (
-                                  <p className="text-red-600 text-sm mt-2">
+                                  <p className="text-red-600 text-xs mt-1">
                                     *{errors.variants[index].quantity.message}
                                   </p>
                                 )}
                               </div>
-
-                              {/* Remove Button */}
-                              <button
-                                type="button"
-                                onClick={() => removeVariant(index)}
-                                className="ml-2 text-red-600 hover:text-red-800"
-                              >
-                                X
-                              </button>
                             </div>
+
+                            {/* Remove Button - Position at top right of variant card */}
+                            <button
+                              type="button"
+                              onClick={() => removeVariant(index)}
+                              className="mt-2 sm:mt-0 sm:absolute sm:top-2 sm:right-2 text-red-600 hover:text-red-800 text-sm"
+                              aria-label="Remove variant"
+                            >
+                              Remove
+                            </button>
                           </div>
                         ))}
 
@@ -911,7 +1039,7 @@ const AllProducts = () => {
                               quantity: "",
                             })
                           }
-                          className="mt-2 text-indigo-600"
+                          className="mt-1 text-indigo-600 text-sm sm:text-base"
                         >
                           + Add Variant
                         </button>
@@ -919,10 +1047,10 @@ const AllProducts = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="mt-6 flex justify-end space-x-4">
+                    <div className="mt-4 sm:mt-6 flex justify-center sm:justify-end space-x-4">
                       <button
                         type="submit"
-                        className="inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        className="w-full sm:w-auto inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       >
                         Update Product
                       </button>

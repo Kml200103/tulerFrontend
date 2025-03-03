@@ -138,9 +138,9 @@ const AdminOrders = () => {
 
 
   return (
-    <div className="overflow-x-auto ">
+    <div className="overflow-x-auto">
       <div className="bg-white flex items-center justify-center font-sans overflow-hidden">
-        <div className="w-full max-w-7xl">
+        <div className="w-full">
           <div className="bg-white shadow-md rounded my-6">
             <div className="flex justify-between items-center p-4">
               <h1 className="text-xl font-semibold">Admin Orders</h1>
@@ -152,67 +152,76 @@ const AdminOrders = () => {
               </div>
             ) : (
               <>
-                <table className="w-full table-auto">
-                  <thead>
-                    <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                      <th className="py-3 px-0 text-left cursor-pointer">
-                        Order#
-                      </th>
-                      <th className="py-3 px-0 text-left">Items</th>
-                      <th className="py-3 px-0 text-center">Total Amount</th>
-                      <th className="py-3 px-0 text-center">
-                        Shipping Address
-                      </th>
-                      <th className="py-3 px-0 text-center">Order Status</th>
-                      <th className="py-3 px-0 text-center">Payment Status</th>
-                      <th className="py-3 px-0 text-left">Order Time</th>
-                      <th className="py-3 px-0 text-center">Actions</th>
-                      <th className="py-3 px-0 text-center">Cancel</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-gray-600 text-sm font-light">
-                    {orders?.map((order) => (
-                      <tr
-                        key={order.orderId}
-                        className="border-b border-gray-200 hover:bg-gray-100"
-                      >
-                        <td className="py-3 px-0 text-left whitespace-nowrap">
-                          <span className="font-medium">
-                            {truncateText(order?.orderId, 8)}
-                          </span>
-                        </td>
-                        <td className="py-3 px-0 text-left">
-                          {order.items
-                            .map(
-                              (item) =>
-                                `${item?.productName} - ${item?.quantity}`
-                            )
-                            .join(", ")}
-                        </td>
-                        <td className="py-3 px-0 text-center">
-                          ${order?.totalPrice}
-                        </td>
-                        <td className="py-3 px-0 text-center">
-                          {truncateText(
-                            `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
-                            30
-                          )}
-                        </td>
-                        <td className="py-3 px-0 text-center">
-                          {editableOrderId === order?.orderId ? (
-                            // Check if the order status is not CANCELLED or COMPLETED
-                            order.status !== "CANCELLED" &&
-                            order.status !== "COMPLETED" ? (
-                              <select
-                                value={newStatus}
-                                onChange={(e) =>
-                                  handleStatusChange(e, order.orderId)
-                                }
-                              >
-                                <option value="PENDING">PENDING</option>
-                                <option value="COMPLETED">COMPLETED</option>
-                                {/* <option value="CANCELLED">CANCELLED</option> */}
-                              </select>
+                {/* Desktop View - Full Table */}
+                <div className="hidden md:block">
+                  <table className="w-full table-auto">
+                    <thead>
+                      <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th className="py-3 px-2 text-left cursor-pointer">
+                          Order#
+                        </th>
+                        <th className="py-3 px-2 text-left">Items</th>
+                        <th className="py-3 px-2 text-center">Total</th>
+                        <th className="py-3 px-2 text-center">Address</th>
+                        <th className="py-3 px-2 text-center">Order Status</th>
+                        <th className="py-3 px-2 text-center">Payment</th>
+                        <th className="py-3 px-2 text-left">Order Time</th>
+                        <th className="py-3 px-2 text-center">Actions</th>
+                        <th className="py-3 px-2 text-center">Cancel</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-gray-600 text-sm font-light">
+                      {orders?.map((order) => (
+                        <tr
+                          key={order.orderId}
+                          className="border-b border-gray-200 hover:bg-gray-100"
+                        >
+                          <td className="py-3 px-2 text-left whitespace-nowrap">
+                            <span className="font-medium">
+                              {truncateText(order?.orderId, 8)}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-left">
+                            {order.items
+                              .map(
+                                (item) =>
+                                  `${item?.productName} - ${item?.quantity}`
+                              )
+                              .join(", ")}
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            ${order?.totalPrice}
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            {truncateText(
+                              `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
+                              30
+                            )}
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            {editableOrderId === order?.orderId ? (
+                              // Check if the order status is not CANCELLED or COMPLETED
+                              order.status !== "CANCELLED" &&
+                              order.status !== "COMPLETED" ? (
+                                <select
+                                  value={newStatus}
+                                  onChange={(e) =>
+                                    handleStatusChange(e, order.orderId)
+                                  }
+                                  className="text-sm p-1 border rounded"
+                                >
+                                  <option value="PENDING">PENDING</option>
+                                  <option value="COMPLETED">COMPLETED</option>
+                                </select>
+                              ) : (
+                                <span
+                                  className={`${chooseColor(
+                                    order.status
+                                  )} py-1 px-3 rounded-full text-xs`}
+                                >
+                                  {order.status.toUpperCase()}
+                                </span>
+                              )
                             ) : (
                               <span
                                 className={`${chooseColor(
@@ -221,58 +230,48 @@ const AdminOrders = () => {
                               >
                                 {order.status.toUpperCase()}
                               </span>
-                            )
-                          ) : (
+                            )}
+                          </td>
+                          <td className="py-3 px-2 text-center">
                             <span
-                              className={`${chooseColor(
-                                order.status
-                              )} py-1 px-3 rounded-full text-xs`}
+                              className={`py-1 px-3 rounded-full text-xs ${choosePaymentColor(
+                                order?.paymentStatus
+                              )}`}
                             >
-                              {order.status.toUpperCase()}
+                              {order?.paymentStatus}
                             </span>
-                          )}
-                        </td>
-                        <td className="py-3 px-0 text-center">
-                          <span
-                            className={`py-1 px-3 rounded-full text-xs ${choosePaymentColor(
-                              order?.paymentStatus
-                            )}`}
-                          >
-                            {order?.paymentStatus}
-                          </span>
-                        </td>
+                          </td>
 
-                        <td className="py-3 px-0 text-left">
-                          {new Date(order?.createdAt).toLocaleString()}
-                        </td>
+                          <td className="py-3 px-2 text-left">
+                            {new Date(order?.createdAt).toLocaleString()}
+                          </td>
 
-                        <td className="py-3 px-0 text-center flex items-center justify-center space-x-2">
-                          <EyeIcon
-                            className="w-8 h-8 cursor-pointer hover:text-purple-500"
-                            onClick={() => handleShow(order)}
-                          />
-                          <Pencil
-                            className={`w-8 h-8 cursor-pointer ${
-                              order.status === "CANCEL"
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:text-purple-500"
-                            }`}
-                            onClick={() => {
-                              if (editableOrderId === order.orderId) {
-                                // If the same order is clicked twice, cancel edit mode
-                                setEditableOrderId(null);
-                                setNewStatus(""); // Reset status
-                              } else {
-                                setEditableOrderId(order.orderId);
-                                setNewStatus(order.status); // Set the current status for the dropdown
-                              }
-                            }}
-                          />
-                        </td>
-                        <td className="py-3 px-0 text-center">
-                          <td className="py-3 px-0 text-center">
+                          <td className="py-3 px-2 text-center flex items-center justify-center space-x-2">
+                            <EyeIcon
+                              className="w-6 h-6 cursor-pointer hover:text-purple-500"
+                              onClick={() => handleShow(order)}
+                            />
+                            <Pencil
+                              className={`w-6 h-6 cursor-pointer ${
+                                order.status === "CANCEL"
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "hover:text-purple-500"
+                              }`}
+                              onClick={() => {
+                                if (editableOrderId === order.orderId) {
+                                  // If the same order is clicked twice, cancel edit mode
+                                  setEditableOrderId(null);
+                                  setNewStatus(""); // Reset status
+                                } else {
+                                  setEditableOrderId(order.orderId);
+                                  setNewStatus(order.status); // Set the current status for the dropdown
+                                }
+                              }}
+                            />
+                          </td>
+                          <td className="py-3 px-2 text-center">
                             <button
-                              className={`mt-4 text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
+                              className={`text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
                                 order.status === "CANCEL"
                                   ? "opacity-50 cursor-not-allowed"
                                   : ""
@@ -280,23 +279,178 @@ const AdminOrders = () => {
                               disabled={order?.status === "CANCEL"}
                               onClick={() => openConfirmModal(order)}
                             >
-                              Cancel Order
+                              Cancel
                             </button>
                           </td>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile View - Cards */}
+                <div className="block md:hidden">
+                  {orders?.map((order) => (
+                    <div
+                      key={order.orderId}
+                      className="bg-white p-4 rounded-lg shadow mb-4 border border-gray-200"
+                    >
+                      <div className="flex justify-between items-center mb-3">
+                        <div>
+                          <span className="font-bold text-gray-700">
+                            Order #
+                          </span>
+                          <span className="font-medium ml-1">
+                            {truncateText(order?.orderId, 8)}
+                          </span>
+                        </div>
+                        <span className="text-gray-600 text-xs">
+                          {new Date(order?.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        <div>
+                          <span className="font-bold text-gray-700 text-sm block">
+                            Status:
+                          </span>
+                          {editableOrderId === order?.orderId ? (
+                            order.status !== "CANCELLED" &&
+                            order.status !== "COMPLETED" ? (
+                              <select
+                                value={newStatus}
+                                onChange={(e) =>
+                                  handleStatusChange(e, order.orderId)
+                                }
+                                className="text-sm p-1 border rounded mt-1 w-full"
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                              </select>
+                            ) : (
+                              <span
+                                className={`${chooseColor(
+                                  order.status
+                                )} py-1 px-2 rounded-full text-xs inline-block mt-1`}
+                              >
+                                {order.status.toUpperCase()}
+                              </span>
+                            )
+                          ) : (
+                            <span
+                              className={`${chooseColor(
+                                order.status
+                              )} py-1 px-2 rounded-full text-xs inline-block mt-1`}
+                            >
+                              {order.status.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+
+                        <div>
+                          <span className="font-bold text-gray-700 text-sm block">
+                            Payment:
+                          </span>
+                          <span
+                            className={`py-1 px-2 rounded-full text-xs inline-block mt-1 ${choosePaymentColor(
+                              order?.paymentStatus
+                            )}`}
+                          >
+                            {order?.paymentStatus}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mb-3">
+                        <span className="font-bold text-gray-700 text-sm block">
+                          Items:
+                        </span>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {order.items
+                            .map(
+                              (item) =>
+                                `${item?.productName} - ${item?.quantity}`
+                            )
+                            .join(", ")}
+                        </p>
+                      </div>
+
+                      <div className="mb-3">
+                        <div className="flex justify-between">
+                          <span className="font-bold text-gray-700 text-sm">
+                            Total:
+                          </span>
+                          <span className="text-green-600 font-medium">
+                            ${order?.totalPrice}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mb-3">
+                        <span className="font-bold text-gray-700 text-sm block">
+                          Address:
+                        </span>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {truncateText(
+                            `${order?.address?.streetAddress}, ${order?.address?.city}, ${order?.address?.state}, ${order.address.country}, ${order.address.pincode}`,
+                            60
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between mt-4">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleShow(order)}
+                            className="bg-gray-100 p-2 rounded-full hover:bg-gray-200"
+                          >
+                            <EyeIcon className="w-5 h-5 text-gray-600" />
+                          </button>
+                          <button
+                            className={`bg-gray-100 p-2 rounded-full ${
+                              order.status === "CANCEL"
+                                ? "opacity-50 cursor-not-allowed"
+                                : "hover:bg-gray-200"
+                            }`}
+                            onClick={() => {
+                              if (editableOrderId === order.orderId) {
+                                setEditableOrderId(null);
+                                setNewStatus("");
+                              } else {
+                                setEditableOrderId(order.orderId);
+                                setNewStatus(order.status);
+                              }
+                            }}
+                          >
+                            <Pencil className="w-5 h-5 text-gray-600" />
+                          </button>
+                        </div>
+                        <button
+                          className={`text-red-500 text-sm font-semibold rounded-md hover:underline transition ${
+                            order.status === "CANCEL"
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          disabled={order?.status === "CANCEL"}
+                          onClick={() => openConfirmModal(order)}
+                        >
+                          Cancel Order
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Pagination Component */}
-                <Pagination
-                  totalItems={totalOrders}
-                  itemsPerPage={pageSize}
-                  onPageChange={setCurrentPage}
-                  setPageSize={setPageSize}
-                  currentPage={currentPage}
-                />
+                <div className="px-4 py-3">
+                  <Pagination
+                    totalItems={totalOrders}
+                    itemsPerPage={pageSize}
+                    onPageChange={setCurrentPage}
+                    setPageSize={setPageSize}
+                    currentPage={currentPage}
+                  />
+                </div>
               </>
             )}
           </div>
@@ -310,9 +464,9 @@ const AdminOrders = () => {
         className="relative z-50"
       >
         <DialogBackdrop className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        <div className="flex items-center justify-center fixed inset-0 z-50">
+        <div className="flex items-center justify-center fixed inset-0 z-50 p-4">
           <DialogPanel className="relative transform overflow-y-auto rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 sm:max-w-3xl w-full max-h-[85vh]">
-            <div className="bg-gray-50 px-6 py-8 sm:px-10">
+            <div className="bg-gray-50 px-4 py-6 sm:px-6">
               {selectedOrder && (
                 <>
                   <div className="flex justify-between items-center">
@@ -325,9 +479,9 @@ const AdminOrders = () => {
                       &times;
                     </button>
                   </div>
-                  <main className="flex flex-col gap-4 p-5">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
+                  <main className="flex flex-col gap-4 p-3 sm:p-5">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                      <div className="flex items-center mb-2 sm:mb-0">
                         <span className="font-semibold text-gray-700">
                           Order ID:
                         </span>
@@ -337,9 +491,9 @@ const AdminOrders = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 border rounded-lg p-4 bg-white">
+                    <div className="flex flex-col gap-2 border rounded-lg p-3 sm:p-4 bg-white">
                       <div className="flex flex-col gap-2">
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap gap-2">
                           <h3
                             className={`px-2 py-1 rounded-full text-xs ${choosePaymentColor(
                               selectedOrder.paymentStatus
@@ -350,7 +504,7 @@ const AdminOrders = () => {
 
                           <h3
                             className={`px-2 py-1 rounded-full text-xs ${chooseColor(
-                              selectedOrder.status.toUpperCase() // Remove the curly braces
+                              selectedOrder.status.toUpperCase()
                             )}`}
                           >
                             {selectedOrder.status.toUpperCase()}
@@ -385,35 +539,57 @@ const AdminOrders = () => {
                     </div>
 
                     <h1 className="text-xl font-semibold">Address</h1>
-                    <div className="flex flex-col gap-2 border rounded-lg p-4 bg-white">
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td>Full Name</td>
-                            <td>{selectedOrder.address.name}</td>
-                          </tr>
-                          <tr>
-                            <td>Street Address</td>
-                            <td>{selectedOrder.address.streetAddress}</td>
-                          </tr>
-                          <tr>
-                            <td>City</td>
-                            <td>{selectedOrder.address.city}</td>
-                          </tr>
-                          <tr>
-                            <td>State</td>
-                            <td>{selectedOrder.address.state}</td>
-                          </tr>
-                          <tr>
-                            <td>Country</td>
-                            <td>{selectedOrder.address.country}</td>
-                          </tr>
-                          <tr>
-                            <td>Pincode</td>
-                            <td>{selectedOrder.address.pincode}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <div className="flex flex-col gap-2 border rounded-lg p-3 sm:p-4 bg-white">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            Full Name:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.name}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            Street:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.streetAddress}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            City:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.city}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            State:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.state}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            Country:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.country}
+                          </span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row">
+                          <span className="font-medium text-gray-700 mr-2 min-w-24">
+                            Pincode:
+                          </span>
+                          <span className="text-gray-600">
+                            {selectedOrder.address.pincode}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </main>
                 </>
