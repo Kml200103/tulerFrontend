@@ -194,7 +194,7 @@ export default function Cart({ onClose }) {
   );
 
   return (
-    <div
+     <div
       className={`fixed top-0 right-0 h-full bg-white shadow-lg overflow-hidden z-50 flex flex-col transition-transform duration-300 
       ${isCartOpen ? "open" : "closed"} 
       ${isFadingOut ? "fade-out" : ""}

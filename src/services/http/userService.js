@@ -28,8 +28,7 @@ export const UserService = BaseService.injectEndpoints({
     }),
    syncCart: builder.mutation({
   query: ({ userId, cartItems, token }) => {
-    console.log('token', token);
-    console.log('cartItems', cartItems)
+   
     const transformedItems = cartItems.map((item) => ({
       productId: item.productId,
       variantId: item.variantId,

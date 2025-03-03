@@ -47,7 +47,7 @@ const Products = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, itemsPerPage]);
+
 
   useEffect(() => {
     fetchProducts();
@@ -100,20 +100,6 @@ const Products = () => {
     setItemsPerPage(size);
     setCurrentPage(1);
   }, []);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [dropdownRef]);
 
   return (
     <div className="container flex flex-col bg-white mt-10">
@@ -168,7 +154,7 @@ const Products = () => {
               )}
             </div>
 
-            {/* Show Reset Button Only If Sorting is Applied */}
+            {/ Show Reset Button Only If Sorting is Applied /}
             {selectedSortOption && (
               <button
                 onClick={resetSorting}
@@ -187,7 +173,7 @@ const Products = () => {
         {isLoading && <p>Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* Search results message */}
+        {/ Search results message /}
         {searchTerm && sortedProducts.length > 0 && (
           <div className="mb-4 text-gray-600 italic">
             Showing results for "{searchTerm}" ({sortedProducts.length}{" "}
