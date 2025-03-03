@@ -1,11 +1,26 @@
+/* Main container for the spin wheel page */
+.spin-wheel-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+
+  padding: 20px;
+}
+
+/* Container for the spin wheel */
 .spin-wheel-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-top: 50px;
   gap: 20px;
+  position: relative;
+  text-align: center;
 }
 
+/* Wheel container styling */
 .wheel-container {
   position: relative;
   display: flex;
@@ -15,48 +30,42 @@
   height: 350px;
 }
 
+/* Spin button styling */
 .spin-button {
   padding: 12px 25px;
   font-size: 1.2rem;
   font-weight: bold;
-  background: linear-gradient(135deg, #ff7300, #ff9500);
+  background: linear-gradient(135deg, #ff7300, #ff9500); /* Honey gradient */
   border: none;
   border-radius: 10px;
+  margin-top: 100px;
   color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 20px; /* Space above the button */
+}
+.spin-button {
+  display: block; /* Default display */
+}
+
+@media (max-width: 600px) {
+  /* Adjust the max-width as needed */
+  .spin-button {
+    display: block; /* Show the button */
+  }
 }
 
 .spin-button:disabled {
-  background: #ccc;
+  background: #ccc; /* Disabled state */
   cursor: not-allowed;
 }
 
 .spin-button:hover {
-  background: linear-gradient(135deg, #ff9500, #ff7300);
+  background: linear-gradient(135deg, #ff9500, #ff7300); /* Hover effect */
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.spin-wheel-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-color: #f9f9f9;
-  padding: 20px;
-}
-
+/* Header styling */
 .spin-header {
   display: flex;
   justify-content: space-between;
@@ -69,33 +78,10 @@ li {
 .spin-header h1 {
   font-size: 24px;
   font-weight: bold;
+  color: #ff5733; /* Honey orange */
 }
 
-.spin-header button {
-  padding: 8px 15px;
-  background-color: #ff5733;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.spin-wheel-container {
-  position: relative;
-  text-align: center;
-}
-
-.spin-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #ff5733;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
+/* Sidebar styles */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -114,11 +100,12 @@ li {
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
   z-index: 100;
-  overflow: auto; /* Prevents scrolling from affecting the whole page */
 }
+
 .sidebar:hover {
   overflow: auto; /* Allows scrolling only when hovering */
 }
+
 .close-btn {
   position: absolute;
   top: 10px;
@@ -129,17 +116,14 @@ li {
   cursor: pointer;
 }
 
-.sidebar h2 {
-  margin-bottom: 15px;
-}
-
+/* Sidebar list styles */
 .sidebar ul {
   list-style: none;
   padding: 0;
 }
 
 .sidebar ul li {
-  background: #ffbe0b;
+  background: #ffbe0b; /* Honey yellow */
   color: white;
   padding: 10px;
   margin-bottom: 5px;
@@ -147,6 +131,7 @@ li {
   text-align: center;
 }
 
+/* Win message styling */
 .win-message {
   margin-top: 20px; /* Space above the message */
   padding: 10px 20px; /* Padding around the message */
@@ -162,4 +147,15 @@ li {
 /* Optional: Add a fade-out effect */
 .win-message.fade-out {
   opacity: 0; /* Make it invisible */
+}
+
+/* List styles */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  font-size: 1.2rem;
+  color: #333; /* Dark text for list items */
 }

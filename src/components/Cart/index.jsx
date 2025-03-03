@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { del, get, put } from "../../services/http/axiosApi"; // Ensure you have a put method for updating
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router"; // Fixed import for react-router-dom
+import { Link, Navigate, useNavigate } from "react-router"; // Fixed import for react-router-dom
 import {
   clearCart as clearCartAction,
   removeItem as removeItemAction,
@@ -17,14 +17,13 @@ export default function Cart({ onClose }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const id = user?.id;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
 
   // Fetch Cart Data
   const fetchCartData = useCallback(async () => {
     if (!id) {
       setCartData(cart);
-
       return;
     }
     try {
@@ -46,32 +45,31 @@ export default function Cart({ onClose }) {
 
   const removeItem = useCallback(
     async (productId, weight) => {
-    
-      // Accept variantId as a parameter
       if (updating) return;
       setUpdating(true);
 
       if (!id) {
-        // Dispatch the removeItem action if userId is not present
-        dispatch(removeItemAction({ productId, weight })); // Pass both productId and variantId
+        // Handle guest cart using Redux
+        dispatch(removeItemAction({ productId, weight }));
         setCartData((prev) => ({
           ...prev,
           items: prev.items.filter(
             (item) =>
-              !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
+              !(item.productId === productId && item.variant.weight === weight)
           ),
         }));
         setUpdating(false);
         return;
       }
 
+      // API call for logged-in users
       try {
         const { receiveObj } = await del(
           "/cart/remove",
           {
             userId: id,
             productId,
-            weight, // Include variantId in the API call
+            weight, // Use weight instead of variantId
           },
           { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
         );
@@ -79,12 +77,13 @@ export default function Cart({ onClose }) {
         if (receiveObj.status === 401) {
           NotificationService.sendErrorMessage(receiveObj.message);
         } else {
-          // Only update the local state if the API call was successful
           setCartData((prev) => ({
             ...prev,
             items: prev.items.filter(
               (item) =>
-                !(item.productId === productId || item.variant.weight === weight) // Ensure both IDs are checked
+                !(
+                  item.productId === productId && item.variant.weight === weight
+                )
             ),
           }));
         }
@@ -96,14 +95,22 @@ export default function Cart({ onClose }) {
     },
     [id, updating, dispatch]
   );
+  const handleCardClick = (item) => {
+    console.log(item);
+
+    const productName = item.productName.trim().replace(/\s+/g, "-");
+
+    navigate(`/product/description/${productName}/${item.productId}`);
+  };
 
   const clearCart = useCallback(async () => {
     if (!id) {
-      // Dispatch the clearCart action if userId is not present
+      // Handle guest cart using Redux
       dispatch(clearCartAction());
       setCartData({ items: [], totalPrice: 0 });
       return;
     }
+
     setUpdating(true);
     try {
       const { receiveObj } = await del(
@@ -111,6 +118,7 @@ export default function Cart({ onClose }) {
         {},
         { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
       );
+
       if (receiveObj.status === 401) {
         NotificationService.sendErrorMessage(receiveObj.message);
       }
@@ -124,12 +132,11 @@ export default function Cart({ onClose }) {
 
   const updateQuantity = useCallback(
     async (productId, weight, change) => {
-      // Accept variantId as a parameter
       if (updating) return; // Prevent multiple requests at the same time
       setUpdating(true);
 
       const currentItem = cartData?.items?.find(
-        (item) => item.productId === productId && item.variant.weight === weight // Check for both productId and variantId
+        (item) => item.productId === productId && item.variant.weight === weight
       );
 
       if (!currentItem) {
@@ -141,13 +148,12 @@ export default function Cart({ onClose }) {
       const newQuantity = Math.max(currentItem.quantity + change, 1);
 
       if (!id) {
-        // Dispatch the decreaseQuantity or increaseQuantity action based on the change
+        // Handle guest user cart using Redux state
         if (change < 0) {
-          dispatch(decreaseQuantityAction({ productId, weight })); // Pass both productId and variantId
+          dispatch(decreaseQuantityAction({ productId, weight }));
         } else {
-          dispatch(increaseQuantityAction({ productId, weight })); // Pass both productId and variantId
+          dispatch(increaseQuantityAction({ productId, weight }));
         }
-        // Update local state to reflect the change immediately
         setCartData((prev) => ({
           ...prev,
           items: prev.items.map((item) =>
@@ -160,22 +166,24 @@ export default function Cart({ onClose }) {
         return;
       }
 
+      // API call for logged-in users
       try {
         const { receiveObj } = await put(
           "/cart/update",
           {
             userId: id,
             productId,
-            weight, // Include variantId in the API call
-            quantity: newQuantity, // Send updated quantity to API
+            weight, // Use weight instead of variantId
+            quantity: newQuantity,
           },
           { Authorization: `Bearer ${localStorage.getItem("userToken")}` }
         );
-        if (receiveObj.status === 401) {
+
+        if (receiveObj?.status === 401) {
           NotificationService.sendErrorMessage(receiveObj.message);
+        } else {
+          await fetchCartData(); // Ensure cart updates after API call
         }
-        // Refresh cart after update
-        await fetchCartData();
       } catch (error) {
         console.error("Error updating cart quantity:", error);
       } finally {
@@ -184,17 +192,21 @@ export default function Cart({ onClose }) {
     },
     [id, updating, fetchCartData, cartData, dispatch]
   );
+
   return (
     <div
-      className={`fixed top-0 right-0 h-full w-[400px] bg-white shadow-lg p-6 overflow-hidden z-50 flex flex-col transition-transform duration-300 ${isCartOpen ? "open" : "closed"
-        } ${isFadingOut ? "fade-out" : ""}`}
+      className={`fixed top-0 right-0 h-full bg-white shadow-lg overflow-hidden z-50 flex flex-col transition-transform duration-300 
+      ${isCartOpen ? "open" : "closed"} 
+      ${isFadingOut ? "fade-out" : ""}
+      w-full xs:w-[85%] sm:w-[65%] md:w-[50%] lg:w-[400px]
+      p-4 sm:p-6`}
     >
       <div className="flex items-center justify-between">
         <img
           loading="lazy"
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/620e45e22b9abd39329ae2f1db91b17636d8d6e35dcd110a32393670cecdbb08"
           alt="Cart Icon"
-          className="object-contain w-10"
+          className="object-contain w-8 sm:w-10"
         />
 
         <button
@@ -202,11 +214,12 @@ export default function Cart({ onClose }) {
             setIsFadingOut(true);
             onClose();
           }}
-          className="text-2xl font-bold text-gray-500 hover:text-gray-800"
+          className="text-xl sm:text-2xl font-bold text-gray-500 hover:text-gray-800"
         >
           &times;
         </button>
       </div>
+
       {cartData?.items?.length > 0 && (
         <button
           onClick={clearCart}
@@ -217,56 +230,61 @@ export default function Cart({ onClose }) {
         </button>
       )}
 
-      <div className="mt-6 w-full bg-neutral-200 h-[1px]" />
+      <div className="mt-4 sm:mt-6 w-full bg-neutral-200 h-[1px]" />
 
       <div className="overflow-y-auto flex-grow">
         {cartData?.items?.length > 0 ? (
-          cartData.items.map((item) => {
-            // Remove the extra curly braces here
-            return (
-              <div
-                key={item._id}
-                className="relative flex gap-7 items-center mt-8 ml-6 font-semibold"
+          cartData.items.map((item) => (
+            <div
+              key={item._id}
+              className="relative flex flex-col xs:flex-row gap-3 xs:gap-5 md:gap-7 items-center mt-6 sm:mt-8 mx-auto xs:ml-2 sm:ml-6 font-semibold w-full"
+            >
+              <button
+                onClick={() => removeItem(item.productId, item.variant.weight)}
+                className="absolute -top-4 right-1 xs:right-4 text-red-500 hover:text-red-600 text-xs sm:text-sm"
               >
-                <button
-                  onClick={() => removeItem(item.productId, item.variant.weight)} // Pass variantId
-                  className="absolute -top-4 right-4 text-red-500 hover:text-red-600 text-sm"
-                >
-                  Remove
-                </button>
+                Remove
+              </button>
 
-                <div className="flex flex-col items-center w-14 py-2 bg-neutral-200 text-black rounded-3xl">
-                  <button
-                    onClick={() =>
-                      updateQuantity(item.productId, item.variant.weight, 1)
-                    } // Pass variantId
-                    className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-t-3xl"
-                    disabled={updating}
-                  >
-                    +
-                  </button>
-                  <span className="py-2 text-lg font-semibold">
-                    {item.quantity}{" "}
-                  </span>
-                  <button
-                    onClick={() =>
-                      updateQuantity(item.productId, item.variant.weight, -1)
-                    } // Pass variantId
-                    className="w-full py-1 text-lg font-bold hover:bg-gray-300 rounded-b-3xl"
-                    disabled={updating}
-                  >
-                    -
-                  </button>
-                </div>
+              <div className="flex flex-row xs:flex-col items-center w-36 xs:w-12 sm:w-14 py-1 xs:py-2 bg-neutral-200 text-black rounded-3xl">
+                <button
+                  onClick={() =>
+                    updateQuantity(item.productId, item.variant.weight, 1)
+                  }
+                  className="w-full py-1 text-base sm:text-lg font-bold hover:bg-gray-300 rounded-l-3xl xs:rounded-l-none xs:rounded-t-3xl"
+                  disabled={updating}
+                >
+                  +
+                </button>
+                <span className="px-4 xs:px-0 xs:py-2 text-base sm:text-lg font-semibold">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() =>
+                    updateQuantity(item.productId, item.variant.weight, -1)
+                  }
+                  className="w-full py-1 text-base sm:text-lg font-bold hover:bg-gray-300 rounded-r-3xl xs:rounded-r-none xs:rounded-b-3xl"
+                  disabled={updating}
+                >
+                  -
+                </button>
+              </div>
+
+              <div
+                className="flex flex-row gap-3 sm:gap-5 w-full xs:w-auto mt-3 xs:mt-0 items-center cursor-pointer" // Add cursor-pointer for visual feedback
+                onClick={() => handleCardClick(item)} // Pass the item to the click handler
+              >
                 <img
                   loading="lazy"
                   src={item?.images || ""}
                   alt={item.productName || "Unknown Product"}
-                  className="object-contain shrink-0 self-stretch my-auto aspect-square rounded-[50px] w-[74px]"
+                  className="object-contain shrink-0 aspect-square rounded-[30px] sm:rounded-[50px] w-[50px] sm:w-[65px] md:w-[74px]"
                 />
 
-                <div className="flex flex-col self-stretch my-auto text-sm">
-                  <div className="text-neutral-900">{item.productName}</div>
+                <div className="flex flex-col text-xs sm:text-sm">
+                  <div className="text-neutral-900 font-medium">
+                    {item.productName}
+                  </div>
                   <div className="text-gray-600 mt-1">
                     Price: ${item.totalPrice.toFixed(2) || ""}
                   </div>
@@ -278,8 +296,8 @@ export default function Cart({ onClose }) {
                   </div>
                 </div>
               </div>
-            );
-          })
+            </div>
+          ))
         ) : (
           <p className="text-center text-gray-500 mt-4">Your Cart is Empty</p>
         )}
@@ -288,23 +306,21 @@ export default function Cart({ onClose }) {
       {cartData?.items?.length > 0 && id ? (
         <Link
           to="/checkout"
-          className="py-3 bg-black text-white rounded-xl px-5 flex justify-between items-center mt-auto"
+          className="py-2 sm:py-3 z-auto bg-black text-white rounded-xl px-3 sm:px-5 flex justify-between items-center mt-auto"
         >
-          <span className="text-sm font-semibold">Checkout</span>
-          <span className="px-5 py-2.5 text-base font-bold bg-yellow-400 text-black rounded-xl">
+          <span className="text-xs sm:text-sm font-semibold">Checkout</span>
+          <span className="px-3 sm:px-5 py-1.5 sm:py-2.5 text-sm sm:text-base font-bold bg-yellow-400 text-black rounded-xl">
             ${cartData?.totalPrice ? cartData.totalPrice.toFixed(2) : "0.00"}
           </span>
         </Link>
       ) : id ? (
-        // If user is logged in but cart is empty
         <p className="text-center text-gray-500 mt-4">
           Please add products to checkout.
         </p>
       ) : (
-        // If user is not logged in
         <button
           onClick={() => navigate("/login")}
-          className="text-center text-red-500 mt-4"
+          className="text-center text-red-500 mt-4 py-2 w-full"
         >
           Please Login
         </button>

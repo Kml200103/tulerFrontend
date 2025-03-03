@@ -7,16 +7,26 @@ import Pagination from "../../components/Pagination";
 const MyOrders = () => {
   const user = useSelector((state) => state.auth.user);
   const userId = user?.id;
-  const [ordersData, setOrdersData] = useState({ orders: {}, totalOrders: 0, loading: true, error: null });
+  const [ordersData, setOrdersData] = useState({
+    orders: {},
+    totalOrders: 0,
+    loading: true,
+    error: null,
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const getMyOrders = useCallback(async () => {
     if (!userId) {
-      setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: null });
+      setOrdersData({
+        orders: {},
+        totalOrders: 0,
+        loading: false,
+        error: null,
+      });
       return;
     }
-    setOrdersData(prev => ({ ...prev, loading: true, error: null }));
+    setOrdersData((prev) => ({ ...prev, loading: true, error: null }));
     try {
       const response = await get(
         `/order/allOrders/${userId}?page=${currentPage}&pageSize=${itemsPerPage}`,
@@ -25,11 +35,18 @@ const MyOrders = () => {
       );
 
       if (!response.receiveObj?.status) {
-        setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: null });
+        setOrdersData({
+          orders: {},
+          totalOrders: 0,
+          loading: false,
+          error: null,
+        });
         return;
       }
 
       const orders = response.receiveObj.orders || [];
+      console.log(orders);
+
       const totalOrders = response.receiveObj.pagination?.totalOrders || 0;
 
       const grouped = orders.reduce((acc, order) => {
@@ -44,10 +61,20 @@ const MyOrders = () => {
         return acc;
       }, {});
 
-      setOrdersData({ orders: grouped, totalOrders, loading: false, error: null });
+      setOrdersData({
+        orders: grouped,
+        totalOrders,
+        loading: false,
+        error: null,
+      });
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setOrdersData({ orders: {}, totalOrders: 0, loading: false, error: "Failed to fetch orders." });
+      setOrdersData({
+        orders: {},
+        totalOrders: 0,
+        loading: false,
+        error: "Failed to fetch orders.",
+      });
     }
   }, [userId, currentPage, itemsPerPage]);
 
@@ -64,7 +91,10 @@ const MyOrders = () => {
     setCurrentPage(1);
   }, []);
 
-  const orderKeys = useMemo(() => Object.keys(ordersData.orders), [ordersData.orders]);
+  const orderKeys = useMemo(
+    () => Object.keys(ordersData.orders),
+    [ordersData.orders]
+  );
 
   return (
     <div className="flex flex-col text-3xl font-semibold leading-[64px] max-w-full rounded-[30px] text-neutral-700">
@@ -81,7 +111,10 @@ const MyOrders = () => {
             </div>
           ) : orderKeys.length > 0 ? (
             orderKeys.map((addressId) => (
-              <OrderDetailsCard key={addressId} group={ordersData.orders[addressId]} />
+              <OrderDetailsCard
+                key={addressId}
+                group={ordersData.orders[addressId]}
+              />
             ))
           ) : (
             <div className="text-center py-8">

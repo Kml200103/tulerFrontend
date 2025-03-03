@@ -121,33 +121,32 @@ const MainLayout = ({ children }) => {
               {/* Hide close button on larger screens */}✖
             </button>
           </div>
-          <div className="p-5">
-            <SpinWheel />
-          </div>
-          <button
+
+          <SpinWheel />
+
+          {/* <button
             onClick={toggleSidebar}
             className="fixed bottom-10 right-10 bg-[#ff7300] text-white p-3 rounded-full z-50 md:hidden"
           >
             Spin
-          </button>
+          </button> */}
         </div>
 
         {/* Search Input */}
         {isSearchInputOpen && (
           <div
             ref={searchInputRef}
-            className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-5 w-[400px]"
+            className="absolute z-50 left-1/2 top-28 transform -translate-x-1/2 mt-1 bg-white border border-gray-300 rounded-full shadow-lg p-2 w-full max-w-sm mx-auto"
           >
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-              className="w-full p-3 border-gray-300 rounded focus:outline-none"
+              className="w-full p-2 focus:outline-none text-sm"
             />
           </div>
         )}
-
         {/* Scroll to Top Button */}
         <div className={`scrollToTopButton ${isVisible ? "visible" : ""}`}>
           <button
